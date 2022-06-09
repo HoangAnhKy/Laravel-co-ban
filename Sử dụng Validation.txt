@@ -1,0 +1,82 @@
+----------------------------------------------------------------------- validation --------------------------------------------------------------
+
+
+- dùng php artisan make:Request tên để cài đặt
+
+- sau đó chuyển authorize = true
+
+vd:
+	public function authorize()
+    {
+        return true;
+    }
+
+- sử dụng rules để tạo validation
+
+vd: 
+	public function rules()
+    {
+        return [
+            'name' => [
+                'required',
+                'string',
+//                'unique:App\Models\Course,name',
+            Rule::unique(Course::class, 'name'),
+            ],
+        ];
+    }
+- dùng messages để trả về đề xuất mong muốn
+vd: 
+	public function messages()
+    {
+        return [
+            'required' => ':attribute Không được để trống !',
+            'string' => ':attribute phải là một chuỗi ký tự!',
+            'unique' => ':attribute đã tồn tại',
+        ];
+    }
+
+- dùng attributes để đặt tên đối tượng mong muốn
+vd: 
+    public function attributes(){
+        return [
+          'name' => 'Tên',
+        ];
+    }
+    
+    ------------------------------------------------------------------------------------------------------------------------------------------
+    muốn lấy giá trị từ route ta dùng
+    
+     protected function prepareForValidation() 
+    {
+        $this->merge(['course' => $this->route('course')]);
+    }
+    
+    public function rules()
+    {
+        return [
+            'course' => [
+              Rule::exists(Course::class, 'id'),
+            ],
+        ];
+    }
+
+----------------------------------------------------------------------- validated --------------------------------------------------------------
+
+
+- khai báo fillable danh sách cách đối tượng cần lấy bên trong model sau khi chạy hàm (CRUD)
+vd:
+    public $fillable = [
+        'name',
+    ];
+
+- Bên controller gọi validated() khi sử dụng
+
+vd: 
+
+    public function store(StoreCourseRequest $request)
+    {
+        $this->model::create($request->validated());
+        return redirect()->route('course.index');
+    }
+

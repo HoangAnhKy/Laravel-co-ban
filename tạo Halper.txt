@@ -1,0 +1,34 @@
+dùng để tạo hàm để dễ dàng sửa.
+
+cách  dùng 
+
+B1: Tạo halper trong add
+
+B2: Lấy đường dẫn truyền vào comporser (auto load) 
+
+B3: sau đó chạy lệnh :composer dump-autoload
+
+
+vd: 
+
+B1: tạo file
+	<?php
+
+	if (!function_exists('helper')) {
+    	function helper()
+    		{
+        		return 'Đây là Helper tùy chỉnh';
+    		}
+	}
+
+B2: vd tạo trong App/ tên halper ở B1
+
+B3:
+	mở composer > autoload thêm vào
+	
+	"autoload": {
+    		"files": [
+        		"app/Helpers/Helper.php"
+    		],
+		......
+	}

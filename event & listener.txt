@@ -1,0 +1,106 @@
+gửi mail với event - listener
+
+
+*** sơ lược cách chạy sau khi tạo file, nên khai báo event và listener ở trong App/Provider/EventServiceProvider sau đó qua bên controller sự kiện khai báo
+event để bắt sự kiện sau web gọi tới controller đó, sau đó qua file event đấy bắt đối tượng đó theo dạng public và gọi qua listener. Trong handle của listener
+gọi tới file notification và truyền lại event->đối tượng đã bắt đấy.
+
+
+
+ **** Mở file Model đang muốn bắt even bên observer khai báo câu lệnh use Notifiable;
+B0: tạo file notification
+
+	** php artisan make:notification [tên file]	
+
+B1: cài đặt event
+
+	** php artisan make:event [tên bạn muốn đặt]
+
+	vd: php artisan make:event sendMailEvent
+
+B2: cài đặt listener lắng nghe event
+	
+	** php artisan make:listener [tên listener] --event=[Tên event muốn lắng nghe]
+	
+	vd: php artisan make:listener SendMailNotification --event=sendMailEvent
+
+B3: khai báo listener ở trong App/Provider/EventServiceProvider
+
+	** [Tên event]::class => [
+
+		[Tên listener]::class,
+	   ]
+
+	vd:
+		protected $listen = [
+			// chỗ cần điền
+        		Registered::class => [
+            		SendEmailVerificationNotification::class,
+        		],
+    		];
+
+B4: Vào Controller để khai báo event, bởi vì bản chất là sau khi sự kiện Thêm, xóa, sửa .... hoàn tất thì event nó sẽ được kích hoạt
+	
+	* [Tên event]::dispatch(đối tượng cần bắt);
+
+	vd: khái báo event bên controller Auth và truyền đối tượng $Auth vào event
+
+		  public function account(Request $request)
+    		{
+        		$path = Storage::disk('public')->putFile('avatars', $request->file('avatar'));
+       		$Auth = Auth::create([
+            		'name' => $request->get('name'),
+            		'level' => 0,
+            		'avatar' => $path,
+            		'email' => $request->get('email'),
+            		'password' => Hash::make($request->get('password')),
+        		]);
+
+        		sendMailEvent::dispatch($Auth);
+    		}
+	
+B5: vào file event để khai báo đối tượng vừa truyền được vào event
+
+	vd:
+		public $Auth;
+    		public function __construct($Auth)
+    		{
+        		$this->Auth = $Auth;
+    		}
+
+B6: vào handle trong file listener gọi notification
+
+	** Notification::send($event->Auth, new [tên file notification]($event->Auth));
+
+	*lưu ý nếu có tạo file bên observer thì qua tắt sự kiện bên đó đi
+
+B7: truyền cái dữ liệu vừa thêm lại cho notification để tiện cho việc gửi mail
+
+		private $auth;
+    		public function __construct($Auth)
+   		{
+        		$this->auth = $Auth;
+    		}
+
+B8: cấu hình lại nội dung sẽ được gửi qua mail trong notification ở hàm tomail
+		
+		vd:
+		    public function toMail($notifiable)
+		    {
+			return (new MailMessage)
+				    ->line('Hello'. $this->auth->name)
+				    ->action('Notification Action', url('/'))
+				    ->line('Thank you for using our application!');
+		    }
+
+
+B9: cáu hình lại file env 
+		MAIL_MAILER=smtp
+		MAIL_HOST=smtp.gmail.com
+		MAIL_PORT=587
+		MAIL_USERNAME= tài khoản gmail
+		MAIL_PASSWORD= mật khẩu gmail
+		MAIL_ENCRYPTION=tls
+		MAIL_FROM_ADDRESS=miecute0509@gmail.com
+		MAIL_FROM_NAME="${APP_NAME}"
+	

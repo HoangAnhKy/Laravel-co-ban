@@ -1,0 +1,45 @@
+middleWare là để phân quyền
+
+----- Khởi tạo
+
+* dùng câu lệnh php artisan make:middleware [Tên]
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+- Xử lý dữ liệu hay phân quyền các thứ sẽ được thao tác bên middleware vừa tạo
+
+- phải đặt controller middleware để quản lý
+
+vd: 
+Route::group([
+    'middleware' => 'admin',
+	], function(){
+
+    Rote::resource('course', CourseController::class)->except([
+        'show',
+	);
+
+    Route::resource('student', StudentsController::class)->except([
+        'show',
+    ]);
+});
+
+- với 'admin' được tạo bên trong kernel trong thư mục $request bằng cách copy middleware có sẵn như 'web' sau đó đổi tên và thêm những middleware của mình muốn quản lý vào
+- Thao tác với session để đạt hiệu quả hơn trong việc quản lý dữ liệu
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+SESSION
+
+lấy session:
+
+	* session()->has('key')
+
+Thêm session: xử dụng put để có thể ghi đè dữ liệu
+	
+	* session()->put('key', 'value')
+xóa session
+
+	* session()->flush();  //xóa toàn bộ
+	* session()->forget('key'); // xóa 1

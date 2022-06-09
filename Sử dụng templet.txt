@@ -1,0 +1,14 @@
+tách file html ra làm các trang nhỏ
+như hearder, footer, ...
+sau đó include nó vào để cố định form
+
+@yield để khai báo nội dung body ( section) với tên tự đặt
+
+vd: @yield('noidung') Để chèn vào nội dung khác vào trong section
+
+khi sử dụng chỉ cần gọi @section('noidung') và đóng nó @endSection bao quanh nó trong html mình muốn nó kế thừa
+và gọi thêm @extends('file gốc chứa toàn bộ dao diện')
+
+sử dụng stack('[tên]') để import file css hoặc js vào hàm chính, hàm con sửa dụng push('[tên]') để đẩy qua
+
+chỉnh thanh patigone thành bootrap bằng cách vô app=>provider=>AppSeviceProvider thêm  Paginator::useBootstrap(); Trong boot

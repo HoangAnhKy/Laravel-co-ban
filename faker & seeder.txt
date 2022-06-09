@@ -1,0 +1,69 @@
+------------------------------------------------- link tham khảo ----------------------------------------------------
+
+ * https://github.com/fzaninotto/Faker
+ * muốn chỉnh một số địa chỉ thuộc việt nam ta vào config -> app ->fake-location chỉnh thành vi_VN
+---------------------------------------------------------------------------------------------------------------------
+- Faker để tạo dữ liệu giả để tiện dùng cho test
+
+- cách dùng sử dụng factory đã được tạo cùng migrations, tạo giống cách tạo database 
+
+
+- để vừa tạo database vùa chèn dữ liệu ảo ta dùng: php artisan migrate --seed
+
+- để tạo dữ liệu ảo: php artisan db:seed
+
+- kèm theo câu lệnh sau: php artisan db:seed --force 
+
+
+ * vì Một số thao tác gieo hạt có thể khiến bạn thay đổi hoặc mất dữ liệu.
+ Để bảo vệ bạn khỏi việc chạy các lệnh gieo hạt dựa trên cơ sở dữ liệu sản xuất của bạn,
+ bạn sẽ được nhắc xác nhận trước khi trình gieo hạt được thực thi trong productionmôi trường.
+ Để buộc trình gieo hạt chạy mà không có lời nhắc, hãy sử dụng --forcecờ:
+ 
+cú pháp: 'tên cột' => $this->faker->tên kiểu dữ liệu
+
+
+vd:
+
+- factory
+ class StudentsFactory extends Factory
+{
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->name(),
+            'gender' => $this->faker->boolean(),
+            'birthdate' => $this->faker->dateTimeBetween('-30 years', '-18 years'),
+            'status' => $this->faker->randomElement(StudentStatus::asArray()),
+            'course_id' => Course::inRandomOrder()->value('id'),
+        ];
+    }
+}
+
+
+- seeders
+	public function run()
+    {
+        Course::factory(10)->create();
+        Students::factory(1000)->create();
+    }
+-----------------------------------------------------------------------
+
+có thể tạo dữ liệu với seeder
+
+vd/: tạo trong dữ liệu trong class UserrSeeder
+
+ 	$data = [
+          'name' => 'SuperAdmin',
+            'level' => 1,
+            'email' => 'sadmin@gmail.com',
+            'pass' => '123',
+        ];
+        Userr::create($data);
+
+	sau đó qua datatable seeder gọi hàm
+
+	 $this->call([
+           UserrSeeder::class,
+        ]);
+	

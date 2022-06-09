@@ -1,0 +1,15 @@
+cài đặt các extention
+
+- Laravel Extension Pack
+- auto close tag
+- auto rename tag
+- PHPStorm Formatter
+- Tabnine AI Autocomplete for Javascript, Python, Typescript, PHP, Go, Java, Ruby & more
+- Duplicate selection or line
+- IntelliCode
+- Laravel Blade Spacer
+- Laravel Goto Controller
+- PHP Server
+- PHP Sniffer & Beautifier
+- PHP Debug
+- PHP IntelliSense

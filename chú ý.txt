@@ -1,0 +1,93 @@
++ controller nằm trong app -> http -> controller, không nên viết nhều vào đó vì nó còn kế thừa
+
++ view nằm trong resources->view
+
++ file .env là file cấu hình, chỉ cần cấu hình 1 lần
+
++ có 2 dạng code code thuần và code blade
+
+	kiểu blade có dùng {{}} thay cho <?php ?> còn các loại khác thêm @ ở trước 
+	
+	dùng csf_token cho kiểu post get bảo mật như capcha
+
+	loại cơ bản: <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>" /> thêm token giống captra
+
+có 2 loại truyền data
+
+c1
+        return view('hello', [
+            'ten' => $ten,
+        ]);
+c2
+	return view('hello', compact('ten'));
+
+lưu ý khi gọi tên controller trong router :
+
++ Route::get(url:'/{ten?}', action:[\App\Http\Controllers\WellcomtoController::class, 'tên function']);
+
++ use Illuminate\Http\Request; trong conller dùng để lấy dữ liệu thông qua hàm get=> không quan trọng dùng post hay get
+dùng post hoặc get cũng được nhưng lưu ý csf_token
+
++ dùng các hàm hỗ trợ trong migration để truy xuất database: all(), Get(), ...
+
++ có thể dùng thêm query() để thực hiện truy vấn sau đó nhảy qua hàm khác
+
++ Dùng Attribute thay thế function get set trong modal như vậy đẹp hơn
+vd:
+
+	public function address(): Attribute
+	{
+    		return Attribute::make(
+        		get: fn ($value, $attributes) => new Address(
+            	$attributes['address_line_one'],
+            	$attributes['address_line_two'],
+        		),
+    		);
+	}
+
+
++ có thể dùng {{ route('create'}} để đặt link cho thao tác tránh trường hợp ta đổi tên route thì các link khác sẽ die
+
+
++ dùng thêm public $timestamps = false; để vô hiệu hóa create_at và update_at dùng trong modal đang dùng
+
++ protected $table = '[tên bảng]' nếu tên không đúng
+
+
++ dùng route group đế nhóm vào 1 nhóm vd
+
+Route::group(['prefix' => 'Courses'], function(){
+    Route::get('/',[CourseController::class, 'index'] );
+    Route::get('/create',[CourseController::class, 'create'] )->name('course.create');
+    Route::post('/create',[CourseController::class, 'store'] )->name('course.store');
+});
+
+prefix = tiền tố
+
+dùng redirect để quay lại trang mong muốn
+
+vd return redirect()->route('....')
+
+truyền dữ liệu qua route bằng cách href="{{route('ten_route', ['ten biến' => dữ liẹu truyền vào])}} nhớ khai báo trên route {ten biến}
+
+- dùng paginate('số cột trong 1 trang') để phân trang
+dùng {{$data->links()}} trong  view để hiện ra số trang
+
+muốn dùng patigation theo bootrap thì ta vô App->providers->AppServiceProvider điền thêm Pagination:: useBootstrap()
+
+- dùng insert thì không khai báo đối tượng, dùng create có khai báo đối tượng vì nó có nhập dữ liệu sau đó khởi tạo, và select lấy lại hộ
+- update không có khai báo đối tượng vì nó có thẻ thay thế nhiều đối tượng.
+
+
+- dùng thẻ old() trong input để lấy lại giá trị cũ
+- dùng $this->tên truyền bên route để lấy giá trị mong muốn
+
+xử dụng View::share() để share tên title (use Illuminate\Support\Facades\View;)
+
+Rule::unique(Course::class)->ignore($this->course), kiểm tra trừ thằng trùng nó
+
+
+
+
+
+

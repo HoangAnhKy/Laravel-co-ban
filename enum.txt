@@ -1,0 +1,100 @@
+- cài đặt enum 
+  
+	composer require bensampo/laravel-enum
+
+- sau đó chạy thêm câu lệnh
+	
+	php artisan make:enum [Tên]
+
+-- cách gọi ra dùng
+* cách 1: gọi enum ở bên view
+vd: 
+
+  Trạng thái
+        &nbsp;
+        <input type="radio" name="status" value="{{ \App\Enums\StudentStatus::Di_hoc }}" checked> Đi học
+        &nbsp;
+        <input type="radio" name="status" value="{{ \App\Enums\StudentStatus::Vang }}"> Vắng
+        &nbsp;
+        <input type="radio" name="status" value="{{ \App\Enums\StudentStatus::Bo_hoc }}"> Bỏ học
+
+* cách 2: dùng trong controller
+	+ tạo function bên controller có thể đưa lên contructor(View::share) để toàn bộ đều dùng được
+	public function create()
+    {
+        $arrEnum = StudentStatus::asArray();
+        return View('Students.create', compact('arrEnum'));
+    }
+
++sau đấy qua view dùng 
+
+	Trạng thái
+        &nbsp;
+        <input type="radio" name="status" value="{{ $arrEnum['Di_hoc'] }}" checked> Đi học
+        &nbsp;
+        <input type="radio" name="status" value="{{ $arrEnum['Vang']  }}"> Vắng
+        &nbsp;
+        <input type="radio" name="status" value="{{ $arrEnum['Bo_hoc']  }}"> Bỏ học
+
+*cách 3: tạo vòng lặp thông qua mảng
+
+	+ tạo function mảng bên enum
+
+	public static function arrEnum(): array
+    {
+        return [
+            "Đi học" => self::Di_hoc,
+            "Bảo Lưu" => self::Bao_luu,
+            "Bỏ học" => self::Bo_hoc,
+        ];
+    }
+
+	+ bên controller gọi lại trong construct
+
+        public function __construct(){
+       	$arrEnum = StudentStatus::arrEnum();
+        	View::share('arrEnum', $arrEnum);
+    	}
+	
+	+ bên view dùng loop để duyệt với if phần tử đầu tiên thì chọn checked
+
+	Trạng thái
+
+        @foreach ($arrEnum as $option => $value)
+            &nbsp;
+            <input type="radio" name="status" value="{{ $value }}"
+            @if ($loop->first)
+                checked
+            @endif
+            > {{ $option }}
+        @endforeach
+
+
+--------------------------------------------- hiện thông tin ra bằng cách lất value --------------------------------
+
+ public static function getkeyByValue($value): string
+    {
+        return array_search($value, self::arrEnum(), true);
+    }
+
+các hàm hỗ trợ khác
+getKeys(): toàn bộ key
+getValues(): toàn bộ value	
+getValue($key): lấy value
+getKey($value): lấy key
+
+formValue():
+formKey():
+
+hasKey(string $key): kiểm tra các key trong Enum có chứa $key hay không
+hasValue(string|int $value, bool $strict = true): kiểm tra các giá trị trong Enum có chứa $value hay không.
+
+
+
+
+
+
+
+
+
+

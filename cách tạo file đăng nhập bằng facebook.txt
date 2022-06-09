@@ -1,0 +1,30 @@
+-------------------- facebook-------------------------
+
+B1: truy cập vào link https://developers.facebook.com/
+
+B2: chọn Ứng dụng của tôi  > Tạo mới project
+
+B3: chọn Đăng nhập bằng facebook
+
+B4: chọn cài đặt > thông tin cơ bản > điền tất cả với tên miền của Laravel + hạng mục mua sắm > lưu
+
+B5: chọn Đăng nhập bằng facebook > cài đặt > cài đặt URI chuyển hướng OAuth
+
+B6: tích mở ché độ nhà phát triển (trên cùng)
+
+--------------------- Tạo ứng dụng đăng nhập bằng Google ------------------
+
+B1: Khởi tạo dự án
+
+	Tạo project: https://console.developers.google.com/projectcreate
+	
+	Tạo credentials: https://console.developers.google.com/apis/credentials
+
+B2: Đăng kí OAuth consent screen trước rồi sau đó. 
+
+	truy cập credentials > Tạo file credentials > OAuth client ID
+
+B3: Đặt tên miền sau đó click vào Authorized redirect URIs
+
+B4: tại Authorized redirect URIs dán link redirect và callback trong route web qua
+

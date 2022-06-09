@@ -1,0 +1,66 @@
+Tham khảo thêm tại
+
+https://laravel.com/docs/9.x/socialite
+---------------------------------------------------------------------------------
+B1: cài đặt thư viện bằng câu lệnh
+
+composer require laravel/socialite
+
+**chỉ sử dụng với facebook, twitter, linkedin, google, github, gitlab thêm mạng
+xã hội khác thì vào (#https://socialiteproviders.com/about/)
+
+
+B2: vào config > services sau đó thêm dữ liệu mạng xã hội vào (lấy ở link đính kèm B1)
+
+vd:
+
+'github' => [
+    'client_id' => env('GITHUB_CLIENT_ID'),
+    'client_secret' => env('GITHUB_CLIENT_SECRET'),
+    'redirect' => 'http://example.com/callback-url',
+],
+
+B3: cài đặt file env
+
+tra google thôi vd: gifhub app Oauth
+
++ vào setting > developer setting > Oauth apps
+
++ cấu hình các thông tin trong đó
+
++ vào file env copy thông tin và dán dữ liệu vào, với thông tin sau khi cấu hình
+và tên chứa trong nội dung copy B2
+ 
+  ** lưu ý redirect sẽ phải cấu hình lại ở B2 như sau
+
+	+ thêm một đối tượng dùng chung ở env
+	
+		CALLBACK_URL = 'Link tới trang callback' nhưng không truyền paramater(provider))
+
+	+ quay lại file config app add thêm env('CALLBACK_URL') . '/Pramater',
+
+B4: tạo route điều hướng  
+
+vd: 
+	use Laravel\Socialite\Facades\Socialite;
+ 
+	Route::get('/auth/redirect/{provider}', function (provider) {
+    		return Socialite::driver($provider)->redirect();
+	});
+	
+	Route::get('/auth/callback/{provider}', function (provider){
+    		$user = Socialite::driver($provider)->user();
+	});
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+** Truyền dữ liệu thu được vào sql
+B1: Thêm các thông tin đã truyền qua thuộc tính with
+vd: tạo session flast (dùng 1 lần) để lấy tên, email và avartar
+Route::get('/auth/callback/{provider}', function ($provider) {
+    $user = Socialite::driver($provider)->user();
+    return redirect()->Route('register')->with([
+        'name' => $user->GetName(),
+        'email' => $user->GetEmail(),
+        'avatar' => $user->GetAvatar(),
+    ]);
+});

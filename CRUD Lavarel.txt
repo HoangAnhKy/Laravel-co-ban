@@ -1,0 +1,96 @@
+- dùng fill để lưu
+
+- lưu ý: tên của các cột phải khớp với dữ liệu
+
+vd:khởi tạo đối tượng thêm hoặc sửa
+	$obj = new Course();
+	$obj->fill($rq->All());
+	$obj->save()
+
+muốn dùng loại nào thì dùng except để loại trừ cột không mong muốn
+và dùng thêm 
+
+protected 	$fillable = [ các cột mong muốn] để trống bằng all
+
+
+C2 lưu: Course::create($request->except('_token'));
+
+Xóa file bằng cách láy giá trị qua method delete
+
+cách 1: xóa theo dạng query builder, nó sẽ hiểu là xóa nhưng nó là 1 id mà thôi
+
+	public function destroy($course)
+    {
+        Course::destroy($course) cách 1.1
+	  Course::where('id', $course)->delete() cách 1.2
+
+
+        return redirect()->route('index');
+    }
+
+
+cách 2: nó sẽ là 1 đối tượng và nếu không tồn tại trong database thì không xóa được sẽ báo lỗi
+
+	public function destroy(Course $course)
+    {
+         $course->delete();
+         return redirect()->route('index');
+    }
+
+edit tương tự
+
+cách 1 :
+	public function edit($course)
+    {
+        $obj = Course::where('id', $course)->first(); 	1.1
+        $obj = Course::find($course);				1.2
+    }
+
+cách 2:
+
+ 	public function edit(Course $course)
+    {
+        return View('course.edit', [
+            'data' => $course,
+            ]);
+    }
+
+
+update tương tự:
+	public function update(Request $request, Course $course)
+    {
+        Course::where('id', $course->id)->update($request->except('_token', '_method'));
+        return redirect()->route('index');
+    }
+
+tìm kiếm:
+public function index(Request $request)
+    {
+        $search = $request->get('search');
+        $data = Sinhvien::query()->where('name', 'like' , '%'.$search.'%')->get();
+
+//        $data = Sinhvien::query()->get();
+//        return View('sinhvien.index', compact('data'));
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

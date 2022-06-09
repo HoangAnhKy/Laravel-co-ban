@@ -1,0 +1,35 @@
+ Các cách tạo file cơ bản với lavavel
+
+--------------------------------------- Cài đặt và sử dụng --------------------------------------------------------
+
+chạy câu lệnh để cài đặt: composer require yajra/laravel-datatables-oracle
+
+Gọi : Datatables::of(User::query())->make(true); để sử dụng
+
+-------------------------------------- Tạo file --------------------------------------------------------
+
+php artisan --version để kiểm tra
+
+composer create-project laravel/laravel [tên mục] để tạo fordel
+
+php artisan make:controller [tên controller] để tạo controller
+
+php artisan make:model [tên model] để tạo model
+
+composer require barryvdh/laravel-debugbar --dev download debug về cho file
+
+php artisan make:model [tên bảng] --all
+
+để tạo: # Shortcut to generate a model, migration, factory, seeder, policy, controller, and form requests... với:
+
+migration tạo bảng
+factory, seeder để tạo dữ liệu ảo
+controller, model như cũ
+requests kết quả trả về
+php artisan make:migration create_[tênbảng + s]_table tạo bảng
+
+php artisan migrate để thực tthi
+
+tạo request validation php artisan make:request [tên bảng]/[tên view] vd: php artisan make:request Sinhvien/IndexRequest
+
+sau đó mở file đó lên sửa validate => create trên laravel

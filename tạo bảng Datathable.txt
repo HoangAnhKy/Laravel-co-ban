@@ -1,0 +1,153 @@
+ajax
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.11.5/b-2.2.2/b-colvis-2.2.2/b-html5-2.2.2/b-print-2.2.2/date-1.1.2/fc-4.0.2/fh-3.2.2/r-2.2.9/rg-1.1.4/sc-2.0.5/sl-1.3.4/datatables.min.css"/>
+ 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.11.5/b-2.2.2/b-colvis-2.2.2/b-html5-2.2.2/b-print-2.2.2/date-1.1.2/fc-4.0.2/fh-3.2.2/r-2.2.9/rg-1.1.4/sc-2.0.5/sl-1.3.4/datatables.min.js"></script>
+
+sử dụng composer này để tạo bẳng kết hợp với ajax (datatable.net)
+composer require yajra/laravel-datatables-oracle
+
+
+- chèn dưới script đoạn code sau và sửa lại cho phù hợp
+
+
+<script>
+	$(function() {
+   		 $('#users-table').DataTable({
+       		 processing: true,
+        		serverSide: true,
+        		ajax: '{!! route('datatables.data') !!}',
+      		columns: [
+       		     { data: 'id', name: 'id' },
+       		     { data: 'name', name: 'name' },
+       		     { data: 'email', name: 'email' },
+      		      { data: 'created_at', name: 'created_at' },
+            		{ data: 'updated_at', name: 'updated_at' }
+        		]
+    		});
+	});
+</script>
+
+
+- truyền dữ liệu thêm vào column như btn các kiểu thì ra dùng thêm ta dùng
+ 	render: function(data, type, row, meta) để chèn nó sẽ return về html, bên controller truyền về link thông qua data
+
+- gán mặc định không đổi với các nút orderable: false, searchable: false,
+
+- Với processing: true, serverSide: true, để hiện thị loading
+
+- dùng select: true, để chọn những cột mong muốn
+
+- đặt tên class cho cột
+
+	"columnDefs": [
+    		{ className: "my_class", "targets": [ 0 ] }
+  	]
+
+- lengthMenu: [1, 10, 50, 100], để set lại menu
+
+- để hiện các button report ra ta dùng thêm  dom: 'Blfrtip'
+
+- để tinh chỉnh nút report ta dùng:
+ 	buttons: [
+                    {
+                        extend: ['excelHtml5'],
+                        exportOptions: {
+                            columns: ':visible :not(.no-select)'
+                        }
+                    }
+	]
+	 
+	trong đó extend: là tên nút, exportOptions: là chỉnh gì trong đó, trong đấy column là cột sẽ ẩn (:visible) và hàm :not để chọn class ẩn không bị chọn khi report
+
+- để chỉnh sửa cho nhiều bảng ta dùng khai báo biến
+	var buttonCommon = {
+        	exportOptions: {
+            	format: {
+        
+            	}
+        	}
+    	};
+
+- sau đấy ta sẽ kế thừa nó lại cho các button
+		buttons: [
+                    $.extend( true, {}, buttonCommon, {
+                        extend: 'copyHtml5'
+                    } ),
+                    $.extend( true, {}, buttonCommon, {
+                        extend: 'excelHtml5'
+                    } ),
+                    $.extend( true, {}, buttonCommon, {
+                        extend: 'pdfHtml5'
+                    }),$.extend( true, {}, buttonCommon, {
+                        extend: 'csvHtml5'
+                    }),$.extend( true, {}, buttonCommon, {
+                        extend: 'print'
+                    }),
+                    'colvis',
+           ],
+
+- bắt sự kiện theo ajax-jquery
+
+$(document).on('click', 'tên class', function(){ sự kiện cần xử lý });
+data: form.serialize() // lấy toàn bộ giá trị trong form
+
+----------------------------------------------- controller sử lý ---------------------------------------
+
+- Tạo 1 route điều hướng vào nó và trong controller tạo 1 function
+
+	public function api()
+    {
+        return DataTables::of(Course::query())->make('true');
+    }
+
+- với make true để ranger ra cái view, phải có thead để phân biệt với loại body	
+
+- muốn sửa đổi cột nào thì dùng editcolumn
+
+	->editColumn('created_at', function ($object) {
+                return;
+            })
+ còn thêm cột thì 
+
+	->addColumn('edit', function ($object) {
+                return;
+            })
+vd: 
+    public function api()
+    {
+        return DataTables::of($this->model::query())
+            ->editColumn('created_at', function($object){
+                return $object->getDay;
+            })
+            ->addColumn('edit', function($object){
+                return route('course.edit', $object);
+            })
+            ->addColumn('delete', function($object){
+                return route('course.destroy', $object);
+            })
+            ->make(true);
+    }
+
+-------------------------------------------------- Sử dụng api thay cho code bên controller ----------------------------
+
+vd: 
+	public function api2(request $request){
+        $data =  $this->model->query()->paginate(1, ['*'], 'page', $request->get('draw'));
+        $arr['draw'] = $data->currentPage();
+        $arr['data'] = [];
+        foreach ($data->items() as $item){
+            $item->setAppends([
+                'getDay'
+            ]);
+            $item->edit = route('course.edit', $item);
+            $item->delete = route('course.destroy', $item);
+            $arr['data'][] = $item;
+        }
+        $arr['recordsTotal'] = $data->total();
+        $arr['recordsFiltered'] = $data->total();
+        return $arr;
+    }

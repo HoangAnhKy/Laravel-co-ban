@@ -1,0 +1,65 @@
+* sử dụng Relationship để kết nối 2 bảng lại với nhau, dùng trong Datatable. Có thể có nhiều cách như là dùng hàm có sẵn hoặc sử dụng các câu truy vấn query.
+
+ví dụ: sử dụng câu query với hàm $query, hàm có sẵn với $$data_in_course ưu tiên sử dụng join theo $query
+	public function api()
+    {
+        $query = Students::query()
+        ->select('students.*')
+        ->addselect('courses.name as course_id')
+        ->join('courses', 'courses.id', 'students.course_id');
+
+        $data_in_course =  Students::query()->with('course');
+		
+	 // trong return của dataTable có thể chỉnh tùy biến theo dataTable
+		
+        return DataTables::of($query)->make(true);
+    }
+
+
+* Lưu ý:
+	khai báo trong Model theo quang hệ bảng 1 nhiều hay nhiều nhiều
+
+vd: 
+
+  + liên kết một một: One To One
+ 	public function course() // khóa chính
+    {
+        return $this->hasOne(Course::class);
+    }
+
+  + liên kết một nhiều One To Many (Inverse) / Belongs To
+
+	// sử dụng bên khóa có đối tượng là khóa ngoại
+	public function course():BelongsTo 
+    {
+        return $this->belongsTo(Course::class);
+    }
+
+	// sử dụng bên khóa có đối tượng là khóa chính
+	public function student():hasMany  
+    {
+        return $this->hasMany(Students::class);
+    }
+ + ngoài ra còn quan hệ nhiều nhiều ( cả 2 đều dùng belongsToMany) nhưng nó sẽ rắc rối hơn
+---------------------------------------------------------------------------------------------------------------------------------
+
+* câu truy vấn dùng như sử dụng mysql bình thường nhưng các hàm có sẵn như select, where các thứ phải để bên ngoài
+
+vd: 
+  $query = Students::query()
+        ->select('students.*')
+        ->addselect('courses.name as course_id')
+        ->join('courses', 'courses.id', 'students.course_id');
+
+* sử dụng addSelect để thêm select
+* sử dụng DB::raw và khai báo use Illuminate\Support\Facades\DB; (kiểu thô)
+	để sử dụng các hàm như Cout, max, min .....
+
+
+vd: sử dụng thêm DB::raw
+
+	$query = $this->model->query()
+            ->select('courses.*')
+            ->addSelect(DB::raw('COUNT(students.course_id) as countST'))
+            ->Join('students', 'students.course_id', 'courses.id')
+            ->groupBy('students.course_id');

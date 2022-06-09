@@ -1,0 +1,79 @@
+---------- Observer
+
+- Công dụng dùng để bắt sự kiện
+- lệnh sử dụng:
+	* php artisan make:observer [ TÊN ] --model=[ tên đối tượng model cần theo dõi]
+vd:
+	php artisan make:observer UserObserver --model=User
+
+@ lưu ý nhớ khai báo User trong đường dẫn sau
+
+	App\Providers\EventServiceProvider -> function boot
+
+	khai báo:  [ tên model ]::observe( [ tên file observer ]::class);
+
+	vd:  User::observe(UserObserver::class);
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+---------- Notification 
+
+- dùng để thông báo hoặc thực thi sự kiện
+
+- lệnh tạo: php artisan make:notification [Tên]
+
+* cách dùng:
+
+	nếu đã chắc chắn gửi mail thì ta sẽ làm tắt như sau:
+
+	B1: Mở file Model đang muốn bắt even bên observer khai báo câu lệnh use Notifiable;
+		
+		vd: vào model user -> nhập use Notifiable
+	
+	B2: mở file observer lên chèn vào sự kiện muốn bắt như sau:
+
+		- $user->notify(new [tên bảng notification] ($invoice));
+
+		vd: sự kiện tạo file
+
+		public function created(User $user)
+    		{
+        		$user->notify(new notification_User_senMail($user));
+    		}
+
+	B3: truyền cái user vừa thêm lại cho notification để tiện cho việc gửi mail
+
+		private $user;
+    		public function __construct($user)
+   		{
+        		$this->user = $user;
+    		}
+
+	B4: cấu hình lại nội dung sẽ được gửi qua mail trong notification ở hàm tomail
+		
+		vd:
+		    public function toMail($notifiable)
+		    {
+			return (new MailMessage)
+				    ->line('Hello'. $this->auth->name)
+				    ->action('Notification Action', url('/'))
+				    ->line('Thank you for using our application!');
+		    }
+
+	B5: vào App\Providers\EventServiceProvider kiểm tra xem đã khai báo observer hay chưa
+
+	B6: cấu hình file env (search google cho chắc 'gmail php send email')
+
+		MAIL_MAILER=smtp
+		MAIL_HOST=smtp.gmail.com
+		MAIL_PORT=587
+		MAIL_USERNAME= tài khoản gmail
+		MAIL_PASSWORD= mật khẩu gmail
+		MAIL_ENCRYPTION=tls
+		MAIL_FROM_ADDRESS=miecute0509@gmail.com
+		MAIL_FROM_NAME="${APP_NAME}"		
+	
+	B7: kiểm tra xem tài khoản có cho phép truy cập kém an toàn hay chưa
+		
+		
