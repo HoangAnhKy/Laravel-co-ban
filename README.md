@@ -1,6 +1,7 @@
 <div align="center"> <h1> Cách dùng cơ bản trên Laravel </h1> </div>
 
 - [Cách tạo file cơ bản](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/c%C3%A1ch%20t%E1%BA%A1o%20file%20c%C6%A1%20b%E1%BA%A3n.txt)
+- [Tạo ide helper](#sử-dụng-ide-helper)
 - [Đặt tên title cho toàn file](#đặt-tên-title-trang)
 - [Thêm, Xóa, Sửa](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/CRUD%20Lavarel.txt)
 - [Sử dụng templet](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/S%E1%BB%AD%20d%E1%BB%A5ng%20templet.txt)
@@ -20,7 +21,14 @@
 - [Sử dụng @Auth, @Guest](#sử-dụng-auth-và-guest)
 - [Up hosting](#up-host)
 ***
-
+## **Sử dụng ide helper**
+  Chạy lần lượt các lệnh sau để cài đặt
+  ```sh
+  composer require --dev barryvdh/laravel-ide-helper
+  ```
+  ```sh
+  php artisan ide-helper:models "App\Models\[model cần hỗ trợ]" -w
+  ```
 ## **Mã hóa (hash)**
  ```sh
    - Hash::make(value) //dùng để mã hóa
