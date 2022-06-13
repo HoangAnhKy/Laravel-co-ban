@@ -1,4 +1,4 @@
-middleWare là để phân quyền
+middleWare dùng để phân quyền
 
 ----- Khởi tạo
 
@@ -9,21 +9,36 @@ middleWare là để phân quyền
 
 - Xử lý dữ liệu hay phân quyền các thứ sẽ được thao tác bên middleware vừa tạo
 
-- phải đặt controller middleware để quản lý
+- phải đặt controller middleware để quản lý, có 2 cách để tạo
 
-vd: 
-Route::group([
-    'middleware' => 'admin',
-	], function(){
+C1: tạo thẳng trong file route Web bằng cách tạo group nhóm các thành phần cần phân quyền sử dụng để điều hướng
+	vd: 
+	Route::group([
+    		'middleware' => 'admin',
+		], function(){
 
-    Rote::resource('course', CourseController::class)->except([
-        'show',
-	);
+    		Rote::resource('course', CourseController::class)->except([
+        		'show',
+		);
 
-    Route::resource('student', StudentsController::class)->except([
-        'show',
-    ]);
-});
+    		Route::resource('student', StudentsController::class)->except([
+        		'show',
+    		]);
+	});
+
+C2: Tạo thẳng router mới để và tiến hành phân quyền
+
+	Vào App > Providers > RouterServiceProvider 
+	
+	Tiếp theo đến phần Routes trong function boot tạo thêm Router:prefix
+
+	vd: Router::prefix('admin')
+		->middleware('admin') // Tên của middleware cần xử lý
+		->name('admin.')
+		->group( base_path( 'routes/admin.php' ) )
+	
+	sau đó vào routes tạo file admin.php
+
 
 - với 'admin' được tạo bên trong kernel trong thư mục $request bằng cách copy middleware có sẵn như 'web' sau đó đổi tên và thêm những middleware của mình muốn quản lý vào
 - Thao tác với session để đạt hiệu quả hơn trong việc quản lý dữ liệu
