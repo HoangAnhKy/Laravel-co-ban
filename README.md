@@ -20,6 +20,7 @@
 - [Sử dụng auth](#sử-dụng-auth-trong-model)
 - [Sử dụng @Auth, @Guest](#sử-dụng-auth-và-guest)
 - [Up hosting](#up-host)
+- [Xử lý giá trị null](#xử-lý-giá-trị-null)
 ***
 ## **Sử dụng ide helper**
   Chạy lần lượt các lệnh sau để cài đặt
@@ -114,3 +115,5 @@ class User extends Model implements
  @endguest
  ```
 ***
+## Xử lý giá trị null
+ **Nếu trong bảng có hàng tồn tại giá trị null gây nên lỗi thì ta sử dụng `optional` để tránh tình trạng báo lỗi**
