@@ -1,5 +1,8 @@
 * sử dụng Relationship để kết nối 2 bảng lại với nhau, dùng trong Datatable. Có thể có nhiều cách như là dùng hàm có sẵn hoặc sử dụng các câu truy vấn query.
 
+* sử dụng relationship có sẵn, muốn lấy cột nào thì ta phải dùng là 
+	vd: with('course:id,name,...')
+	
 ví dụ: sử dụng câu query với hàm $query, hàm có sẵn với $$data_in_course ưu tiên sử dụng join theo $query
 	public function api()
     {
