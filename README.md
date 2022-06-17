@@ -5,6 +5,7 @@
 - [Tạo ide helper](#sử-dụng-ide-helper)
 - [Đặt tên title cho toàn file](#đặt-tên-title-trang)
 - [Thêm, Xóa, Sửa](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/CRUD%20Lavarel.txt)
+- [Xóa mềm](#xóa-mềm)
 - [Một số câu truy vấn Eloquent](#một-số-câu-truy-vấn-eloquent)
 - [Sử dụng templet](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/S%E1%BB%AD%20d%E1%BB%A5ng%20templet.txt)
 - [Sử dụng Validation](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/S%E1%BB%AD%20d%E1%BB%A5ng%20Validation.txt)
@@ -150,3 +151,8 @@ $(document).ready(function () {
         });
     });
 ```
+***
+## Xóa mềm
+- Khai báo `use SoftDeletes` trong `use Illuminate\Database\Eloquent\SoftDeletes;` ở trong Model
+- tạo cột `deleted_at` ở trong sql
+- sau đó xóa như bình thường là được vd `$this->model->destroy(ID)`
