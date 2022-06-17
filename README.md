@@ -1,7 +1,7 @@
 <div align="center"> <h1> Cách dùng cơ bản trên Laravel </h1> </div>
 
 - [Cách tạo file cơ bản](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/c%C3%A1ch%20t%E1%BA%A1o%20file%20c%C6%A1%20b%E1%BA%A3n.txt)
-- [jquery]
+- [jquery](#jquery)
 - [Tạo ide helper](#sử-dụng-ide-helper)
 - [Đặt tên title cho toàn file](#đặt-tên-title-trang)
 - [Thêm, Xóa, Sửa](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/CRUD%20Lavarel.txt)
@@ -141,7 +141,7 @@ class User extends Model implements
   - `distinct()` dùng để lọc giá trị bị trùng trong databsse
   - `pluck('city')` dùng để lấy giá trị trong cột nào đó thôi, có thể thay thế select 
   ***
-##jquery
+## jquery
 **submit dữ liệu khi click vào option lựa chọn trong form có chứa select
 ```sh
 $(document).ready(function () {
