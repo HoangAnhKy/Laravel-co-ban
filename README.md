@@ -4,6 +4,7 @@
 - [Tạo ide helper](#sử-dụng-ide-helper)
 - [Đặt tên title cho toàn file](#đặt-tên-title-trang)
 - [Thêm, Xóa, Sửa](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/CRUD%20Lavarel.txt)
+- [Một số câu truy vấn Eloquent](#một-số-câu-truy-vấn-eloquent)
 - [Sử dụng templet](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/S%E1%BB%AD%20d%E1%BB%A5ng%20templet.txt)
 - [Sử dụng Validation](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/S%E1%BB%AD%20d%E1%BB%A5ng%20Validation.txt)
 - [tạo bảng Datathable](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/t%E1%BA%A1o%20b%E1%BA%A3ng%20Datathable.txt)
@@ -117,3 +118,25 @@ class User extends Model implements
 ***
 ## Xử lý giá trị null
  **Nếu trong bảng có hàng tồn tại giá trị null gây nên lỗi thì ta sử dụng `optional` để tránh tình trạng báo lỗi**
+***
+## Một số câu truy vấn Eloquent
+  - `create(giá trị cần thêm)` dùng để thêm dữ liệu
+  - `update(giá trị cần sửa)` dùng để update dữ liệu
+  - `delete()` hoặc `destroy(Giá trị cần xóa)` để xóa dữ liệu
+  - `validated()` dùng để validate dữ liệu khi đã validation dữ liệu
+  - `find(giá trị cần tìm)` dùng để tìm kiếm dữ liệu
+  - `where(cột cần lấy, giá trị so sánh của cột đó)` dùng để kiểm tra dữ liệu
+  - `paginate(số trang)` dùng để phân trang
+  - `select(giá trị cần lấy)` dùng để lấy dữ liệu, `addselect(giá trị cần lấy)` dùng để lấy thêm dữ liệu
+  - `join('tên bảng', 'giá trị 1', 'giá trị 2')` dùng để kết hợp nhiều bảng lại với nhau
+  - `when` dùng để thay thế if else. Nó sẽ kiểm tra giá trị cần lấy có tồn tại hay không rồi sau đó kiểm tra lại một lần nữa xem giá trị có trùng với dữ liệu trong database hay không nếu, nếu có thì nó mới lấy
+  ```sh
+    ->when($request->has(giá trị cần lấy), function($q){
+        return $q->where(cột cần lấy, giá trị so sánh);
+    })
+  ```
+  - `latest()` dùng để lấy các giá trị ở cuối hàng
+  - `clone()` dùng để tránh bị trùng khi sử dụng nhiều lần `$this->model`
+  - `distinct()` dùng để lọc giá trị bị trùng trong databsse
+  - `pluck('city')` dùng để lấy giá trị trong cột nào đó thôi, có thể thay thế select 
+  ***
