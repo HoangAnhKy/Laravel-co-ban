@@ -129,6 +129,7 @@ class User extends Model implements
   - `find(giá trị cần tìm)` dùng để tìm kiếm dữ liệu
   - `where(cột cần lấy, giá trị so sánh của cột đó)` dùng để kiểm tra dữ liệu
   - `paginate(số trang)` dùng để phân trang
+  - `{{ $users->withQueryString()->links() }}` dùng để nối câu truy vấn để hiện số trang tiếp theo của câu truy vấn
   - `select(giá trị cần lấy)` dùng để lấy dữ liệu, `addselect(giá trị cần lấy)` dùng để lấy thêm dữ liệu
   - `join('tên bảng', 'giá trị 1', 'giá trị 2')` dùng để kết hợp nhiều bảng lại với nhau
   - `when` dùng để thay thế if else. Nó sẽ kiểm tra giá trị cần lấy có tồn tại hay không rồi sau đó kiểm tra lại một lần nữa xem giá trị có trùng với dữ liệu trong database hay không nếu, nếu có thì nó mới lấy
