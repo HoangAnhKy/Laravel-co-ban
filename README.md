@@ -24,6 +24,7 @@
 - [Sử dụng @Auth, @Guest](#sử-dụng-auth-và-guest)
 - [Up hosting](#up-host)
 - [Xử lý giá trị null](#xử-lý-giá-trị-null)
+- [Tạo lưu trữ ảnh với Drive trên Laravel qua dự án của Google](#tạo-lưu-trữ-ảnh-với-drive-trên-laravel-qua-dự-án-của-google)
 ***
 ## **Sử dụng ide helper**
   Chạy lần lượt các lệnh sau để cài đặt
@@ -157,3 +158,104 @@ $(document).ready(function () {
 - Khai báo `use SoftDeletes` trong `use Illuminate\Database\Eloquent\SoftDeletes;` ở trong Model
 - tạo cột `deleted_at` ở trong sql
 - sau đó xóa như bình thường là được vd `$this->model->destroy(ID)`
+***
+## Tạo lưu trữ ảnh với Drive trên Laravel qua dự án của Google 
+
+B1: Khởi tạo dự án
+
+	Tạo project: https://console.developers.google.com/projectcreate
+	
+	Tạo credentials: https://console.developers.google.com/apis/credentials
+
+B2: Đăng kí OAuth consent screen trước rồi sau đó. 
+
+	truy cập credentials > Tạo file credentials > OAuth client ID
+
+B3: Đặt tên miền sau đó click vào Authorized redirect URIs 
+
+** khác với đăng nhập bằng tài khoản google chúng ta sẽ đặt điều hướng về oauthplayground 
+
+=> https://developers.google.com/oauthplayground
+
+B4: vào Library > kiếm Google Drive > click vô nó
+
+B5: truy cập link https://developers.google.com/oauthplayground
+
+B6: click vô cài đặt > tích chọn use your own OAuth > nhập mã OAuth khi tạo credentials
+
+B7: kiếm Drive API v3 > chọn ALL > Auth...APIs
+
+B8: đăng nhập tài khoản google tích chọn full quyền
+
+B9: click Exchange auth code for tokens
+
+B10: copy refresh_token bên json
+
+B11: qua drive tạo folder lưu > copy đuôi trên url
+
+- Qua bên laravel
+
+B1: cài đặt package sau 
+
+```sh
+composer require nao-pon/flysystem-google-drive:~1.1
+```
+
+B2:Tạo file GoogleDriveServiceProvider sau đó thêm dữ liệu sau
+```sh
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Support\ServiceProvider;
+
+class GoogleDriveServiceProvider extends ServiceProvider
+{
+    /**
+     * Bootstrap the application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        \Storage::extend('google', function ($app, $config) {
+            $client = new \Google_Client();
+            $client->setClientId($config['clientId']);
+            $client->setClientSecret($config['clientSecret']);
+            $client->refreshToken($config['refreshToken']);
+
+            return new \Google_Service_Drive($client);
+        });
+    }
+
+    /**
+     * Register the application services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        //
+    }
+}
+
+```
+B3:  thêm dữ liệu sau vào `providers` trong file `config/app.php`
+```sh
+App\Providers\GoogleDriveServiceProvider::class,
+```
+
+B4: copy file sau dán vào `config/filesystems.php`
+```sh
+'google' => [
+            'driver' => 'google',
+            'clientId' => env('GOOGLE_DRIVE_CLIENT_ID'),
+            'clientSecret' => env('GOOGLE_DRIVE_CLIENT_SECRET'),
+            'refreshToken' => env('GOOGLE_DRIVE_REFRESH_TOKEN'),
+            'folderId' => env('GOOGLE_DRIVE_FOLDER_ID'),
+        ],
+```
+B5: Cập nhật file .env Thêm ClientID, ClientSecret, RefreshToken vừa thực hiện các bước ở trên vào file env
+
+**Để đẩy file lên drive ta dùng lệnh `Storage::disk('google')->put('file, nội dung)`**
+**Để lấy file trên drive về ta dùng lệnh `Storage::disk('google')->files->get($fileId)`**
