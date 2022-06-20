@@ -193,7 +193,7 @@ B10: copy refresh_token bên json
 
 B11: qua drive tạo folder lưu > copy đuôi trên url
 
-- Qua bên laravel
+**Qua bên laravel**
 
 B1: cài đặt package sau 
 
@@ -259,3 +259,4 @@ B5: Cập nhật file .env Thêm ClientID, ClientSecret, RefreshToken vừa th�
 
 **Để đẩy file lên drive ta dùng lệnh `Storage::disk('google')->put('file, nội dung)`**
 **Để lấy file trên drive về ta dùng lệnh `Storage::disk('google')->files->get($fileId)`**
+***
