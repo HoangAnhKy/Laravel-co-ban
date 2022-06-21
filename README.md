@@ -201,7 +201,7 @@ B1: cài đặt package sau đối với laravel 9
 composer require masbug/flysystem-google-drive-ext
 ```
 
-B2:Tạo file GoogleDriveServiceProvider sau đó thêm dữ liệu sau
+B2:Tạo file GoogleDriveServiceProvider trong `app > Provider` sau đó thêm dữ liệu sau
 ```sh
 <?php
 
