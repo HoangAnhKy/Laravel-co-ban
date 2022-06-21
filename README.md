@@ -195,10 +195,10 @@ B11: qua drive tạo folder lưu > copy đuôi trên url
 
 **Qua bên laravel**
 
-B1: cài đặt package sau 
+B1: cài đặt package sau đối với laravel 9
 
 ```sh
-composer require nao-pon/flysystem-google-drive:~1.1
+composer require masbug/flysystem-google-drive-ext
 ```
 
 B2:Tạo file GoogleDriveServiceProvider sau đó thêm dữ liệu sau
