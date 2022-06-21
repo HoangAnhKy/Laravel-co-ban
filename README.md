@@ -274,4 +274,14 @@ B5: Cập nhật file .env Thêm ClientID, ClientSecret, RefreshToken vừa th�
 
 - **Để đẩy file lên drive ta dùng lệnh `Storage::disk('google')->putFile('file, nội dung, sử dụng public nếu muốn công khai file)`**
 - **Để lấy file trên drive về ta dùng lệnh `collect(Storage::disk('google')->listContents('/', có lấy thư mục con hay không (true or false)))` lưu ý nên sử dụng mảng để truy xuất dữ liệu `array[1][path]`**
+- vd lấy file
+```sh
+Route::get('link', function () {
+    $dir = '/';
+    $recursive = true; // Có lấy file trong các thư mục con không?
+    $contents = collect(Storage::disk('google')->listContents($dir, $recursive));
+    $res = $contents->where('type', '=', 'file'); // có thể sử dụng thêm first() để lấy giá trị đầu tiên
+    return $res[1]; // lấy thư mục đầu tiên
+});
+```
 ***
