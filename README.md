@@ -25,6 +25,9 @@
 - [Up hosting](#up-host)
 - [Xử lý giá trị null](#xử-lý-giá-trị-null)
 - [Tạo lưu trữ ảnh với Drive trên Laravel qua dự án của Google](#tạo-lưu-trữ-ảnh-với-drive-trên-laravel-qua-dự-án-của-google)
+	- [Các thao tác bên google cloud](#các-thao-tác-bên-google-cloud)
+	- [Các thao tác cần thực hiện bên laravel](#các-thao-tác-cần-thực-hiện-bên-laravel)
+	- [Một số lưu ý khi thao tác](#một-số-lưu-ý-khi-thao-tác)
 ***
 ## **Sử dụng ide helper**
   Chạy lần lượt các lệnh sau để cài đặt
@@ -159,8 +162,8 @@ $(document).ready(function () {
 - tạo cột `deleted_at` ở trong sql
 - sau đó xóa như bình thường là được vd `$this->model->destroy(ID)`
 ***
-## Tạo lưu trữ ảnh với Drive trên Laravel qua dự án của Google 
-
+## **Tạo lưu trữ ảnh với Drive trên Laravel qua dự án của Google** 
+## **Các Thao tác bên Google cloud**
 B1: Khởi tạo dự án
 
 	Tạo project: https://console.developers.google.com/projectcreate
@@ -173,29 +176,29 @@ B2: Đăng kí OAuth consent screen trước rồi sau đó.
 
 B3: Đặt tên miền sau đó click vào Authorized redirect URIs 
 
-** khác với đăng nhập bằng tài khoản google chúng ta sẽ đặt điều hướng về oauthplayground 
+**Khác với đăng nhập bằng tài khoản google chúng ta sẽ đặt điều hướng về oauthplayground**
 
 => https://developers.google.com/oauthplayground
 
-B4: vào Library > kiếm Google Drive > click vô nó
+B4: Vào Library > kiếm Google Drive > click vô nó
 
-B5: truy cập link https://developers.google.com/oauthplayground
+B5: Truy cập link https://developers.google.com/oauthplayground
 
-B6: click vô cài đặt > tích chọn use your own OAuth > nhập mã OAuth khi tạo credentials
+B6: Click vô cài đặt > tích chọn use your own OAuth > nhập mã OAuth khi tạo credentials
 
-B7: kiếm Drive API v3 > chọn ALL > Auth...APIs
+B7: Kiếm Drive API v3 > chọn ALL > Auth...APIs
 
-B8: đăng nhập tài khoản google tích chọn full quyền
+B8: Đăng nhập tài khoản google tích chọn full quyền
 
-B9: click Exchange auth code for tokens
+B9: Click Exchange auth code for tokens
 
-B10: copy refresh_token bên json
+B10: Copy refresh_token bên json
 
-B11: qua drive tạo folder lưu > copy đuôi trên url
+B11: Qua drive tạo folder lưu > copy đuôi trên url
 
-**Qua bên laravel**
+## **Các thao tác cần thực hiện bên laravel**
 
-B1: cài đặt package sau đối với laravel 9
+B1: Cài đặt package sau đối với laravel 9
 
 ```sh
 composer require masbug/flysystem-google-drive-ext
@@ -254,12 +257,12 @@ class GoogleDriveServiceProvider extends ServiceProvider
 }
 
 ```
-B3:  thêm dữ liệu sau vào `providers` trong file `config/app.php`
+B3: Thêm dữ liệu sau vào `providers` trong file `config/app.php`
 ```sh
 App\Providers\GoogleDriveServiceProvider::class,
 ```
 
-B4: copy file sau dán vào `config/filesystems.php`
+B4: Copy file sau dán vào `config/filesystems.php`
 ```sh
 'google' => [
         'driver' => 'google',
@@ -270,12 +273,14 @@ B4: copy file sau dán vào `config/filesystems.php`
         //'teamDriveId' => env('GOOGLE_DRIVE_TEAM_DRIVE_ID'),
     ],
 ```
-B5: Cập nhật file .env Thêm ClientID, ClientSecret, RefreshToken vừa thực hiện các bước ở trên vào file env
+B5: Cập nhật file .env Thêm ClientID, ClientSecret, RefreshToken vừa thực hiện các bước ở trên vào file env.
+
+## **Một số lưu ý khi thao tác**
 
 - **Để đẩy file lên drive ta dùng lệnh `Storage::disk('google')->putFile('file, nội dung, sử dụng public nếu muốn công khai file)`**
 - **Để lấy toàn bộ danh sách trên drive về ta dùng lệnh `collect(Storage::disk('google')->listContents('/', có lấy thư mục con hay không (true or false)))` lưu ý nên sử dụng mảng để truy xuất dữ liệu `array[1][path]`**
 
-**Ví dụ code xử lý vụ đăng tải file lên sau đó lấy link về  **
+**Ví dụ code xử lý vụ đăng tải file lên sau đó lấy link về**
 ```sh
 Route::post('test', function (Request $request) {
     $path = (Storage::disk('google')->putFile($request->get('name'), $request->file('avatar'), 'public'));
@@ -289,8 +294,9 @@ Route::post('test', function (Request $request) {
 })->name('put_image');
 ```
 
-- **Để xóa link trên Drive ra dùng `Storage::disk('google')->delete($res['path'])` **
-Vd: xóa path được lấy về qua request
+- **Để xóa link trên Drive ra dùng `Storage::disk('google')->delete($res['path'])`**
+
+**Vd: xóa path được lấy về qua request**
 ```sh
 Route::get('delete', function (Request $request){
     $path = $request->get('path');
