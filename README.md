@@ -273,15 +273,33 @@ B4: copy file sau dán vào `config/filesystems.php`
 B5: Cập nhật file .env Thêm ClientID, ClientSecret, RefreshToken vừa thực hiện các bước ở trên vào file env
 
 - **Để đẩy file lên drive ta dùng lệnh `Storage::disk('google')->putFile('file, nội dung, sử dụng public nếu muốn công khai file)`**
-- **Để lấy file trên drive về ta dùng lệnh `collect(Storage::disk('google')->listContents('/', có lấy thư mục con hay không (true or false)))` lưu ý nên sử dụng mảng để truy xuất dữ liệu `array[1][path]`**
-- vd lấy file
+- **Để lấy toàn bộ danh sách trên drive về ta dùng lệnh `collect(Storage::disk('google')->listContents('/', có lấy thư mục con hay không (true or false)))` lưu ý nên sử dụng mảng để truy xuất dữ liệu `array[1][path]`**
+
+**Ví dụ code xử lý vụ đăng tải file lên sau đó lấy link về  **
 ```sh
-Route::get('link', function () {
+Route::post('test', function (Request $request) {
+    $path = (Storage::disk('google')->putFile($request->get('name'), $request->file('avatar'), 'public'));
+
     $dir = '/';
     $recursive = true; // Có lấy file trong các thư mục con không?
     $contents = collect(Storage::disk('google')->listContents($dir, $recursive));
-    $res = $contents->where('type', '=', 'file'); // có thể sử dụng thêm first() để lấy giá trị đầu tiên
-    return $res[1]; // lấy thư mục đầu tiên
+    $res = $contents->where('path', '=', $path)->first();
+
+    dd('https://drive.google.com/file/d/'.$res['extra_metadata']['id'].'/view');
+})->name('put_image');
+```
+
+- **Để xóa link trên Drive ra dùng `Storage::disk('google')->delete($res['path'])` **
+Vd: xóa path được lấy về qua request
+```sh
+Route::get('delete', function (Request $request){
+    $path = $request->get('path');
+    $dir = '/';
+    $recursive = true; // Có lấy file trong các thư mục con không?
+    $contents = collect(Storage::disk('google')->listContents($dir, $recursive));//lấy tất cả danh sách về
+    $res = $contents->where('path', '=', $path)->first();
+
+    Storage::disk('google')->delete($res['path']);
 });
 ```
 ***
