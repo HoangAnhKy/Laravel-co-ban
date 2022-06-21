@@ -272,6 +272,6 @@ B4: copy file sau dán vào `config/filesystems.php`
 ```
 B5: Cập nhật file .env Thêm ClientID, ClientSecret, RefreshToken vừa thực hiện các bước ở trên vào file env
 
-- **Để đẩy file lên drive ta dùng lệnh `Storage::disk('google')->put('file, nội dung)`**
-- **Để lấy file trên drive về ta dùng lệnh `Storage::disk('google')->files->get($fileId)`**
+- **Để đẩy file lên drive ta dùng lệnh `Storage::disk('google')->putFile('file, nội dung, sử dụng public nếu muốn công khai file)`**
+- **Để lấy file trên drive về ta dùng lệnh `collect(Storage::disk('google')->listContents('/', có lấy thư mục con hay không (true or false)))` lưu ý nên sử dụng mảng để truy xuất dữ liệu `array[1][path]`**
 ***
