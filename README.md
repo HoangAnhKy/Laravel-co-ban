@@ -262,12 +262,13 @@ App\Providers\GoogleDriveServiceProvider::class,
 B4: copy file sau dán vào `config/filesystems.php`
 ```sh
 'google' => [
-            'driver' => 'google',
-            'clientId' => env('GOOGLE_DRIVE_CLIENT_ID'),
-            'clientSecret' => env('GOOGLE_DRIVE_CLIENT_SECRET'),
-            'refreshToken' => env('GOOGLE_DRIVE_REFRESH_TOKEN'),
-            'folderId' => env('GOOGLE_DRIVE_FOLDER_ID'),
-        ],
+        'driver' => 'google',
+        'clientId' => env('GOOGLE_DRIVE_CLIENT_ID'),
+        'clientSecret' => env('GOOGLE_DRIVE_CLIENT_SECRET'),
+        'refreshToken' => env('GOOGLE_DRIVE_REFRESH_TOKEN'),
+        'folder' => env('GOOGLE_DRIVE_FOLDER'),
+        //'teamDriveId' => env('GOOGLE_DRIVE_TEAM_DRIVE_ID'),
+    ],
 ```
 B5: Cập nhật file .env Thêm ClientID, ClientSecret, RefreshToken vừa thực hiện các bước ở trên vào file env
 
