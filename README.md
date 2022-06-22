@@ -148,7 +148,7 @@ class User extends Model implements
   - `pluck('city')` dùng để lấy giá trị trong cột nào đó thôi, có thể thay thế select 
   ***
 ## jquery
-**submit dữ liệu khi click vào option lựa chọn trong form có chứa select
+**submit dữ liệu khi click vào option lựa chọn trong form có chứa select**
 ```sh
 $(document).ready(function () {
         $('.select-filter').change(function () {
@@ -156,7 +156,7 @@ $(document).ready(function () {
         });
     });
 ```
-** Tạo Thông báo notification trong jquery
+**Tạo Thông báo notification trong jquery**
 - Đảm bảo khai báo đầy đủ các cdn sau để tiện cho việc sử dụng
 ```sh
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
