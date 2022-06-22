@@ -156,6 +156,21 @@ $(document).ready(function () {
         });
     });
 ```
+** Tạo Thông báo notification trong jquery
+- Đảm bảo khai báo đầy đủ các cdn sau để tiện cho việc sử dụng
+```sh
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> // khai báo jquery
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script> // khai báo jquerry kèm theo toastr
+```
+- Sau khi khai báo xong, sử dụng câu lệnh sau để tạo thông báo
+```sh
+ $(document).ready(function () {
+     toastr.options.positionClass = 'toast-bottom-right'; // điều chỉnh hướng hiển thị 
+     toastr.success('Nội dung thông báo', 'title') // có thể sử dụng warning, success, error, info
+});
+``` 
+- Có thể tham khảo thêm [tại đây](https://github.com/CodeSeven/toastr)
 ***
 ## Xóa mềm
 - Khai báo `use SoftDeletes` trong `use Illuminate\Database\Eloquent\SoftDeletes;` ở trong Model
