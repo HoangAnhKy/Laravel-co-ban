@@ -28,6 +28,7 @@
 	- [Các thao tác bên google cloud](#các-thao-tác-bên-google-cloud)
 	- [Các thao tác cần thực hiện bên laravel](#các-thao-tác-cần-thực-hiện-bên-laravel)
 	- [Một số lưu ý khi thao tác](#một-số-lưu-ý-khi-thao-tác)
+- [Laravel execl](#import-laravel-excel)
 ***
 ## **Sử dụng ide helper**
   Chạy lần lượt các lệnh sau để cài đặt
@@ -172,6 +173,41 @@ $(document).ready(function () {
 });
 ``` 
 - Có thể tham khảo thêm [tại đây](https://github.com/CodeSeven/toastr)
+
+**Import dữ liệu với jqerry**
+
+```sh
+$(document).ready(function () {
+                toastr.options.positionClass = 'toast-bottom-right';
+                toastr.options.closeButton = true;
+                toastr.options.preventDuplicates = false;
+
+                $("#csv").change(function () {
+                    let formData = new FormData();
+                    formData.append('csv', $(this)[0].files[0]);
+                    formData.append('_token','{{ csrf_token() }}');
+                    $.ajax({
+                        url: '{{route('import')}}',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: formData,
+                        enctype: 'multipart/form-data',
+                        async: false,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+
+                        success: function (response) {
+                            toastr.success("Your data has been imported", "Import success");
+
+                        },
+                        error: function (response) {
+                            toastr.error(response.responseJSON.message, "Import error");
+                        }
+                    })
+                });
+            });
+```
 
 **Khi sử dụng ajax jquery gặp lỗi `CSRF token mismatch.` đó là do thiếu csrf, cách fix đó là thêm ở `data: {_token: '{{ csrf_token() }}'}`**
 ***
@@ -325,5 +361,66 @@ Route::get('delete', function (Request $request){
 
     Storage::disk('google')->delete($res['path']);
 });
+```
+***
+## Import Laravel excel
+
+**Xử dụng [laravel Execel](https://docs.laravel-excel.com)**
+
+- B1: Cài đặt thư viện, xử dụng câu lệnh sau để cài đặt.
+
+```sh
+composer require maatwebsite/excel
+```
+ - Nếu có lỗi xảy ra do cài đặt trên laravel 9 hãy xử dụng câu lệnh sau
+
+```sh
+composer require psr/simple-cache:^1.0 maatwebsite/excel
+```
+
+- B2: Xử dụng câu lệnh này để tạo file import, nhớ đổi tên model để phù hợp
+
+```sh
+php artisan make:import UsersImport --model=Post 
+```
+
+- B3: Sửa lại file vừa tạo từ `ToModel` thành `ToArray`, sau đó đổi tên function thành array (chỗ nào báo lỗi thì cứ cho thành array :3)
+
+- B4: Xử dụng file controller để gọi tới file vừa tạo ở B1.
+
+```sh
+ Maatwebsite\Excel\Facades\Excel::import(new 'tên_file_ở_bước_1', 'tên_file_có_thể_lấy_qua_request');
+```
+- B5: Thêm Heading row bằng cách implements nó
+
+VD:
+```
+use Maatwebsite\Excel\Concerns\ToArray;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+class PostImport implements ToArray,WithHeadingRow
+```
+
+- B6: Lấy giá trị bằng cách sử dụng `$array['tên cột']`
+
+Vd: 
+ 	$company = $array['cong_ty'];
+      $Language = $array['ngon_ngu'];
+
+- B7: Lưu giá trị import bằng cách sử dụng Eloquent, nên sử dụng `firstOrCreate` để tránh bị trùng dữ liệu
+
+vd: 
+```
+foreach ($array as $each) {
+            try {
+                Post::query()->firstOrCreate([
+                    'company' => $each['cong_ty'],
+                    'language' => $each['ngon_ngu'],
+                    'location' => $each['dia_diem'],
+                    'link' => $each['link'],
+                ]);
+            } catch (Exception $e) {
+                dd($each);
+            }
+        }
 ```
 ***
