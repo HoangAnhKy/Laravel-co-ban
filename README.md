@@ -37,12 +37,13 @@
   ```sh
   php artisan ide-helper:models "App\Models\[model cần hỗ trợ]" -w
   ```
+  ***
 ## **Mã hóa (hash)**
  ```sh
    - Hash::make(value) //dùng để mã hóa
    - Hash::check(value, hashvalue)// dùng để kiểm tra mã hóa
    ```
-   ___
+***
 ## **Gửi mail**
   * [gửi mail bằng Observer & Notification](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/g%E1%BB%ADi%20mail%20Observer%20%26%20Notification.txt)
   * [gửi mail bằng event & listener](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/event%20%26%20listener.txt)
