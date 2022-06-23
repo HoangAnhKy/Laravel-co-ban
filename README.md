@@ -367,6 +367,7 @@ Route::get('delete', function (Request $request){
 
 **Xử dụng [laravel Execel](https://docs.laravel-excel.com)**
 
+*Để có thể sử dụng mượt mà, tối ưu hơn nên kết hợp với [jquery](#jquery)*
 - B1: Cài đặt thư viện, xử dụng câu lệnh sau để cài đặt.
 
 ```sh
