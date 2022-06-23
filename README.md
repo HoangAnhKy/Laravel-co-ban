@@ -171,6 +171,8 @@ $(document).ready(function () {
 });
 ``` 
 - Có thể tham khảo thêm [tại đây](https://github.com/CodeSeven/toastr)
+
+**Khi sử dụng ajax jquery gặp lỗi `CSRF token mismatch.` đó là do thiếu csrf, cách fix đó là thêm ở `data: {_token: '{{ csrf_token() }}'}`**
 ***
 ## Xóa mềm
 - Khai báo `use SoftDeletes` trong `use Illuminate\Database\Eloquent\SoftDeletes;` ở trong Model
