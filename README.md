@@ -138,6 +138,7 @@ class User extends Model implements
   - `{{ $users->withQueryString()->links() }}` dùng để nối câu truy vấn để hiện số trang tiếp theo của câu truy vấn
   - `select(giá trị cần lấy)` dùng để lấy dữ liệu, `addselect(giá trị cần lấy)` dùng để lấy thêm dữ liệu
   - `join('tên bảng', 'giá trị 1', 'giá trị 2')` dùng để kết hợp nhiều bảng lại với nhau
+  - `joinsub('Tên bảng', 'as tên mới hoặc không', function($join){ $join->on('tên bảng', 'tên bảng join') })` dùng để kết hợp các bảng có sử dụng subquery, các câu truy vấn lồng nhau
   - `when` dùng để thay thế if else. Nó sẽ kiểm tra giá trị cần lấy có tồn tại hay không rồi sau đó kiểm tra lại một lần nữa xem giá trị có trùng với dữ liệu trong database hay không nếu, nếu có thì nó mới lấy
   ```sh
     ->when($request->has(giá trị cần lấy), function($q){
