@@ -211,6 +211,32 @@ $(document).ready(function () {
 ```
 
 **Khi sử dụng ajax jquery gặp lỗi `CSRF token mismatch.` đó là do thiếu csrf, cách fix đó là thêm ở `data: {_token: '{{ csrf_token() }}'}`**
+
+**Đổ dữ liệu vào form**
+
+```sh
+ $(document).ready(function () {
+            $.ajax({
+                url: '{{ route('api') }}',
+                datatype: 'json',
+                success: function (response){
+                    // console.log(response)
+                    response.forEach(function (each) {
+                        // console.log(each); test thử xem dữ liệu có về hay không, sử dụng append là chính
+                        $('#table_student').append($('<tr>')
+                        .append($('<td>').append(each.id))
+                        .append($('<td>').append(each.nameStudent))
+                        .append($('<td>').append(each.created_at))
+                        );
+                    })
+                },
+                error: function (response) {
+
+                }
+            })
+        })
+```
+
 ***
 ## Xóa mềm
 - Khai báo `use SoftDeletes` trong `use Illuminate\Database\Eloquent\SoftDeletes;` ở trong Model
