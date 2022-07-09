@@ -5,6 +5,7 @@
 - [Tạo ide helper](#sử-dụng-ide-helper)
 - [Đặt tên title cho toàn file](#đặt-tên-title-trang)
 - [Thêm, Xóa, Sửa](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/CRUD%20Lavarel.txt)
+- [Phân trang](#phân-trang)
 - [Xóa mềm](#xóa-mềm)
 - [Một số câu truy vấn Eloquent](#một-số-câu-truy-vấn-eloquent)
 - [Sử dụng templet](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/S%E1%BB%AD%20d%E1%BB%A5ng%20templet.txt)
@@ -63,7 +64,44 @@
  ```
  
  ***
- 
+## **Phân trang**
+- Sử dụng `response` để tạo trả về kiểu api để dễ tạo phân trang tùy ý
+```sh
+ public function api()
+    {
+        $data = Student::query()->with('course')->paginate(10);
+
+        return response()->json([
+            'success' => true,
+            'data' => $data->getCollection(),
+            'pagination' => $data->linkCollection()
+        ]);
+    }
+```
+- Bên view tạo `ajax jquery` để lấy dữ liệu về sau đó đổ dữ liệu sau vài success `chi tiết trong phần jquery bên dưới`
+
+```
+//tạo div ở trên body
+<div class="justify-content-center pagination" id="pagination"></div>
+
+//đổ dữ liệu sau vào script và gọi lại tên hàm và truyền dữ liệu trong phần success jquerry vd `renderPagination(response.pagination);`
+function  renderPagination(links){
+            links.forEach(function (each) {
+                $('#pagination').append($('<li>').attr('class', 'page-item')
+                    .append(`<a class="page-link ${each.active ? 'active' : ''}" href="${each.url}">${each.label}</a> `)
+                )
+            })
+        }
+// chỉnh lại url cho chuẩn và lưu ý thêm  data: { page: {{ request()->get('page') ?? 1 }} } ở ajax
+$(document).on('click', '#pagination > li > a', function (event) {
+                event.preventDefault(); // ngăn event hoạt động
+                let page = $(this).text();
+                let urlParams = new URLSearchParams(window.location.search);
+                urlParams.set('page', page);
+                window.location.search = urlParams;
+            })
+```
+***
 ## **Chỉnh sửa lại migration đã tồn tại hoặc đã chạy trên hệ thống (Thêm dữ liệu trong SQL )**
   * Tạo mới một migration ```php artisan make:migration alter_table```
   * Sử dụng cú pháp sau để thực thi
