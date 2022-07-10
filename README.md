@@ -274,7 +274,10 @@ $(document).ready(function () {
             })
         })
 ```
-
+**Cập nhật lại trang với jquery**
+```
+ $("id").load(location.href + "id");
+```
 ***
 ## Xóa mềm
 - Khai báo `use SoftDeletes` trong `use Illuminate\Database\Eloquent\SoftDeletes;` ở trong Model
