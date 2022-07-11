@@ -93,12 +93,26 @@ function renderPagination(links) {
             })
         }
 // chỉnh lại url cho chuẩn và lưu ý thêm  data: { page: {{ request()->get('page') ?? 1 }} } ở ajax
-$(document).on('click', '#pagination > li > a', function (event) {
-                event.preventDefault(); // ngăn event hoạt động
+ $(document).on('click', '#pagination > li > a', function (event) {
+                event.preventDefault(); //ngăn event button hoạt động
                 let page = $(this).text();
-                let urlParams = new URLSearchParams(window.location.search);
-                urlParams.set('page', page);
-                window.location.search = urlParams;
+                let urlParams = new URLSearchParams(window.location.search);//lấy giá trị trên url
+                let get_page = urlParams.get('page')
+		
+                if("« Previous" !== page && page !== "Next »"){
+                    urlParams.set('page', page);
+                    window.location.search = urlParams;
+                }
+		else if("« Previous" === page && parseInt(get_page)-1 >= 1 ){
+                    page = parseInt(get_page) - 1;
+                    urlParams.set('page', page);
+                    window.location.search = urlParams;
+                }
+		else if("Next »"=== page && parseInt(get_page)+1 <= max_page){
+                    page = parseInt(get_page) + 1;
+                    urlParams.set('page', page);
+                    window.location.search = urlParams;
+                }
             })
 ```
 ***
