@@ -85,10 +85,10 @@
 <div class="justify-content-center pagination" id="pagination"></div>
 
 //đổ dữ liệu sau vào script và gọi lại tên hàm và truyền dữ liệu trong phần success jquerry vd `renderPagination(response.pagination);`
-function  renderPagination(links){
+function renderPagination(links) {
             links.forEach(function (each) {
-                $('#pagination').append($('<li>').attr('class', 'page-item')
-                    .append(`<a class="page-link ${each.active ? 'active' : ''}" href="${each.url}">${each.label}</a> `)
+                $('#pagination').append($('<li>').attr('class', `page-item ${each.active ? 'active' : ''}` )
+                    .append(`<a class="page-link" href="${each.url}">${each.label}</a> `)
                 )
             })
         }
