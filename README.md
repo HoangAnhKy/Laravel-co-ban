@@ -93,6 +93,7 @@ function renderPagination(links) {
             })
         }
 // chỉnh lại url cho chuẩn và lưu ý thêm  data: { page: {{ request()->get('page') ?? 1 }} } ở ajax
+// thêm ` let max_page; và max_page = response.pagination[response.pagination.length - 2].label;` 
  $(document).on('click', '#pagination > li > a', function (event) {
                 event.preventDefault(); //ngăn event button hoạt động
                 let page = $(this).text();
