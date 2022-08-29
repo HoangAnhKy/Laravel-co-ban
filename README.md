@@ -485,14 +485,37 @@ B5: Cập nhật file .env Thêm ClientID, ClientSecret, RefreshToken vừa th�
 
 ```php
 Route::post('test', function (Request $request) {
-    $path = (Storage::disk('google')->putFile($request->get('name'), $request->file('avatar'), 'public'));
-
+    // thêm dữ liệu
+    $path_file = $request->file('file');
+    $name_folder = $request->get('name');
+    $name_file = $path_file->getClientOriginalName();
+    
+    //kiểm tra tồn tại, nếu có xóa dữ liệu trong database và drive sau đó thêm lại
+    if(Storage::disk('google')->exists($name_folder.'/'.$name_file))
+    {
+        $data =  DriveSQL::query()->where('Pathfile', $name_folder.'/'.$name_file)->first();
+        DriveSQL::destroy($data->id);
+        Storage::disk('google')->delete($name_folder.'/'.$name_file);
+        $path = Storage::disk('google')->putFileAs($name_folder, $path_file, $name_file, 'public');   
+    }
+    else
+    {
+        $path = Storage::disk('google')->putFileAs($name_folder, $path_file, $name_file, 'public');
+    }
+    
+    // dùng để lấy link
     $dir = '/';
     $recursive = true; // Có lấy file trong các thư mục con không?
     $contents = collect(Storage::disk('google')->listContents($dir, $recursive));
     $res = $contents->where('path', '=', $path)->first();
-
-    dd('https://drive.google.com/file/d/'.$res['extra_metadata']['id'].'/view');
+    
+    $data = [
+        'Pathfile' => $path,
+        'linkFile' =>'https://drive.google.com/file/d/'.$res['extra_metadata']['id'].'/view'
+    ];
+    
+    DriveSQL::create($data);
+    return redirect()->route('PostIMG');
 })->name('put_image');
 ```
 
