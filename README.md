@@ -29,6 +29,7 @@
     -   [Các thao tác bên google cloud](#các-thao-tác-bên-google-cloud)
     -   [Các thao tác cần thực hiện bên laravel](#các-thao-tác-cần-thực-hiện-bên-laravel)
     -   [Một số lưu ý khi thao tác](#một-số-lưu-ý-khi-thao-tác)
+    -   [Demo thực tế uploadfile và lưu dữ liệu về data](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/PostIMG.zip)
 -   [Laravel execl](#import-laravel-excel)
 
 ---
