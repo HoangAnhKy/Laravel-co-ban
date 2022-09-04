@@ -1,7 +1,7 @@
 B1: Cài đặt môi trường
 
 ```sh
-	composer require league/oauth2-google
+composer require league/oauth2-google
 ```
 
 B2: Khởi tạo 2 Controller
