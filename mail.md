@@ -3,6 +3,9 @@ B1: Cài đặt môi trường
 ```sh
 composer require league/oauth2-google
 ```
+```sh
+composer require phpmailer/phpmailer
+```
 
 B2: Khởi tạo 2 Controller
 
