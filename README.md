@@ -628,3 +628,33 @@ foreach ($array as $each) {
 ```
 
 ---
+## Export Laravel excel
+```sh
+composer require maatwebsite/excel
+```
+
+-   Nếu có lỗi xảy ra do cài đặt trên laravel 9 hãy xử dụng câu lệnh sau
+
+```sh
+composer require psr/simple-cache:^1.0 maatwebsite/excel
+```
+
+-   B2: Xử dụng câu lệnh này để tạo file export, nhớ đổi tên model để phù hợp. File sau khi tạo sẽ nằm trong `app/excel`
+
+```sh
+php artisan make:export UsersExport --model=User
+```
+
+-   B3: Khởi tạo function export trong controller muốn export 
+
+```php
+    // UsersExport in UsersController
+    public function export() 
+    {
+        return Excel::download(new UsersExport, 'users.xlsx');
+    }
+```
+
+-   B4: Khai báo route và sài.
+
+---
