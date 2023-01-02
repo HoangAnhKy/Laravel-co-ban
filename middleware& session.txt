@@ -47,13 +47,35 @@ C2: Tạo thẳng router mới để và tiến hành phân quyền
 
 SESSION
 
-lấy session:
+kiểm tra session:
 
 	* session()->has('key')
+	
+lấy session:
+
+	* session()->get('key') hoặc session('key')
+	
+lấy session trong __construct 
+
+	$this->middleware(function (){
+            dd(session()->all());
+        });
+	
+	// nếu không thể lấy session thì vào Kernel check xem có tồn tại các dòng sau hay không
+	
+	protected $middlewareGroups = [
+		'web' => [
+		    // ....
+		    \Illuminate\Session\Middleware\StartSession::class,
+		    \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+		],
+    	];
 
 Thêm session: xử dụng put để có thể ghi đè dữ liệu
 	
 	* session()->put('key', 'value')
+	* session(['key' => 'value'])
+	
 xóa session
 
 	* session()->flush();  //xóa toàn bộ
