@@ -186,8 +186,29 @@ else{
 ## Sử dụng @auth và @guest
 
 -   Dùng để kiểm tra xem khách hàng đã đăng nhập hay chưa, sử dụng trong blade khi có sài `Auth::login($user);`
-    vd:
+-   Dùng để lấy UserLogin 
+    ```php
+     $condition = array('email' => $data_request['email'], 'password' => $data_request['password']);
+     Auth::attempt($condition)
+    ```
+- Muốn chỉnh lại Table khi dùng Auth thì vào `config > Auth`
 
+    vd:
+    
+    ```php
+        'providers' => [
+        'users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Login::class, // chỉnh model
+        ],
+
+        // 'users' => [
+        //     'driver' => 'database',
+        //     'table' => 'users',
+        // ],
+    ],
+    ```
+    
 ```php
 @auth
   // nếu đã đăng nhập thì xử lý gì
