@@ -138,11 +138,12 @@ $(document).on("click", "#pagination > li > a", function (event) {
 -   Tạo mới một migration `php artisan make:migration alter_table`
 -   Sử dụng cú pháp sau để thực thi
     ```php
-    if (!Schema:hasColumn('tên bảng', 'Tên cột')){
+    if (!Schema:hasColumn('tên bảng', 'Tên cột')){ // kiểm tra cột có tồn tại hay không
       //dữ liệu có sẵn khi tạo migration và chỉnh sửa
       Schema::table('tên bảng', function (Blueprint $table)
        {
-                $table->
+                // muốn thay đổi gì  đó thì thêm change() 
+                // vd: $table->smallInteger('role')->default('4')->change();
       });
     }
     ```
