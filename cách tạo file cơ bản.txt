@@ -33,3 +33,16 @@ php artisan migrate để thực tthi
 tạo request validation php artisan make:request [tên bảng]/[tên view] vd: php artisan make:request Sinhvien/IndexRequest
 
 sau đó mở file đó lên sửa validate => create trên laravel
+
+
+
+
+a=php artisan $*
+amma= php artisan make:model $* --all
+debug=composer require barryvdh/laravel-debugbar --dev
+cr=composer create-project laravel/laravel $*
+enum=composer require bensampo/laravel-enum
+amme=php artisan make:enum $*
+crCake = composer create-project --prefer-dist cakephp/app:~4.0 $*
+clscache=php artisan cache:clear && php artisan view:clear && php artisan config:clear && php artisan event:clear && php artisan route:clear
+publicMail=php artisan vendor:publish --tag=laravel-mail
