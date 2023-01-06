@@ -14,7 +14,25 @@ vd:
 
 	vd:  User::observe(UserObserver::class);
 
-
+	- Muốn chỉnh sửa lại email thì vào đường dẫn 
+	
+		vendor > laravel > frameword > src > illuminate > notification > resource > view email
+		
+	- Muốn add thêm biến để lấy data các thứ thì vào đường dẫn sau 
+		
+		vendor > laravel > frameword > src > illuminate > notification > Messenges > simpleMessenge
+		
+	- Muốn sử dụng các biến, các function đã khai báo thì vào hàm toMail set
+	
+		vd: public function toMail($notifiable)
+		    {
+			return (new MailMessage)->user($notifiable)
+				    ->from('151901594@dntu.edu.vn', 'kyha')
+				    ->line('The introduction to the notification.')
+				    ->action('Notification Action', url('/'))
+				    ->line('Thank you for using our application!');
+		    }
+	
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ---------- Notification 
