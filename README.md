@@ -34,7 +34,8 @@
     -   [Một số lưu ý khi thao tác](#một-số-lưu-ý-khi-thao-tác)
     -   [Demo thực tế uploadfile và lưu dữ liệu về data](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/PostIMG.zip)
 -   [Laravel execl](#import-laravel-excel)
-
+-   [Laravel with reactjs](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/reactjs%20with%20laravel/Reactjs%20with%20Laravel.md)
+    - [demo](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/reactjs%20with%20laravel/laravel-vite-reactjs.zip)
 ---
 
 ## **Sử dụng ide helper**
