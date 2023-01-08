@@ -27,6 +27,25 @@ kết quả sau khi thực hiện bước trên
     }
 ```
 
+Sau đó vào `vite.config.js`
+
+```js
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+import react from 'react';
+
+export default defineConfig({
+    plugins: [
+        react(),
+        laravel({
+            input: ['resources/css/app.css', 'resources/js/app.js'],
+            refresh: true,
+        }),
+    ],
+});
+
+```
+
 B6: Vào `resources/components` tạo file `App.jsx`
 
 ```js
