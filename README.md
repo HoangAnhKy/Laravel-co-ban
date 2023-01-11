@@ -36,7 +36,7 @@
 -   [Laravel execl](#import-laravel-excel)
 -   [Laravel with reactjs](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/reactjs%20with%20laravel/Reactjs%20with%20Laravel.md)
     -   [demo](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/reactjs%20with%20laravel/laravel-vite-reactjs.zip)
--   [kết nối 2 database](https://github.com/HoangAnhKy/Laravel-co-ban/connect%202%20database.md)
+-   [kết nối 2 database](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/connect%202%20database.md)
 
 ---
 
