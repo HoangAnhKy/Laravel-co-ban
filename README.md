@@ -35,7 +35,9 @@
     -   [Demo thực tế uploadfile và lưu dữ liệu về data](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/PostIMG.zip)
 -   [Laravel execl](#import-laravel-excel)
 -   [Laravel with reactjs](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/reactjs%20with%20laravel/Reactjs%20with%20Laravel.md)
-    - [demo](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/reactjs%20with%20laravel/laravel-vite-reactjs.zip)
+    -   [demo](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/reactjs%20with%20laravel/laravel-vite-reactjs.zip)
+-   [kết nối 2 database](https://github.com/HoangAnhKy/Laravel-co-ban/connect%202%20database.md)
+
 ---
 
 ## **Sử dụng ide helper**
@@ -58,6 +60,7 @@ php artisan ide-helper:models "App\Models\[model cần hỗ trợ]" -w
   - Hash::make(value) //dùng để mã hóa
   - Hash::check(value, hashvalue)// dùng để kiểm tra mã hóa
 ```
+
 ---
 
 ## **Up host**
@@ -95,38 +98,36 @@ php artisan ide-helper:models "App\Models\[model cần hỗ trợ]" -w
 
 ```js
 //tạo div ở trên body
-<div class="justify-content-center pagination" id="pagination"></div>;
+<div class='justify-content-center pagination' id='pagination'></div>;
 
 //đổ dữ liệu sau vào script và gọi lại tên hàm và truyền dữ liệu trong phần success jquerry vd `renderPagination(response.pagination);`
 function renderPagination(links) {
     links.forEach(function (each) {
-        $("#pagination").append(
-            $("<li>")
-                .attr("class", `page-item ${each.active ? "active" : ""}`)
-                .append(
-                    `<a class="page-link" href="${each.url}">${each.label}</a> `
-                )
+        $('#pagination').append(
+            $('<li>')
+                .attr('class', `page-item ${each.active ? 'active' : ''}`)
+                .append(`<a class="page-link" href="${each.url}">${each.label}</a> `)
         );
     });
 }
 // chỉnh lại url cho chuẩn và lưu ý thêm  data: { page: {{ request()->get('page') ?? 1 }} } ở ajax
 // thêm ` let max_page; và max_page = response.pagination[response.pagination.length - 2].label;`
-$(document).on("click", "#pagination > li > a", function (event) {
+$(document).on('click', '#pagination > li > a', function (event) {
     event.preventDefault(); //ngăn event button hoạt động
     let page = $(this).text();
     let urlParams = new URLSearchParams(window.location.search); //lấy giá trị trên url
-    let get_page = urlParams.get("page");
+    let get_page = urlParams.get('page');
 
-    if ("« Previous" !== page && page !== "Next »") {
-        urlParams.set("page", page);
+    if ('« Previous' !== page && page !== 'Next »') {
+        urlParams.set('page', page);
         window.location.search = urlParams;
-    } else if ("« Previous" === page && parseInt(get_page) - 1 >= 1) {
+    } else if ('« Previous' === page && parseInt(get_page) - 1 >= 1) {
         page = parseInt(get_page) - 1;
-        urlParams.set("page", page);
+        urlParams.set('page', page);
         window.location.search = urlParams;
-    } else if ("Next »" === page && parseInt(get_page) + 1 <= max_page) {
+    } else if ('Next »' === page && parseInt(get_page) + 1 <= max_page) {
         page = parseInt(get_page) + 1;
-        urlParams.set("page", page);
+        urlParams.set('page', page);
         window.location.search = urlParams;
     }
 });
@@ -143,7 +144,7 @@ $(document).on("click", "#pagination > li > a", function (event) {
       //dữ liệu có sẵn khi tạo migration và chỉnh sửa
       Schema::table('tên bảng', function (Blueprint $table)
        {
-                // muốn thay đổi gì  đó thì thêm change() 
+                // muốn thay đổi gì  đó thì thêm change()
                 // vd: $table->smallInteger('role')->default('4')->change();
       });
     }
@@ -188,15 +189,15 @@ else{
 ## Sử dụng @auth và @guest
 
 -   Dùng để kiểm tra xem khách hàng đã đăng nhập hay chưa, sử dụng trong blade khi có sài `Auth::login($user);`
--   Dùng để lấy UserLogin 
+-   Dùng để lấy UserLogin
     ```php
      $condition = array('email' => $data_request['email'], 'password' => $data_request['password']);
      Auth::attempt($condition)
     ```
-- Muốn chỉnh lại Table khi dùng Auth thì vào `config > Auth`
+-   Muốn chỉnh lại Table khi dùng Auth thì vào `config > Auth`
 
     vd:
-    
+
     ```php
         'providers' => [
         'users' => [
@@ -210,7 +211,7 @@ else{
         // ],
     ],
     ```
-    
+
 ```php
 @auth
   // nếu đã đăng nhập thì xử lý gì
@@ -263,8 +264,8 @@ else{
 
 ```js
 $(document).ready(function () {
-    $(".select-filter").change(function () {
-        $("#form-filter").submit();
+    $('.select-filter').change(function () {
+        $('#form-filter').submit();
     });
 });
 ```
@@ -282,9 +283,9 @@ $(document).ready(function () {
 -   Sau khi khai báo xong, sử dụng câu lệnh sau để tạo thông báo
 
 ```js
- $(document).ready(function () {
-     toastr.options.positionClass = 'toast-bottom-right'; // điều chỉnh hướng hiển thị
-     toastr.success('Nội dung thông báo', 'title') // có thể sử dụng warning, success, error, info
+$(document).ready(function () {
+    toastr.options.positionClass = 'toast-bottom-right'; // điều chỉnh hướng hiển thị
+    toastr.success('Nội dung thông báo', 'title'); // có thể sử dụng warning, success, error, info
 });
 ```
 
@@ -501,31 +502,31 @@ Route::post('test', function (Request $request) {
     $path_file = $request->file('file');
     $name_folder = $request->get('name');
     $name_file = $path_file->getClientOriginalName();
-    
+
     //kiểm tra tồn tại, nếu có xóa dữ liệu trong database và drive sau đó thêm lại
     if(Storage::disk('google')->exists($name_folder.'/'.$name_file))
     {
         $data =  DriveSQL::query()->where('Pathfile', $name_folder.'/'.$name_file)->first();
         DriveSQL::destroy($data->id);
         Storage::disk('google')->delete($name_folder.'/'.$name_file);
-        $path = Storage::disk('google')->putFileAs($name_folder, $path_file, $name_file, 'public');   
+        $path = Storage::disk('google')->putFileAs($name_folder, $path_file, $name_file, 'public');
     }
     else
     {
         $path = Storage::disk('google')->putFileAs($name_folder, $path_file, $name_file, 'public');
     }
-    
+
     // dùng để lấy link
     $dir = '/';
     $recursive = true; // Có lấy file trong các thư mục con không?
     $contents = collect(Storage::disk('google')->listContents($dir, $recursive));
     $res = $contents->where('path', '=', $path)->first();
-    
+
     $data = [
         'Pathfile' => $path,
         'linkFile' =>'https://drive.google.com/file/d/'.$res['extra_metadata']['id'].'/view'
     ];
-    
+
     DriveSQL::create($data);
     return redirect()->route('PostIMG');
 })->name('put_image');
@@ -644,7 +645,9 @@ foreach ($array as $each) {
 ```
 
 ---
+
 ## Export Laravel excel
+
 ```sh
 composer require maatwebsite/excel
 ```
@@ -661,11 +664,11 @@ composer require psr/simple-cache:^1.0 maatwebsite/excel
 php artisan make:export UsersExport --model=User
 ```
 
--   B3: Khởi tạo function export trong controller muốn export 
+-   B3: Khởi tạo function export trong controller muốn export
 
 ```php
     // UsersExport in UsersController
-    public function export() 
+    public function export()
     {
         return Excel::download(new UsersExport, 'users.xlsx');
     }
