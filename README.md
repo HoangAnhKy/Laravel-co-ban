@@ -676,4 +676,128 @@ php artisan make:export UsersExport --model=User
 
 -   B4: Khai báo route và sài.
 
+### lưu ý
+
+-   `WithHeadings` Để thêm header cho excel
+-   `ShouldAutoSize` Căn chỉnh
+-   `WithStyles` Thêm màu cho đẹp
+
+```php
+<?php
+
+namespace App\Exports;
+
+use App\Models\Course;
+use Faker\Core\Color;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+
+class CoursesExport implements
+    FromCollection,
+    WithHeadings,
+    ShouldAutoSize,
+    WithStyles
+{
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+    public function collection()
+    {
+        return Course::all();
+    }
+
+    public function headings(): array
+    {
+        return [
+            'NO. ',
+            'NameCourse',
+            'Created At',
+            'Updated At',
+            'Del Fag',
+            'Active'
+        ];
+    }
+
+    public function styles(Worksheet $sheet)
+    {
+        //kẻ đường viền cho tất cả các ô
+        $sheet->getStyle('A1:F'.$sheet->getHighestRow())->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['argb' => '000000'],
+                ],
+            ]
+        ]);
+        return [
+            // set riêng chữ và đổ màu giao diện cho hàng đầu tiên
+            1 => [
+                // set về chữ
+                'font' => [
+                    'bold' => true,
+                    'size' => '18',
+                    'color' => ['argb' => 'FFFFFF']
+                ],
+                // set về giao diện
+                'fill' => [
+                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'startColor' => [
+                        'argb' => '008000',
+                    ],
+                ],
+            ]
+        ];
+    }
+
+}
+
+
+```
+
+-   Nếu muốn chỉnh sửa lại cho hợp lý thì ta nên sử dụng `FromView`. Với cách sửa dụng y như controller bình thường là truyền data rồi gọi tới view
+
+```php
+namespace App\Exports;
+
+use App\Invoice;
+use Illuminate\Contracts\View\View;
+use Maatwebsite\Excel\Concerns\FromView;
+
+class InvoicesExport implements FromView
+{
+    public function view(): View
+    {
+        return view('exports.invoices', [
+            'invoices' => Invoice::all()
+        ]);
+    }
+}
+```
+
+-   Sử dụng `WithMapping` để lấy ra dữ liệu mình muốn
+
+```php
+use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\WithMapping;
+
+class InvoicesExport implements FromQuery, WithMapping
+{
+    /**
+    * @var Invoice $invoice
+    */
+    public function map($invoice): array
+    {
+        return [
+            $invoice->invoice_number,
+            $invoice->user->name,
+            Date::dateTimeToExcel($invoice->created_at),
+        ];
+    }
+}
+```
+
 ---
