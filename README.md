@@ -255,6 +255,9 @@ else{
 -   `clone()` dùng để tránh bị trùng khi sử dụng nhiều lần `$this->model`
 -   `distinct()` dùng để lọc giá trị bị trùng trong databsse
 -   `pluck('city')` dùng để lấy giá trị trong cột nào đó thôi, có thể thay thế select
+-   `take(LIMIT)` dùng đê lấy giới hạn số dòng cần lấy
+-   `setVisible(['id', 'nameCouse'])` dùng để lấy các cột cần lấy
+-   `setHidden(['id', 'nameCouse'])` dùng để ẩn các cột không cần lấy
 
 ---
 
