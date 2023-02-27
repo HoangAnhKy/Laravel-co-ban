@@ -804,3 +804,19 @@ class InvoicesExport implements FromQuery, WithMapping
 ```
 
 ---
+
+#Transaction
+
+```php
+  public function store(ValidateCourse $request)
+    {
+        try{
+            DB::beginTransaction(); // khai báo sự kiện
+        $this->m_course->query()->create($request->validated());
+        DB::commit(); // xác nhận
+        return redirect()->route('courses.index');
+        }catch(Exception $e){
+            DB::rollBack(); // hủy
+        }
+    }
+```
