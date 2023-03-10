@@ -847,7 +847,9 @@ protected function schedule(Schedule $schedule)
 B4: lệnh chạy file
 
 ```sh
-php artisan schedule:run
+php artisan schedule:run        // chạy file
+php artisan schedule:work       // chạy ngầm
+php artisan schedule:list       // xem thời gian chạy
 ```
 
 B5: cấu hình server thì chạy crontab
