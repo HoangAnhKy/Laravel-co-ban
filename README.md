@@ -820,3 +820,43 @@ class InvoicesExport implements FromQuery, WithMapping
         }
     }
 ```
+
+#CronJob
+
+B1: câu lệnh khởi tạo `command`. file command sẽ được khởi tạo bên trong `/app/Console/Command/`
+
+```sh
+    php artisan make:command {namefile} --command={nameCommand}:cron
+```
+
+-   ví dụ `php artisan make:command DemoCron --command=demo:cron`
+
+B2: vào file vừa tạo cấu hình trong `handle`
+
+B3: khai báo trong `kernel`
+
+```sh
+protected function schedule(Schedule $schedule)
+    {
+        // $schedule->command('inspire')->hourly();
+        $schedule->command('demo:cron')
+            ->everyMinute();
+    }
+```
+
+B4: lệnh chạy file
+
+```sh
+php artisan schedule:run
+```
+
+B5: cấu hình server thì chạy crontab
+
+vd
+
+```sh
+crontab - e
+# "C:\laragon\bin\php\php-8.1.0\php.exe" "artisan" demo:cron > "NUL" 2>&1
+```
+
+nếu bị lỗi 'No scheduled commands are ready to run.' thì chạy lệnh `composer require guzzlehttp/guzzle`
