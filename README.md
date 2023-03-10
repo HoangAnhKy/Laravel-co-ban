@@ -833,6 +833,21 @@ B1: câu lệnh khởi tạo `command`. file command sẽ được khởi tạo 
 
 B2: vào file vừa tạo cấu hình trong `handle`
 
+```php
+public function handle()
+{
+    Log::info("Cron Job running at ". now());
+
+    User::create([
+        'name' => 'test2',
+        'email' => 'test2@gmail.com',
+        'password' => bcrypt('123456789')
+    ]);
+
+    return 0;
+}
+```
+
 B3: khai báo trong `kernel`
 
 ```sh
