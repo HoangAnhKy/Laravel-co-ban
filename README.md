@@ -238,6 +238,22 @@ else{
 -   `validated()` dùng để validate dữ liệu khi đã validation dữ liệu
 -   `find(giá trị cần tìm)` dùng để tìm kiếm dữ liệu
 -   `where(cột cần lấy, giá trị so sánh của cột đó)` dùng để kiểm tra dữ liệu
+    ```php
+     // dùng để tìm kiểm nhiều
+     $query->where([
+        ['column_1', '=', 'value_1'],
+        ['column_2', '<>', 'value_2'],
+        [COLUMN, OPERATOR, VALUE],
+        ...
+    ])
+    
+    ```
+-   `whereHas` dùng để search các cột trong bảng liên kết 
+    ```php
+    $query->whereHas('Course', function ($query) use ($key_search){
+                $query->where('name_course', 'like', '%'.$key_search.'%');
+            })->get();
+    ```
 -   `paginate(số trang)` dùng để phân trang
 -   `{{ $users->withQueryString()->links() }}` dùng để nối câu truy vấn để hiện số trang tiếp theo của câu truy vấn
 -   `select(giá trị cần lấy)` dùng để lấy dữ liệu, `addselect(giá trị cần lấy)` dùng để lấy thêm dữ liệu, `selectRaw(câu truy vấn đã được viết sẵn)` dùng để lấy giá trị đã được viết sẵn
