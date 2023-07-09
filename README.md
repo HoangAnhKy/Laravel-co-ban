@@ -37,7 +37,7 @@
 -   [Laravel with reactjs](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/reactjs%20with%20laravel/Reactjs%20with%20Laravel.md)
     -   [demo](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/reactjs%20with%20laravel/laravel-vite-reactjs.zip)
 -   [kết nối 2 database](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/connect%202%20database.md)
-
+-   [Unzip](#unzip-file)
 ---
 
 ## **Sử dụng ide helper**
@@ -893,3 +893,17 @@ crontab - e
 ```
 
 nếu bị lỗi 'No scheduled commands are ready to run.' thì chạy lệnh `composer require guzzlehttp/guzzle`
+
+---
+# Unzip file
+```php
+$zip = new \ZipArchive();
+    if ($zip->open($file ) == TRUE) {
+        // Giải nén tất cả các tệp tin từ tệp tin ZIP vào thư mục đích
+        $zip->extractTo('dir/unzip');
+        $zip->close();
+        echo 'Giải nén tệp tin ZIP thành công';
+    } else {
+        echo 'Không thể mở tệp tin ZIP';
+    }
+```
