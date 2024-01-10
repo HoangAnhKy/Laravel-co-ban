@@ -275,7 +275,8 @@ else{
 -   `setVisible(['id', 'nameCouse'])` dùng để lấy các cột cần lấy
 -   `setHidden(['id', 'nameCouse'])` dùng để ẩn các cột không cần lấy
 -   `setAttribute('key', value)` dùng để thêm mới một giá trị nào đó trong khi xử lý.
-
+-   `current($value)` dùng để lấy giá trị đầu tiên trong mảng ['key' => 'value'].
+-   `next($value)` dùng để lấy giá trị thứ 2 trong mảng ['key' => 'value'].
 ---
 
 ## jquery
