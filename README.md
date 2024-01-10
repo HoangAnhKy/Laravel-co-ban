@@ -260,7 +260,7 @@ else{
 -   `join('tên bảng', 'giá trị 1', 'giá trị 2')` dùng để kết hợp nhiều bảng lại với nhau
 -   `joinsub('Tên bảng', 'as tên mới hoặc không', function($join){ $join->on('tên bảng', 'tên bảng join') })` dùng để kết hợp các bảng có sử dụng subquery, các câu truy vấn lồng nhau
 -   `when` dùng để thay thế if else. Nó sẽ kiểm tra giá trị cần lấy có tồn tại hay không rồi sau đó kiểm tra lại một lần nữa xem giá trị có trùng với dữ liệu trong database hay không nếu, nếu có thì nó mới lấy
--   `setAttribute('key', value)` dùng để thêm mới một giá trị nào đó trong khi xử lý.
+
 ```php
   ->when($request->has(giá trị cần lấy), function($q){
       return $q->where(cột cần lấy, giá trị so sánh);
@@ -274,6 +274,7 @@ else{
 -   `take(LIMIT)` dùng đê lấy giới hạn số dòng cần lấy
 -   `setVisible(['id', 'nameCouse'])` dùng để lấy các cột cần lấy
 -   `setHidden(['id', 'nameCouse'])` dùng để ẩn các cột không cần lấy
+-   `setAttribute('key', value)` dùng để thêm mới một giá trị nào đó trong khi xử lý.
 
 ---
 
