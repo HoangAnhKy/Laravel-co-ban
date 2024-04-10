@@ -254,6 +254,15 @@ else{
                 $query->where('name_course', 'like', '%'.$key_search.'%');
             })->get();
     ```
+-   `orWhere` dùng để tìm kiếm hoặc
+    ```php
+        if (!empty($list_search)){
+            $query->where(...array_shift($list_search));
+            foreach ($list_search as $search):
+                $query->orWhere(...$search);
+            endforeach;
+        }
+    ```
 -   `paginate(số trang)` dùng để phân trang
 -   `{{ $users->withQueryString()->links() }}` dùng để nối câu truy vấn để hiện số trang tiếp theo của câu truy vấn
 -   `select(giá trị cần lấy)` dùng để lấy dữ liệu, `addselect(giá trị cần lấy)` dùng để lấy thêm dữ liệu, `selectRaw(câu truy vấn đã được viết sẵn)` dùng để lấy giá trị đã được viết sẵn
