@@ -80,3 +80,58 @@ vd:
         return redirect()->route('course.index');
     }
 
+-------------------------------------------------------------- custom validated --------------------------------------------------------------
+
+- Sử dụng câu lệnh sau để tạo ra Rule theo ý muốn của mình, có thể sử dụng lại nhiều lần
+
+```sh
+    php artisan make:rule ValueRequestUser
+```
+
+thư mục được tạo sẽ nằm trong thư mục `app/Rules/*`
+
+- để sử dụng thì chỉ cần gọi nó ở trong filed cần check validated
+
+```php 
+    $validate = $request->validate([
+        'old_password'=>['required', new ValueRequestUser($user)],
+        'password'=>'required',
+        'repassword'=>'required'
+    ]);
+```
+
+Lưu ý: muốn nhận data truyền vào thì phải sử dụng thêm __construct
+- ví dụ
+```php
+<?php
+
+namespace App\Rules;
+
+use App\Models\Users;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+
+class ValueRequestUser implements ValidationRule
+{
+    private $user;
+    public function __construct($user)
+    {
+        $this->user = $user;
+    }
+
+    /**
+     * Run the validation rule.
+     *
+     * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
+     */
+    public function validate(string $attribute, mixed $value, Closure $fail) : void
+    {
+        if( !Hash::check($value, $this->user->password)){
+            $fail('Password not matching');
+        }
+    }
+}
+
+```
