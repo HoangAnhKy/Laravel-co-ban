@@ -12,3 +12,5 @@ và gọi thêm @extends('file gốc chứa toàn bộ dao diện')
 sử dụng stack('[tên]') để import file css hoặc js vào hàm chính, hàm con sửa dụng push('[tên]') để đẩy qua
 
 chỉnh thanh patigone thành bootrap bằng cách vô app=>provider=>AppSeviceProvider thêm  Paginator::useBootstrap(); Trong boot
+
+để xuất html ra ngoài view dùng {!! $text !!}
