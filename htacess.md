@@ -32,6 +32,20 @@ RewriteCond: Kiểm tra nếu file hoặc thư mục không tồn tại(chỉ th
 
  - có thể dùng biểu thức chính quy(Regex) để check
 
+ - Chi tiết của `%{Type}`
+
+    | Biến môi trường        | Ý nghĩa                                                   | Ví dụ giá trị                                    |
+    |------------------------|-----------------------------------------------------------|--------------------------------------------------|
+    | **`REQUEST_URI`**       | Đường dẫn và chuỗi truy vấn từ yêu cầu URL                | `/products/view.php?id=123`                      |
+    | **`HTTP_HOST`**         | Tên miền hoặc địa chỉ IP của máy chủ                      | `example.com`                                    |
+    | **`QUERY_STRING`**      | Chuỗi truy vấn từ URL                                     | `term=apple&category=fruit`                      |
+    | **`REQUEST_FILENAME`**  | Đường dẫn tuyệt đối tới file trên hệ thống                | `/var/www/html/products/view.php`                |
+    | **`REMOTE_ADDR`**       | Địa chỉ IP của client (người dùng)                        | `192.168.1.10`                                   |
+    | **`HTTP_USER_AGENT`**   | Chuỗi mô tả trình duyệt/hệ điều hành của người dùng       | `Mozilla/5.0 (Windows NT 10.0; Win64; x64)`      |
+    | **`SERVER_PORT`**       | Cổng máy chủ mà Apache đang lắng nghe                     | `80` (HTTP) hoặc `443` (HTTPS)                   |
+    | **`HTTP_REFERER`**      | URL của trang web dẫn người dùng đến trang hiện tại       | `https://www.google.com/search?q=apache+rewrite` |
+
+
 RewriteRule: Quy tắc viết lại URL.
 - `$1` là tham chiếu tới chuỗi con trong mẫu biểu thức chính quy của RewriteRule. Ví dụ `RewriteRule ^post/([0-9]+)$ post.php?id=$1 [L]`
 là đang so sánh nhóm con đầu tiên khớp với chuỗi các số (0-9)
