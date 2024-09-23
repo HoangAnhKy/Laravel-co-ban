@@ -24,7 +24,7 @@ if (file_exists($dir)) {
     // Kiểm tra nếu phương thức tồn tại
     if (method_exists($controller, $methodName)) {
         // $controller->{$methodName}();
-        call_user_func_array([$controller, $name_action], $slug); // truyền toàn bộ slug vô
+        call_user_func_array([$controller, $methodName], $slug); // truyền toàn bộ slug vô
     } else {
         echo "Method not found.";
     }
