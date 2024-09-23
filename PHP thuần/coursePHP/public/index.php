@@ -7,6 +7,9 @@ $url = isset($_GET['url']) ? $_GET['url'] : null;
 $url = rtrim($url, '/');
 $url = explode('/', $url);
 
+// Lấy slug còn lại đằng sau ví dụ URL/course/edit/id
+$slug =  count($url) > 2 ? array_slice($url, 2) : [];
+
 // Phân tích URL và gọi controller tương ứng
 $controllerName = isset($url[0]) && $url[0] ? ucfirst($url[0]) . 'Controller' : 'UsersController';
 $methodName = isset($url[1]) && $url[1] ? $url[1] : 'index';
@@ -20,7 +23,8 @@ if (file_exists($dir)) {
 
     // Kiểm tra nếu phương thức tồn tại
     if (method_exists($controller, $methodName)) {
-        $controller->{$methodName}();
+        // $controller->{$methodName}();
+        call_user_func_array([$controller, $name_action], $slug); // truyền toàn bộ slug vô
     } else {
         echo "Method not found.";
     }
