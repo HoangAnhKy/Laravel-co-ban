@@ -15,7 +15,7 @@ class CourseController extends Controller
     {
         parent::__construct();
         $this->modal = new Courses();
-        $this->layout = __DIR__ . "/../view/coures/";
+        $this->layout = __DIR__ . "/../view/course/";
     }
 
     public function index()
@@ -29,13 +29,13 @@ class CourseController extends Controller
         $sql = "SELECT * FROM {$this->modal->alias}";
 
         if ($search !== ""){
-//            $sql .= " WHERE name LIKE '%{$search}%' ";
-//            $sql_count .= " WHERE name LIKE '%{$search}%' ";
+            $sql .= " WHERE name LIKE '%{$search}%' ";
+            $sql_count .= " WHERE name LIKE '%{$search}%' ";
         }
 
         $sql .= " LIMIT {$offset}, " . LIMIT;
-        $row = (int)ceil($this->db->selectOne($sql_count)["count"] / LIMIT);
-        $courses = $this->db->select($sql, ucfirst($this->modal->alias));
+        $row = (int)ceil($this->modal->selectOne($sql_count)["count"] / LIMIT);
+        $courses = $this->modal->select($sql, ucfirst($this->modal->alias));
 
         require $this->layout . "index.php";
     }
@@ -45,7 +45,7 @@ class CourseController extends Controller
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $course_save = new Courses($_POST);
             $sql = "INSERT INTO {$this->modal->alias} (name) VALUES ('{$course_save->name}')";
-            if ($this->db->exec($sql)) {
+            if ($this->modal->exec($sql)) {
                 header("Location: " . BASE_URL . "/course");
                 exit;
             }
@@ -61,13 +61,13 @@ class CourseController extends Controller
                 $course_save = new Courses($_POST);
                 $sql = "UPDATE {$this->modal->alias} SET name='{$course_save->name}' WHERE id={$id}";
 
-                if ($this->db->exec($sql)) {
+                if ($this->modal->exec($sql)) {
                     header("Location: " . BASE_URL . "/course");
                     exit;
                 }
             } else {
                 $sql = "SELECT * FROM {$this->modal->alias} WHERE id = {$id}";
-                $course = $this->db->selectOne($sql, ucfirst($this->modal->alias));
+                $course = $this->modal->selectOne($sql, ucfirst($this->modal->alias));
                 require $this->layout . "edit.php";
             }
         }
@@ -78,7 +78,7 @@ class CourseController extends Controller
         if (isset($id) && is_numeric($id)) {
             $sql = "DELETE FROM {$this->modal->alias} WHERE id={$id}";
 
-            if ($this->db->exec($sql)) {
+            if ($this->modal->exec($sql)) {
                 header("Location: " . BASE_URL . "/course");
                 exit;
             }

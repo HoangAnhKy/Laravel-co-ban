@@ -1,6 +1,8 @@
 <?php
 namespace modal;
-class Courses {
+
+require_once  __DIR__."/Table.php";
+class Courses extends Table {
 
     public $alias = "courses";
     public $id;
@@ -17,16 +19,9 @@ class Courses {
         }
     }
 
-    public function getDisplayCreated(){
-        return !empty($this->created_at) ? $this->created_at->format('Y-m-d') : "";
-    }
-
-    public function getUpdated(){
-        return !empty($this->updated_at) ? $this->updated_at->format('Y-m-d') : "";
-
-    }
-
-    public function setName($name){
-        return $this->name = $name;
+    public function getCourse (){
+        $sql = "SELECT id, name FROM {$this->alias}";
+        $result = $this->select($sql, $this->alias);
+        return $result;
     }
 }

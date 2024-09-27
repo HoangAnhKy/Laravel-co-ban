@@ -49,7 +49,7 @@ ob_start() ?>
         <?php endif; ?>
         </tbody>
     </table>
-        <?php require __DIR__ . "/../layout/componemt/paginate.php" ?>
+    <?php require __DIR__ . "/../layout/componemt/paginate.php" ?>
 
 
 <?php $content = ob_get_clean(); ?>

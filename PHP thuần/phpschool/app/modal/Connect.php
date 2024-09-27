@@ -10,7 +10,7 @@ class Connect
         return $connect;
     }
 
-    public function select($sql, $modal = "")
+    public function select($sql, $modal = "", $contain = [])
     {
         $connect = $this->ConnectDB();
         $response = $connect->query($sql);
@@ -20,13 +20,24 @@ class Connect
         if ($modal !== "" && file_exists(__DIR__ . "/" . $modal . ".php")) {
             $modal = "\\modal\\" . $modal;
         }
-        foreach ($response as $each) {
+
+        foreach ($response as $row => $each) {
             if ($modal !== "") {
-                $result[] = new $modal($each);
+                $result[$row] = new $modal($each);
+                if (!empty($contain)){
+                    foreach ($contain as $key){
+                        if (isset($each[$key])){
+                            $modal_contain = "\\modal\\" . ucfirst($key);
+                            $result[$row]->$key = new $modal_contain(json_decode($each[$key], true)[0]);
+                        }
+                    }
+                }
+
             } else {
-                $result[] = $each;
+                $result[$row] = $each;
             }
         }
+
         return $result;
     }
     public function selectOne($sql, $modal = "")
