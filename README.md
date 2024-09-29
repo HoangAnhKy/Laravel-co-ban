@@ -40,6 +40,26 @@
 -   [Unzip](#unzip-file)
 ---
 
+## **Chỉnh sửa Modal**
+
+- muốn tạo một hàm viết sẵn cho các table sau kế thừa ta phải dùng `static function` (phương thức tĩnh)
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Tables extends Model
+{
+    public static function selectALL(){
+        return self::select()->paginate(LIMIT)->items();
+    }
+}
+
+```
+
 ## **Sử dụng ide helper**
 
 Chạy lần lượt các lệnh sau để cài đặt
