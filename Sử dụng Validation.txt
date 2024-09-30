@@ -45,8 +45,16 @@ vd:
     }
     
     ------------------------------------------------------------------------------------------------------------------------------------------
-    muốn lấy giá trị từ route ta dùng
+    Xử lý nâng cao hơn.
     
+    - prepareForValidation() xử lý trước khi xác thực.
+    - passedValidation() sẽ xử lý sau khi quá trình xác thực thành công.
+    
+    
+    - $this->route(key): lấy giá trị từ route 
+    - $this->merge([key => value]): thêm giá trị vào $request để check
+
+    ví dụ
      protected function prepareForValidation() 
     {
         $this->merge(['course' => $this->route('course')]);
