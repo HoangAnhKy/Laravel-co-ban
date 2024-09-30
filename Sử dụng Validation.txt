@@ -49,6 +49,7 @@ vd:
     
     - prepareForValidation() xử lý trước khi xác thực.
     - passedValidation() sẽ xử lý sau khi quá trình xác thực thành công.
+    - validated() hàm thực thi validate
     
     
     - $this->route(key): lấy giá trị từ route 
@@ -67,6 +68,14 @@ vd:
               Rule::exists(Course::class, 'id'),
             ],
         ];
+    }
+
+    // kế thừa và ghi đè nó
+    public function validated($key = null, $default = null)
+    {
+        $validated = parent::validated();
+        unset($validated['course']);
+        return $validated;
     }
 
 ----------------------------------------------------------------------- validated --------------------------------------------------------------
