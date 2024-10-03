@@ -238,9 +238,11 @@ Ví dụ:
 ```
 
 # Một số phương thức cơ bản:
+
 + `Cache::put()`          // Lưu trữ giá trị vào cache
 + `Cache::get()`          // Lấy giá trị từ cache
 + `Cache::remember()`     // Dùng cache remember để lưu và tự động lấy giá trị nếu chưa tồn tại
++ `Cache::rememberForever()`     // Dùng để lưu vĩnh viễn
 + `Cache::forget()`       // Xóa cache
 + `Cache::has()`          // Kiểm tra tồn tại
 
@@ -259,3 +261,15 @@ $value = Cache::remember('key', 600, function () {
 // Xóa cache
 Cache::forget('key');
 ```
+
++ `Cache::tags('key')` nhóm các cache liên quan đến một tag
+    - `Cache::tags('key')->flush()` xóa toàn bộ cache liên quan tới key
+    - `Cache::tags('key')->put('key', 'value', 'time')` lưu
+    - `Cache::tags('key')->get('key')` lấy
+    - `Cache::tags('key')->forget('key')` xóa cache cụ thể
+    - `Cache::tags('key')->has('key')` check tồn tại
+    - `Cache::tags('key')->remember()` và `Cache::tags('key')->rememberForever()`
+
++  `Cache::getMemcached()` trả về một đối tượng Memcached, từ đó có thể gọi trực tiếp các phương thức của Memcached như `getAllKeys()`, `get()`, `set()`, `delete()`, `flush()`, `getStats()`, `increment()`, và `decrement()`.
+
+    ví dụ `Cache::getMemcached()->getAllKeys()` Lấy tất cả các keys
