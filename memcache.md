@@ -9,28 +9,63 @@ php artisan cache:clear && php artisan view:clear && php artisan config:clear &&
 ```
 # Cấu hình memcache
 
-B1: Cài đặt Memcached
+B1: Cài đặt Memcached và php-memcached 
 
+1) [windown](https://memcached.org/)
 
-- [windown](https://memcached.org/)
-- linux
+tải [php-memcached ](https://windows.php.net/downloads/pecl/releases/memcached/3.2.0/) 
+
+sau đó copy thư mục `php-memcached.dll` qua ext và thêm nó vô `php.ini`
+
+2) linux
 ```sh
 # cài với linux
 sudo apt-get install memcached php-memcached
 ```
 
-- docker
+3) docker
 
 Sử dụng lệnh sau để kéo và chạy một container Memcached từ Docker Hub:
 
 ```sh
-docker run -d --name memcached-container -p 11211:11211 memcached
+docker run -d --name memcached-container -p 11211:11211 memcached 
 ```
-với: 
-- -d: Chạy container ở chế độ nền (detached mode).
-- --name memcached-container: Đặt tên cho container là memcached-container.
-- -p 11211:11211: Mở cổng 11211 của container ra cổng 11211 của máy chủ để Laravel có thể kết nối tới.
+- chú thích:
+    - -d: Chạy container ở chế độ nền (detached mode).
+    - --name memcached-container: Đặt tên cho container là memcached-container.
+    - -p 11211:11211: Mở cổng 11211 của container ra cổng 11211 của máy chủ để Laravel có thể kết nối tới.
 memcached: Tên của image Memcached từ Docker Hub.
+
+**Lưu ý khi truy cập docker check cache**
+- Khi sử dụng docker exec để truy cập vào container, cần thêm tùy chọn `--user root` để có quyền root trong container.
+
+```sh
+docker exec -it --user root memcached-container sh
+```
+sau khi vào bằng root cài telnet với libmemcached-tools (nếu muốn sử dụng memcached-tool):
+
+```sh
+apt-get update
+apt-get install telnet
+apt-get install libmemcached-tools
+```
+
+- Kết nối telnet sau khi cài đặt
+
+```sh
+telnet 127.0.0.1 11211
+
+# thành công sẽ hiện
+# Trying 127.0.0.1...
+# Connected to 127.0.0.1.
+# Escape character is '^]'.
+
+```
+lệnh cơ bản
+- `quit` để thoát
+- `get {key}` để lấy {key}
+- `stats items` hiển thị thông tin về các slab (bộ nhớ được chia thành các khối gọi là slabs) và số lượng các items (các cặp key-value) được lưu trữ trong mỗi slab.
+- `stats cachedump` kiểm tra danh sách các key trong Memcached
 
 B2: Muốn chỉnh sửa `memcache` ở laravel, vào `config/cache`tìm đến mục `stores`
 
