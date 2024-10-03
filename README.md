@@ -38,6 +38,7 @@
     -   [demo](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/reactjs%20with%20laravel/laravel-vite-reactjs.zip)
 -   [kết nối 2 database](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/connect%202%20database.md)
 -   [Unzip](#unzip-file)
+-   [Memcached](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/memcache.md)
 ---
 
 ## **Chỉnh sửa Modal**
