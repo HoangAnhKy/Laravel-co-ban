@@ -41,6 +41,35 @@
 -   [Memcached](https://github.com/HoangAnhKy/Laravel-co-ban/blob/main/memcache.md)
 ---
 
+## **Lưu ý với hàm tĩnh (static function)** ##
+
+- Nếu dùng hàm tĩnh muốn dùng biến của lớp con thì dùn `static`
+
+- ví dụ: 
+
+```php
+// Users.php
+class Users extends Table
+{
+    // ...
+        protected static $key_students = "student_";
+    // ...
+}
+// Table.php
+class Table
+{
+    // ...
+     public static function saveValue($request = NULL)
+    {
+        if (!empty(static::$key_students)) {
+            self::clearCache(static::$key_students);
+        }
+    }
+    // ...
+}
+
+```
+
 ## **Chỉnh sửa Modal**
 
 - muốn tạo một hàm viết sẵn cho các table sau kế thừa ta phải dùng `static function` (phương thức tĩnh)
