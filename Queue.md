@@ -2,6 +2,9 @@ Queues (hàng đợi) trong Laravel cho phép xử lý các tác vụ nặng m�
 
 Laravel hỗ trợ nhiều driver cho queue như database, redis, sqs, beanstalkd, v.v. 
 
+
+ShouldQueue là một interface được sử dụng để chỉ định rằng một job, event, hoặc mailable nên được xử lý thông qua hệ thống queue thay vì được thực thi ngay lập tức
+
 # Tạo Queue bằng DATABASE
 
 Cấu hình driver trong .env: `QUEUE_CONNECTION=database`
