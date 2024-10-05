@@ -416,6 +416,66 @@ Các phương thức hỗ trợ lặp qua từng phần tử hoặc thực hiệ
   $wrapped = Collection::wrap('Hello');
   ```
 
+- `shift()`: Lấy và xóa phần tử đầu tiên của collection.
+
+  ```php
+  $firstItem = $collection->shift();
+  // Kết quả của $firstItem: 1
+  // Kết quả của collection: [2, 3, 4, 5]
+  ```
+
+- `pop()`: Lấy và xóa phần tử cuối cùng của collection.
+
+  ```php
+  $lastItem = $collection->pop();
+  // Kết quả của $lastItem: 5
+  // Kết quả của collection: [1, 2, 3, 4]
+  ```
+
+- `prepend()`: Thêm một phần tử vào đầu collection.
+
+  ```php
+  $collection->prepend(0);
+  // Kết quả: [0, 1, 2, 3, 4, 5]
+  ```
+
+- `push()`: Thêm một phần tử vào cuối collection.
+
+  ```php
+  $collection->push(6);
+  // Kết quả: [1, 2, 3, 4, 5, 6]
+  ```
+
+- `put()`: Thêm hoặc cập nhật một phần tử với khóa cụ thể.
+
+  ```php
+  $collection = collect(['name' => 'John']);
+  $collection->put('age', 30);
+  // Kết quả: ['name' => 'John', 'age' => 30]
+  ```
+
+- `set()`: Tương tự như `put()`, được sử dụng để đặt giá trị cho một khóa.
+
+  ```php
+  $collection->set('location', 'Hanoi');
+  // Kết quả: ['name' => 'John', 'age' => 30, 'location' => 'Hanoi']
+  ```
+
+- `forget()`: Xóa một phần tử khỏi collection bằng khóa của nó.
+
+  ```php
+  $collection->forget('age');
+  // Kết quả: ['name' => 'John', 'location' => 'Hanoi']
+  ```
+
+- `pull()`: Lấy ra và xóa một phần tử khỏi collection.
+
+  ```php
+  $value = $collection->pull('name');
+  // Kết quả của $value: 'John'
+  // Kết quả của collection: ['location' => 'Hanoi']
+  ```
+
 ## 7. Phương Thức Điều Kiện (Conditional Methods)
 Dùng để thực thi các thao tác dựa trên điều kiện.
 
@@ -499,4 +559,57 @@ Dùng để nối dữ liệu trong collection.
   ```php
   $joined = $collection->join(', ');
   // Kết quả: "1, 2, 3, 4, 5"
+  ```
+
+## 12. Phương Thức Cập Nhật Và Thêm Phần Tử (Update and Add Methods)
+Dùng để cập nhật hoặc thêm phần tử mới vào collection.
+
+- `push()`: Thêm một phần tử vào cuối collection.
+
+  ```php
+  $collection->push(6);
+  // Kết quả: [1, 2, 3, 4, 5, 6]
+  ```
+
+- `put()`: Đặt một cặp khóa - giá trị vào collection.
+
+  ```php
+  $collection->put(10, 'new value');
+  // Kết quả: [1, 2, 3, 4, 5, 10 => 'new value']
+  ```
+
+- `prepend()`: Thêm một phần tử vào đầu collection.
+
+  ```php
+  $collection->prepend(0);
+  // Kết quả: [0, 1, 2, 3, 4, 5]
+  ```
+
+- `add()`: Alias của `push()`.
+
+  ```php
+  $collection->add(7);
+  // Kết quả: [1, 2, 3, 4, 5, 7]
+  ```
+
+- `forget()`: Xóa một phần tử dựa trên khóa.
+
+  ```php
+  $collection->forget(1);
+  // Kết quả: [0 => 1, 2 => 3, 3 => 4, 4 => 5]
+  ```
+
+- `set()`: Cập nhật giá trị cho một khóa cụ thể.
+
+  ```php
+  $collection->set(2, 'updated value');
+  // Kết quả: [1, 'updated value', 3, 4, 5]
+  ```
+
+- `update()`: Cập nhật nhiều giá trị trong collection.
+
+  ```php
+  $collection = collect(['name' => 'John', 'age' => 30]);
+  $updated = $collection->update(['age' => 31, 'city' => 'New York']);
+  // Kết quả: ['name' => 'John', 'age' => 31, 'city' => 'New York']
   ```
