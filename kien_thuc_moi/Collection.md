@@ -163,6 +163,11 @@ Các hàm này thường được sử dụng để thao tác trực tiếp trê
   ```
 
 - **`sole`**: Lấy phần tử duy nhất trong mảng thỏa mãn điều kiện, hoặc trả về lỗi nếu không có hoặc nhiều hơn một.
+  ```php
+  collect([1, 2, 3, 4])->sole(function (int $value, int $key) {
+      return $value === 2;
+  });// 2
+  ```
 
 ### Biến Đổi và Chuyển Đổi:
 
@@ -441,7 +446,7 @@ Các hàm này thường được sử dụng để thao tác trực tiếp trê
   var_dump($newCollection->all()); //[1,2,3]
   ```
 
-- **`pipe`**: Truyền collection qua một hoặc nhiều hàm xử lý.
+- **`pipe`**: Truyền collection qua một hàm xử lý.
   ```php
   $collection = collect([1, 2, 3]);
   $piped = $collection->pipe(function (Collection $collection) {
@@ -482,9 +487,7 @@ Các hàm này thường được sử dụng để thao tác trực tiếp trê
       function (Collection $collection) {
           return $collection->sum();
       },
-  ]);
-
-  // 15
+  ]); // 15
   ```
 
 - **`value`**: Phương pháp này lấy một giá trị nhất định từ phần tử đầu tiên của bộ sưu tập:
@@ -520,63 +523,454 @@ Các hàm này thường được sử dụng để thao tác trực tiếp trê
 
 ### Tính Toán và Tổng Hợp:
 
-- **`average`**: Tính giá trị trung bình của các phần tử trong mảng.
-- **`avg`**: Tương tự như `average`, tính giá trị trung bình.
+- **`avg`** và **`average`**: Tính giá trị trung bình của các phần tử trong mảng.
+
+  ```php
+  // use key in array
+  $average = collect([
+      ['foo' => 10],
+      ['foo' => 10],
+      ['foo' => 20],
+      ['foo' => 40]
+  ])->avg('foo'); // 20
+  
+  // not use key
+  $average = collect([1, 1, 2, 4])->avg();// 2
+  ```
 - **`count`**: Đếm số lượng phần tử trong mảng.
+
+  ```php
+  $collection = collect([1, 2, 3, 4]);
+ 
+  $collection->count(); // 4
+  ```
 - **`countBy`**: Đếm số lượng phần tử theo một tiêu chí cụ thể.
+
+  ```php
+  $collection = collect([1, 2, 2, 2, 3]);
+  $counted = $collection->countBy();  
+  $counted->all();// [1 => 1, 2 => 3, 3 => 1]
+  ```
 - **`max`**: Tìm giá trị lớn nhất trong mảng.
+
+  ```php
+  $max = collect([
+    ['foo' => 10],
+    ['foo' => 20]
+  ])->max('foo'); // 20
+
+  $max = collect([1, 2, 3, 4, 5])->max(); // 5
+  ```
 - **`median`**: Tính giá trị trung vị của các phần tử trong mảng.
+
+  ```php
+  $median = collect([
+      ['foo' => 10],
+      ['foo' => 10],
+      ['foo' => 20],
+      ['foo' => 40]
+  ])->median('foo');// 15
+  
+  $median = collect([1, 1, 2, 4])->median();// 1.5
+  ```
 - **`min`**: Tìm giá trị nhỏ nhất trong mảng.
+
+  ```php
+  $min = collect([['foo' => 10], ['foo' => 20]])->min('foo');// 10
+  $min = collect([1, 2, 3, 4, 5])->min();// 1
+  ```
 - **`mode`**: Tìm giá trị xuất hiện nhiều nhất trong mảng.
+
+  ```php
+  $mode = collect([
+    ['foo' => 10],
+    ['foo' => 10],
+    ['foo' => 20],
+    ['foo' => 40]
+  ])->mode('foo');// [10]
+
+  $mode = collect([1, 1, 2, 2])->mode();// [1, 2]
+  ```
 - **`sum`**: Tính tổng các phần tử trong mảng.
+
+  ```php
+  collect([1, 2, 3, 4, 5])->sum();// 15
+
+  collect([
+      ['foo' => 10],
+      ['foo' => 10],
+      ['foo' => 20],
+      ['foo' => 40]
+  ])->sum('foo'); // 80
+  ```
 - **`multiply`**: Nhân các phần tử trong mảng với nhau.
+
+  ```php
+  collect([3])->multiply(3);// [3,3,3]
+  ```
 - **`percentage`**: Tính tỷ lệ phần trăm của các phần tử trong mảng.
+  ```php
+  $collection = collect([1, 1, 2, 2, 2, 3]);
+
+  $percentage = $collection->percentage(fn ($value) => $value === 1); // 33.33
+  ```
 
 ### Nhóm và Tổ Chức:
 
 - **`groupBy`**: Nhóm các phần tử theo một khóa nhất định.
-- **`keyBy`**: Tạo khóa cho mảng dựa trên một thuộc tính của phần tử.
-- **`mapToGroups`**: Nhóm các phần tử dựa trên kết quả của một hàm.
 
+  ```php
+  // có thể dùng callable|array|string 
+
+  $collection = collect([
+      ['account_id' => 'account-x10', 'product' => 'Chair'],
+      ['account_id' => 'account-x10', 'product' => 'Bookcase'],
+      ['account_id' => 'account-x11', 'product' => 'Desk'],
+  ]);
+  
+  $grouped = $collection->groupBy('account_id');
+  
+  /*
+    $collection->groupBy(function (array $item, int $key) {
+      return substr($item['account_id'], -3);
+    });
+
+    dùng cho mảng đa chiều
+
+    $data->groupBy(['skill', function (array $item) {
+      return $item['roles'];
+    }], preserveKeys: true);
+
+  */
+
+  $grouped->all();
+  
+  /*
+      [
+          'account-x10' => [
+              ['account_id' => 'account-x10', 'product' => 'Chair'],
+              ['account_id' => 'account-x10', 'product' => 'Bookcase'],
+          ],
+          'account-x11' => [
+              ['account_id' => 'account-x11', 'product' => 'Desk'],
+          ],
+      ]
+  */
+  ```
+- **`keyBy`**: Tạo khóa cho mảng dựa trên một thuộc tính của phần tử.
+
+  ```php
+  $collection = collect([
+    ['product_id' => 'prod-100', 'name' => 'Desk'],
+    ['product_id' => 'prod-200', 'name' => 'Chair'],
+  ]);
+
+  $keyed = $collection->keyBy('product_id');
+
+  $keyed->all();
+
+  /*
+    [
+        'prod-100' => ['product_id' => 'prod-100', 'name' => 'Desk'],
+        'prod-200' => ['product_id' => 'prod-200', 'name' => 'Chair'],
+    ]
+  */
+  ```
 ### Sắp Xếp và Trật Tự:
 
 - **`sort`**: Sắp xếp các phần tử trong mảng.
+
+  ```php
+  $collection = collect([5, 3, 1, 2, 4]);
+ 
+  $sorted = $collection->sort();
+  // collection được sắp xếp giữ lại các khóa mảng ban đầu, vì vậy trong ví dụ sau, chúng ta sẽ sử dụng phương `values` pháp để đặt lại các khóa thành các chỉ mục được đánh số liên tiếp
+  $sorted->values()->all();// [1, 2, 3, 4, 5]
+  ```
 - **`sortBy`**: Sắp xếp mảng theo một khóa cụ thể.
-- **`sortByDesc`**: Sắp xếp mảng theo một khóa cụ thể theo thứ tự giảm dần.
-- **`sortDesc`**: Sắp xếp mảng theo thứ tự giảm dần.
+  ```php
+
+  $collection = collect([
+      ['name' => 'Desk', 'price' => 200],
+      ['name' => 'Chair', 'price' => 100],
+      ['name' => 'Bookcase', 'price' => 150],
+  ]);
+  
+  $sorted = $collection->sortBy('price');
+  
+  $sorted->values()->all();
+  
+  /*
+      [
+          ['name' => 'Chair', 'price' => 100],
+          ['name' => 'Bookcase', 'price' => 150],
+          ['name' => 'Desk', 'price' => 200],
+      ]
+  */
+  ```
+- **`sortByDesc`**: Sắp xếp mảng theo một khóa cụ thể theo thứ tự giảm dần. Ngược lại của **`sortBy`**
+
+- **`sortDesc`**: Sắp xếp mảng theo thứ tự giảm dần. Ngược lại của **`sort`**
+
 - **`sortKeys`**: Sắp xếp các khóa trong mảng.
-- **`sortKeysDesc`**: Sắp xếp các khóa trong mảng theo thứ tự giảm dần.
+
+  ```php
+  $collection = collect([
+      'id' => 22345,
+      'first' => 'John',
+      'last' => 'Doe',
+  ]);
+  
+  $sorted = $collection->sortKeys();
+  
+  $sorted->all();
+  
+  /*
+      [
+          'first' => 'John',
+          'id' => 22345,
+          'last' => 'Doe',
+      ]
+  */
+  ```
+- **`sortKeysDesc`**: Sắp xếp các khóa trong mảng theo thứ tự giảm dần. Ngược lại của **`sortKeys`**
+
 - **`sortKeysUsing`**: Sắp xếp các khóa trong mảng bằng một hàm so sánh tùy chỉnh.
+
+  ```php
+  $collection = collect([
+      'ID' => 22345,
+      'first' => 'John',
+      'last' => 'Doe',
+  ]);
+  
+  $sorted = $collection->sortKeysUsing('strnatcasecmp'); // gọi hàm callback strnatcasecmp();
+  
+  $sorted->all();
+  
+  /*
+      [
+          'first' => 'John',
+          'ID' => 22345,
+          'last' => 'Doe',
+      ]
+  */
+  ```
+
 - **`shuffle`**: Xáo trộn thứ tự các phần tử trong mảng.
+  
+  ```php
+  $collection = collect([1, 2, 3, 4, 5]);
+ 
+  $shuffled = $collection->shuffle();
+  
+  $shuffled->all();
+  
+  // [3, 2, 5, 1, 4] - (generated randomly)
+  ```
 
 ### Phân Chia và Chia Nhỏ:
 
 - **`chunk`**: Chia mảng thành các mảng con có kích thước cố định.
+  ```php
+  $collection = collect([1, 2, 3, 4, 5, 6, 7]);
+ 
+  $chunks = $collection->chunk(4);
+  
+  $chunks->all();// [[1, 2, 3, 4], [5, 6, 7]]
+  ```
 - **`chunkWhile`**: Chia mảng thành các mảng con dựa trên điều kiện cho trước.
+
+  ```php
+  $collection = collect(str_split('AABBCCCD'));
+ 
+  $chunks = $collection->chunkWhile(function (string $value, int $key, Collection $chunk) {
+      // kiểm tra nếu phần tử hiện tại ($value) bằng phần tử cuối của chunk hiện tại ($chunk->last()), thì tiếp tục thêm vào chunk hiện tại.
+      return $value === $chunk->last();
+  });
+ 
+  $chunks->all(); // [['A', 'A'], ['B', 'B'], ['C', 'C', 'C'], ['D']]
+  ```
 - **`partition`**: Phân chia mảng thành hai nhóm dựa trên một điều kiện.
+  ```php
+  $collection = collect([1, 2, 3, 4, 5, 6]);
+ 
+  [$underThree, $equalOrAboveThree] = $collection->partition(function (int $i) {
+      return $i < 3;
+  });
+  
+  $underThree->all();// [1, 2]
+  
+  $equalOrAboveThree->all();// [3, 4, 5, 6]
+  ```
 - **`slice`**: Lấy một phần của mảng bắt đầu từ vị trí cụ thể.
+  ```php
+  $collection = collect([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  // (Start, end) nếu ko có end sẽ lấy hết
+  $slice = $collection->slice(4);
+  
+  $slice->all();// [5, 6, 7, 8, 9, 10]
+  ```
 - **`sliding`**: Tạo các cửa sổ trượt từ mảng.
+
+  ```php
+  $collection = collect([1, 2, 3, 4, 5]);
+  $chunks = $collection->sliding(2,  step: 1);
+  $chunks->toArray();// [[1, 2], [2, 3], [3, 4], [4, 5]]
+  ```
+
 - **`splice`**: Thêm hoặc loại bỏ phần tử từ mảng tại vị trí cụ thể.
 
+  ```php
+  $collection = collect([1, 2, 3, 4, 5]);
+  // (Start, end) nếu ko có end sẽ lấy hết
+  $chunk = $collection->splice(2, 1);
+  
+  $chunk->all();// [3]
+  
+  $collection->all();// [1, 2, 4, 5]
+  ```
 ### Kết Nối và Hợp Nhất:
 
 - **`concat`**: Kết hợp hai hoặc nhiều mảng lại với nhau.
+
+  ```php
+  $collection = collect(['John Doe']);
+ 
+  $concatenated = $collection->concat(['Jane Doe'])->concat(['name' => 'Johnny Doe']);
+  
+  $concatenated->all();// ['John Doe', 'Jane Doe', 'Johnny Doe']
+  ```
 - **`merge`**: Hợp nhất mảng với mảng khác.
-- **`mergeRecursive`**: Hợp nhất mảng một cách đệ quy.
+
+  ```php
+  $collection = collect(['product_id' => 1, 'price' => 100]);
+  
+  $merged = $collection->merge(['price' => 200, 'discount' => false]);
+  
+  $merged->all();// ['product_id' => 1, 'price' => 200, 'discount' => false]
+  ```
+- **`mergeRecursive`**: Hợp nhất mảng một cách đệ quy. Cùng key sẽ được merge chung với nhau
+
+  ```php
+  $collection = collect(['product_id' => 1, 'price' => 100]);
+  
+  $merged = $collection->mergeRecursive([
+      'product_id' => 2,
+      'price' => 200,
+      'discount' => false
+  ]);
+  
+  $merged->all();
+  
+  // ['product_id' => [1, 2], 'price' => [100, 200], 'discount' => false]
+  ```
 - **`union`**: Kết hợp mảng mà không trùng lặp các khóa.
+  ```php
+  $collection = collect([1 => ['a'], 2 => ['b']]);
+ 
+  $union = $collection->union([3 => ['c'], 1 => ['d']]);
+
+  $union->all();// [1 => ['a'], 2 => ['b'], 3 => ['c']]
+  ```
 
 ### Truy Cập và Kiểm Tra Phần Tử:
 
-- **`first`**: Lấy phần tử đầu tiên của mảng.
-- **`firstOrFail`**: Lấy phần tử đầu tiên hoặc trả về lỗi nếu mảng rỗng.
-- **`firstWhere`**: Lấy phần tử đầu tiên thỏa mãn điều kiện.
-- **`last`**: Lấy phần tử cuối cùng của mảng.
-- **`get`**: Truy cập giá trị tại một khóa cụ thể.
-- **`nth`**: Lấy phần tử thứ n trong mảng.
-- **`only`**: Lấy các phần tử chỉ với các khóa được chỉ định.
-- **`except`**: Loại bỏ các phần tử với các khóa được chỉ định.
-- **`all`**: Lấy toàn bộ các phần tử trong collection.
 
+- **`last`**: Lấy phần tử cuối cùng của mảng.
+  ```php
+  collect([1, 2, 3, 4])->last(function (int $value, int $key) {
+      return $value < 3;
+  }); // 2
+  collect([1, 2, 3, 4])->last();// 4
+  collect([])->last();// null
+  ```
+- **`first`**: Lấy phần tử đầu tiên của mảng.
+
+  ```php
+  collect([1, 2, 3, 4])->first(function (int $value, int $key) {
+    return $value > 2;
+  });// 3
+  collect([])->first();// null
+  collect([1,2,3])->first();// 1
+  ```
+- **`firstOrFail`**: Lấy phần tử đầu tiên hoặc trả về lỗi nếu mảng rỗng.
+
+  ```php
+  collect([1, 2, 3, 4])->firstOrFail(function (int $value, int $key) {
+      return $value > 5;
+  });// Throws ItemNotFoundException...
+
+  collect([1, 2, 3, 4])->firstOrFail(function (int $value, int $key) {
+    return $value > 2;
+  });// 3
+  ```
+
+- **`firstWhere`**: Lấy phần tử đầu tiên thỏa mãn điều kiện.
+
+  ```php
+  $collection = collect([
+      ['name' => 'Regena', 'age' => null],
+      ['name' => 'Linda', 'age' => 14],
+      ['name' => 'Diego', 'age' => 23],
+      ['name' => 'Linda', 'age' => 84],
+  ]);
+  
+  $collection->firstWhere('name', 'Linda');
+  
+  // ['name' => 'Linda', 'age' => 14]
+  ```
+- **`get`**: Truy cập giá trị tại một khóa cụ thể.
+  ```php
+  $collection = collect(['name' => 'taylor', 'framework' => 'laravel']);
+ 
+  $value = $collection->get('name');// taylor
+  // "key" "default"
+  $value = $collection->get('age', 34); // 34
+  $collection->get('email', function () {
+    return 'taylor@example.com';
+  });// taylor@example.com
+
+
+  ```
+- **`nth`**: Lấy phần tử thứ n trong mảng.
+  
+  ```php
+  $collection = collect(['a', 'b', 'c', 'd', 'e', 'f']);
+  // (lấy bước nhảy, bắt đầu từ)
+  $collection->nth(4);// ['a', 'e']
+  $collection->nth(4,1);// ['b', 'f']
+  ```
+- **`only`**: Lấy các phần tử chỉ với các khóa được chỉ định.
+  ```php
+  $collection = collect([
+      'product_id' => 1,
+      'name' => 'Desk',
+      'price' => 100,
+      'discount' => false
+  ]);
+  
+  $filtered = $collection->only(['product_id', 'name']);
+  
+  $filtered->all();
+  
+  // ['product_id' => 1, 'name' => 'Desk']
+  ```
+- **`except`**: Loại bỏ các phần tử với các khóa được chỉ định. Ngược lại **`only`**
+
+  ```php
+  $collection = collect(['product_id' => 1, 'price' => 100, 'discount' => false]);
+  
+  $filtered = $collection->except(['price', 'discount']);
+  
+  $filtered->all();
+  
+  // ['product_id' => 1]
+  ```
+- **`all`**: Lấy toàn bộ các phần tử trong collection.
+  ```php 
+  collect([1, 2, 3])->all();// [1, 2, 3]
+  ```
 ### Quản Lý Phần Tử:
 
 - **`each`**: Thực hiện một hành động cho mỗi phần tử trong mảng.
@@ -699,12 +1093,6 @@ Một số hàm có thể được sử dụng trong cả hai ngữ cảnh, tùy
 - **`whereNotInStrict`**: Lọc bản ghi không thuộc tập hợp với so sánh nghiêm ngặt.
 - **`whereNotNull`**: Lọc bản ghi có giá trị không NULL hoặc kiểm tra trong mảng.
 - **`whereNull`**: Lọc bản ghi có giá trị NULL hoặc kiểm tra trong mảng.
-
-## Tổng Quan
-
-- **Hàm Thường Dùng Với Mảng / Collections:** 97 hàm
-- **Hàm Thường Dùng Với Cơ Sở Dữ Liệu:** 7 hàm
-- **Hàm Có Thể Dùng Cả Với Mảng và Cơ Sở Dữ Liệu:** 42 hàm
 
 ---
 
