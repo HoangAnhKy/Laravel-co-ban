@@ -448,9 +448,75 @@ Các hàm này thường được sử dụng để thao tác trực tiếp trê
       return $collection->sum();
   });// 6
   ```
-- **`pipeInto`**: Truyền collection vào một lớp cụ thể để xử lý.
-- **`pipeThrough`**: Truyền collection qua một chuỗi các lớp xử lý.
-- **`value`**: Trả về giá trị của collection sau khi đã xử lý.
+- **`pipeInto`**: Truyền collection vào một `class` cụ thể để xử lý.
+
+  ```php
+  class ResourceCollection
+  {
+      /**
+       * Create a new ResourceCollection instance.
+       */
+      public function __construct(
+          public Collection $collection,
+      ) {}
+  }
+
+  $collection = collect([1, 2, 3]);
+
+  $resource = $collection->pipeInto(ResourceCollection::class);
+
+  $resource->collection->all(); // [1, 2, 3]
+  ```
+
+- **`pipeThrough`**: Truyền collection qua một chuỗi các class xử lý.
+
+  ```php
+  use Illuminate\Support\Collection;
+
+  $collection = collect([1, 2, 3]);
+
+  $result = $collection->pipeThrough([
+      function (Collection $collection) {
+          return $collection->merge([4, 5]);
+      },
+      function (Collection $collection) {
+          return $collection->sum();
+      },
+  ]);
+
+  // 15
+  ```
+
+- **`value`**: Phương pháp này lấy một giá trị nhất định từ phần tử đầu tiên của bộ sưu tập:
+
+  ```php
+  $collection = collect([
+      ['product' => 'Desk', 'price' => 200],
+      ['product' => 'Speaker', 'price' => 400],
+  ]);
+
+  $value = $collection->value('price');// 200
+  ```
+
+- **`values`**: trả về một bộ sưu tập mới với các khóa được đặt lại thành số nguyên liên tiếp
+
+  ```php
+  $collection = collect([
+      10 => ['product' => 'Desk', 'price' => 200],
+      11 => ['product' => 'Desk', 'price' => 200],
+  ]);
+
+  $values = $collection->values();
+
+  $values->all();
+
+  /*
+      [
+          0 => ['product' => 'Desk', 'price' => 200],
+          1 => ['product' => 'Desk', 'price' => 200],
+      ]
+  */
+  ```
 
 ### Tính Toán và Tổng Hợp:
 
