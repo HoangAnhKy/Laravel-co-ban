@@ -5,611 +5,647 @@
 ```php
 $collection = collect([1,2,3,4,5]);
 ```
-# Các Phương Thức Collection Trong Laravel
 
-## 1. Phương Thức Cơ Bản (Basic Methods)
-Các phương thức dùng để truy xuất, đếm và lấy thông tin tổng quan từ Collection.
+# Phân Loại Các Hàm Theo Ngữ Cảnh Sử Dụng
 
-- `all()`: Trả về tất cả các phần tử của collection dưới dạng mảng.
+Dưới đây là phân loại các hàm dựa trên việc chúng thường được sử dụng với **mảng/collections** hay với **cơ sở dữ liệu (database)**, kèm theo mô tả ngắn gọn cho từng hàm. Một số hàm có thể được sử dụng trong cả hai ngữ cảnh tùy thuộc vào cách thức áp dụng.
+
+## 1. Hàm Thường Dùng Với Mảng / Collections (Arrays/Collections)
+
+Các hàm này thường được sử dụng để thao tác trực tiếp trên các mảng hoặc collections trong bộ nhớ (in-memory). Chúng giúp xử lý, biến đổi và quản lý dữ liệu một cách hiệu quả.
+
+### Lọc và Kiểm Tra:
+
+- **`after`**: Lấy tất cả các phần tử sau phần tử đầu tiên thỏa mãn điều kiện.
 
   ```php
-  $allItems = $collection->all(); // [1, 2, 3, 4, 5]
+  $collection = collect([1, 2, 3, 4, 5]);
+  $collection->after(3); // 4
+  // Dùng chế độ nghiêm ngặt
+  $collection->after('4', strict: true); // false
+  // Callback
+  $collection->after(function (int $value, int $key) {
+      return $value == 3;
+  }); // 4
   ```
 
-- `average()` / `avg()`: Tính giá trị trung bình của các phần tử.
+- **`before`**: Lấy tất cả các phần tử trước phần tử đầu tiên thỏa mãn điều kiện.
 
   ```php
-  $average = $collection->average(); // 3
+  $collection = collect([1, 2, 3, 4, 5]);
+  $collection->before(3); // 2
+  // Dùng chế độ nghiêm ngặt
+  $collection->before('4', strict: true); // false
+  // Callback
+  $collection->before(function (int $value, int $key) {
+      return $value == 3;
+  }); // 2
   ```
 
-- `count()`: Đếm số lượng phần tử trong collection.
+- **`contains`** và **`some`**: Kiểm tra xem mảng có chứa một giá trị cụ thể hay không.
 
   ```php
-  $count = $collection->count(); // 5
+    $collection = collect([1, 2, 3, 4, 5]);
+    // Callback
+    $collection->contains(function (int $value, int $key) {
+        return $value > 5;
+    }); // false
+
+    // check string
+    $collection = collect(['name' => 'Desk', 'price' => 100]);
+    $collection->contains('Desk');// true
+    $collection->contains('New York'); // false'
+
+    // check key value;
+    $collection = collect([
+        ['product' => 'Desk', 'price' => 200],
+        ['product' => 'Chair', 'price' => 100],
+    ]);
+
+    $collection->contains('product', 'Bookcase');
   ```
 
-- `first()`: Lấy phần tử đầu tiên của collection.
+- **`containsOneItem`**: Kiểm tra xem mảng có chứa đúng một phần tử hay không.
 
   ```php
-  $firstItem = $collection->first(); // 1
+  collect([])->containsOneItem(); // false
+
+  collect(['1'])->containsOneItem(); // true
+
+  collect(['1', '2'])->containsOneItem(); // false
   ```
 
-- `last()`: Lấy phần tử cuối cùng của collection.
+- **`containsStrict`**: Kiểm tra xem mảng có chứa một giá trị cụ thể với kiểu dữ liệu chính xác hay không. Cách dùng giống như `contains`.
+- **`doesntContain`**: Kiểm tra xem mảng **không chứa** một giá trị cụ thể. Ngược lại với `Contain`
 
   ```php
-  $lastItem = $collection->last(); // 5
+  // Call Back
+  $collection = collect([1, 2, 3, 4, 5]);
+  $collection->doesntContain(function (int $value, int $key) {
+      return $value < 5;
+  }); // false
+
+  // Check String value
+  $collection = collect(['name' => 'Desk', 'price' => 100]);
+  $collection->doesntContain('Table');// true
+  $collection->doesntContain('Desk');// false
+
+  // Check key value
+    $collection = collect([
+        ['product' => 'Desk', 'price' => 200],
+        ['product' => 'Chair', 'price' => 100],
+    ]);
+    $collection->doesntContain('product', 'Bookcase');// true
   ```
 
-- `keys()`: Lấy tất cả các khóa của collection.
+- **`every`**: Kiểm tra xem tất cả các phần tử trong mảng có thỏa mãn điều kiện không.
 
   ```php
-  $keys = $collection->keys(); // [0, 1, 2, 3, 4]
+
+  collect([1, 2, 3, 4])->every(function (int $value, int $key) {
+      return $value > 2;
+  }); // false
+
   ```
 
-- `values()`: Lấy tất cả các giá trị của collection.
+- **`filter`**: Lọc các phần tử trong mảng dựa trên điều kiện cho trước.
 
   ```php
-  $values = $collection->values(); // [1, 2, 3, 4, 5]
+  $collection = collect([1, 2, 3, 4]);
+  // callback
+  $filtered = $collection->filter(function (int $value, int $key) {
+      return $value > 2;
+  });
+
+  $filtered->all() // [3, 4]
+
+  // Khi không dùng callback thì những gì tương đương với "False" sẽ bị xóa
+  $collection = collect([1, 2, 3, null, false, '', 0, []]);
+  $collection->filter()->all();// [1, 2, 3]
   ```
 
-- `get()`: Lấy giá trị của phần tử dựa trên khóa.
+- **`reject`**: Loại bỏ các phần tử trong mảng dựa trên điều kiện cho trước. Ngược lại với `filter`
 
   ```php
-  $value = $collection->get(1); // 2
+  $collection = collect([1, 2, 3, 4]);
+
+  $filtered = $collection->reject(function (int $value, int $key) {
+      return $value > 2;
+  });
+
+  $filtered->all(); // [1, 2]
   ```
 
-## 2. Phương Thức Xử Lý Dữ Liệu (Data Manipulation Methods)
-Các phương thức dùng để biến đổi hoặc thay đổi dữ liệu trong Collection.
-
-- `chunk()` và `chunkWhile()`: Chia collection thành các phần nhỏ hơn với số lượng phần tử nhất định hoặc theo điều kiện.
+- **`isEmpty`**: Kiểm tra xem mảng có rỗng hay không.
+  ```php
+  collect([])->isEmpty(); // true
+  ```
+- **`isNotEmpty`**: Kiểm tra xem mảng có không rỗng hay không.
 
   ```php
-  $chunks = $collection->chunk(2); // [[1, 2], [3, 4], [5]]
+  collect([])->isNotEmpty(); // false
   ```
 
-- `map()`: Biến đổi từng phần tử trong collection và trả về collection mới.
+- **`has`**: Kiểm tra xem mảng có chứa một khóa(**Key**) cụ thể hay không.
+  ```php
+  $collection = collect(['account_id' => 1, 'product' => 'Desk', 'amount' => 5]);
+  $collection->has('product');// true
+  $collection->has(['product', 'amount']);// true
+  $collection->has(['amount', 'price']);// false
+  ```
+- **`hasAny`**: Kiểm tra xem mảng có chứa bất kỳ một trong các khóa (**Key**) cụ thể hay không.
 
   ```php
-  $multiplied = $collection->map(function ($item) {
+  $collection = collect(['account_id' => 1, 'product' => 'Desk', 'amount' => 5]);
+
+  $collection->hasAny(['product', 'price']);// true
+  $collection->hasAny(['name', 'price']);// false
+  ```
+
+- **`sole`**: Lấy phần tử duy nhất trong mảng thỏa mãn điều kiện, hoặc trả về lỗi nếu không có hoặc nhiều hơn một.
+
+### Biến Đổi và Chuyển Đổi:
+
+- **`map`**: Áp dụng một hàm cho mỗi phần tử trong mảng và trả về mảng mới với kết quả.
+
+  ```php
+  $collection = collect([1, 2, 3, 4, 5]);
+
+  $multiplied = $collection->map(function (int $item, int $key) {
       return $item * 2;
   });
-  // Kết quả: [2, 4, 6, 8, 10]
+
+  $multiplied->all(); // [2, 4, 6, 8, 10]
   ```
 
-- `filter()`: Lọc các phần tử thỏa mãn điều kiện.
+- **`mapInto`**: Chuyển đổi mỗi phần tử trong mảng thành một đối tượng cụ thể.
+  ```php
+  class Currency
+  {
+      /**
+       * Create a new currency instance.
+       */
+      function __construct(
+          public string $code,
+      ) {}
+  }
+  $collection = collect(['USD', 'EUR', 'GBP']);
+  $currencies = $collection->mapInto(Currency::class);
+  $currencies->all(); // [Currency('USD'), Currency('EUR'), Currency('GBP')]
+  ```
+- **`mapSpread`**: Giải nén các mảng con và áp dụng hàm cho từng phần tử.
 
   ```php
-  $filtered = $collection->filter(function ($item) {
-      return $item > 2;
+  $collection = collect([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+
+  $chunks = $collection->chunk(2); // chia mảng thành mảng 2 chiều [[1,2], [3,4], [5,6], [7,8], [9,10]]
+
+  $sequence = $chunks->mapSpread(function (int $even, int $odd) {
+      return $even + $odd;
   });
-  // Kết quả: [3, 4, 5]
+
+  $sequence->all(); // [1, 5, 9, 13, 17]
   ```
 
-- `reduce()`: Giảm collection xuống còn một giá trị duy nhất bằng cách áp dụng hàm lên từng phần tử.
+- **`mapToGroups`**: Nhóm các phần tử theo một khóa nhất định.
 
   ```php
-  $sum = $collection->reduce(function ($carry, $item) {
-      return $carry + $item;
-  }, 0);
-  // Kết quả: 15
+  $collection = collect([
+      [
+          'name' => 'John Doe',
+          'department' => 'Sales',
+      ],
+      [
+          'name' => 'Jane Doe',
+          'department' => 'Sales',
+      ],
+      [
+          'name' => 'Johnny Doe',
+          'department' => 'Marketing',
+      ]
+  ]);
+
+    $grouped = $collection->mapToGroups(function (array $item, int $key) {
+        return [$item['department'] => $item['name']];
+    });
+
+    $grouped->all();
+    /*
+        [
+            'Sales' => ['John Doe', 'Jane Doe'],
+            'Marketing' => ['Johnny Doe'],
+        ]
+    */
   ```
 
-- `duplicates()` và `duplicatesStrict()`: Trả về các giá trị trùng lặp trong collection.
+- **`mapWithKeys`**: Tạo mảng mới với các khóa và giá trị được xác định bởi hàm.
 
   ```php
-  $duplicates = collect([1, 2, 2, 3, 4, 4])->duplicates();
-  // Kết quả: [1 => 2, 4 => 4]
-  ```
+  $collection = collect([
+      [
+          'name' => 'John',
+          'department' => 'Sales',
+          'email' => 'john@example.com',
+      ],
+      [
+          'name' => 'Jane',
+          'department' => 'Marketing',
+          'email' => 'jane@example.com',
+      ],
+      [
+          'name' => 'Jane',
+          'department' => 'Marketing2',
+          'email' => 'jane@example.com',
+      ]
+  ]);
 
-- `flatMap()`: Biến đổi và làm phẳng collection thành một collection mới.
-
-  ```php
-  $flatMapped = $collection->flatMap(function ($item) {
-      return [$item, $item * 2];
+  $keyed = $collection->mapWithKeys(function (array $item, int $key) {
+      return [
+          $item['email'] => $item['name'],
+          $item["department"] => $item["email"]
+        ];
   });
-  // Kết quả: [1, 2, 2, 4, 3, 6, 4, 8, 5, 10]
+  $keyed->all();
+  /*
+    tuy cho 2 case nhưng mảng trả về nó sẽ có mảnh với
+    key => value không trùng nhau
+    [
+      "john@example.com" => "John",
+      "Sales" => "john@example.com",
+      "jane@example.com" => "Jane",
+      "Marketing" => "jane@example.com",
+      "Marketing2" => "jane@example.com"
+    ]
+  */
   ```
 
-- `flatten()`: Làm phẳng một collection đa cấp thành một chiều.
+- **`flatMap`**: Áp dụng một hàm cho mỗi phần tử và làm phẳng mảng kết quả.
 
   ```php
-  $flattened = collect([[1, 2], [3, 4], [5]])->flatten();
-  // Kết quả: [1, 2, 3, 4, 5]
+  $collection = collect([
+      ['name' => 'Sally'],
+      ['school' => 'Arkansas'],
+      ['age' => 28]
+  ]);
+
+  $flattened = $collection->flatMap(function (array $values) {
+      return array_map('strtoupper', $values);
+  });
+  dd($flattened->all()); // ['name' => 'SALLY', 'school' => 'ARKANSAS', 'age' => '28'];
   ```
 
-- `merge()` / `mergeRecursive()`: Trộn collection với một mảng hoặc collection khác.
+- **`flatten`**: Làm phẳng mảng đa chiều thành mảng đơn chiều.
+  ```php
+  $collection = collect([
+      'name' => 'taylor',
+      'languages' => [
+          'php', 'javascript'
+      ]
+  ]);
+  $flattened = $collection->flatten();
+  $flattened->all();// ['taylor', 'php', 'javascript'];
+  ```
+- **`transform`**: Biến đổi mảng bằng cách áp dụng một hàm cho mỗi phần tử. Tuy khá giống `Map` nhưng map là tạo collection mới còn `transform` sửa trực tiếp
 
   ```php
-  $merged = $collection->merge([6, 7]);
-  // Kết quả: [1, 2, 3, 4, 5, 6, 7]
+  $collection = collect([1, 2, 3, 4, 5]);
+
+  $collection->transform(function (int $item, int $key) {
+      return $item * 2;
+  });
+
+  $collection->all(); // [2, 4, 6, 8, 10]
   ```
 
-- `replace()` / `replaceRecursive()`: Thay thế các giá trị trong collection.
+- **`dot`**: Chuyển đổi mảng đa chiều thành mảng đơn chiều với khóa dạng "dot notation".
 
   ```php
-  $replaced = $collection->replace([1 => 10, 2 => 20]);
-  // Kết quả: [1, 10, 20, 4, 5]
+  $collection = collect(['products' => ['desk' => ['price' => 100]]]);
+  $flattened = $collection->dot();
+  $flattened->all // ['products.desk.price' => 100]
   ```
 
-- `reverse()`: Đảo ngược thứ tự của các phần tử trong collection.
+- **`undot`**: Chuyển đổi các khóa dạng "dot notation" thành mảng đa chiều.
 
   ```php
+    $person = collect([
+        'name.first_name' => 'Marie',
+        'name.last_name' => 'Valentine',
+        'address.line_1' => '2992 Eagle Drive',
+        'address.line_2' => '',
+        'address.suburb' => 'Detroit',
+        'address.state' => 'MI',
+        'address.postcode' => '48219'
+    ]);
+
+    $person = $person->undot();
+
+    $person->toArray();
+
+    /*
+        [
+            "name" => [
+                "first_name" => "Marie",
+                "last_name" => "Valentine",
+            ],
+            "address" => [
+                "line_1" => "2992 Eagle Drive",
+                "line_2" => "",
+                "suburb" => "Detroit",
+                "state" => "MI",
+                "postcode" => "48219",
+            ],
+        ]
+    */
+  ```
+
+- **`flip`**: Hoán đổi khóa và giá trị trong mảng.
+
+  ```php
+  $collection = collect(['name' => 'taylor', 'framework' => 'laravel']);
+
+  $flipped = $collection->flip();
+
+  $flipped->all(); // ['taylor' => 'name', 'laravel' => 'framework']
+  ```
+
+- **`reverse`**: Đảo ngược thứ tự các phần tử trong mảng.
+  ```php
+  $collection = collect(['a', 'b', 'c', 'd', 'e']);
   $reversed = $collection->reverse();
-  // Kết quả: [5, 4, 3, 2, 1]
+  $reversed->all(); ['e', 'd', 'c', 'b', 'a'];
   ```
-
-- `shuffle()`: Xáo trộn các phần tử của collection.
+- **`implode`**: Kết hợp các phần tử trong mảng thành một chuỗi với dấu phân cách.
 
   ```php
-  $shuffled = $collection->shuffle();
-  // Kết quả: [3, 1, 5, 4, 2] (ngẫu nhiên)
+  $collection = collect([
+      ['account_id' => 1, 'product' => 'Desk'],
+      ['account_id' => 2, 'product' => 'Chair'],
+  ]);
+
+  $collection->implode('product', ', '); // Desk, Chair
   ```
 
-- `splice()`: Lấy một phần của collection và loại bỏ nó khỏi collection ban đầu.
+- **`pluck`**: Trích xuất giá trị của một khóa cụ thể từ mỗi phần tử trong mảng.
 
   ```php
-  $spliced = $collection->splice(2);
-  // Kết quả: [3, 4, 5]
-  ```
+  $collection = collect([
+      ['product_id' => 'prod-100', 'name' => 'Desk'],
+      ['product_id' => 'prod-200', 'name' => 'Chair'],
+  ]);
 
-- `split()`: Chia collection thành các phần nhỏ hơn.
-
-  ```php
-  $split = $collection->split(3);
-  // Kết quả: [[1, 2], [3, 4], [5]]
-  ```
-
-- `sort()`, `sortBy()`, `sortByDesc()`: Sắp xếp các phần tử trong collection.
-
-  ```php
-  $sorted = $collection->sort();
-  // Kết quả: [1, 2, 3, 4, 5]
-  ```
-
-- `sortKeys()`, `sortKeysDesc()`: Sắp xếp collection dựa trên khóa.
-
-  ```php
-  $sortedByKeys = collect([2 => 'b', 1 => 'a', 3 => 'c'])->sortKeys();
-  // Kết quả: [1 => 'a', 2 => 'b', 3 => 'c']
-  ```
-
-- `take()`: Lấy một số phần tử đầu tiên hoặc cuối cùng từ collection.
-
-  ```php
-  $taken = $collection->take(3);
-  // Kết quả: [1, 2, 3]
-  ```
-
-- `slice()`: Lấy một phần của collection mà không thay đổi collection gốc.
-
-  ```php
-  $sliced = $collection->slice(2);
-  // Kết quả: [3, 4, 5]
-  ```
-
-- `union()`: Hợp nhất collection với một tập giá trị khác, ưu tiên các giá trị từ collection hiện tại.
-
-  ```php
-  $union = $collection->union([6, 7]);
-  // Kết quả: [1, 2, 3, 4, 5, 6, 7]
-  ```
-
-- `unique()`, `uniqueStrict()`: Loại bỏ các giá trị trùng lặp.
-
-  ```php
-  $unique = collect([1, 2, 2, 3, 4, 4])->unique();
-  // Kết quả: [1, 2, 3, 4]
-  ```
-
-- `pad()`: Thêm phần tử vào collection cho đến khi đạt kích thước mong muốn.
-
-  ```php
-  $padded = $collection->pad(7, 0);
-  // Kết quả: [1, 2, 3, 4, 5, 0, 0]
-  ```
-
-## 3. Phương Thức Truy Vấn (Query Methods)
-Dùng để truy vấn, tìm kiếm hoặc kiểm tra dữ liệu trong Collection.
-
-- `contains()`, `containsStrict()`: Kiểm tra xem `Collection` có chứa một giá trị hoặc khóa cụ thể.
-
-  ```php
-  $contains = $collection->contains(3); // true
-  ```
-
-- `find()`: Tìm một phần tử trong `Collection` dựa trên giá trị hoặc điều kiện.
-
-  ```php
-  $found = $collection->firstWhere('id', 1);
-  ```
-
-- `firstWhere()`: Tìm phần tử đầu tiên thỏa mãn điều kiện cụ thể.
-
-  ```php
-  $firstWhere = $collection->firstWhere('name', 'John');
-  ```
-
-- `where()`, `whereStrict()`: Lọc các phần tử dựa trên điều kiện cụ thể.
-
-  ```php
-  $filtered = $collection->where('age', '>', 18);
-  ```
-
-- `whereIn()`, `whereInStrict()`: Kiểm tra xem một giá trị có nằm trong danh sách giá trị cho trước.
-
-  ```php
-  $whereIn = $collection->whereIn('id', [1, 2, 3]);
-  ```
-
-- `whereBetween()`, `whereNotBetween()`: Lọc các phần tử nằm giữa hoặc không nằm giữa hai giá trị.
-
-  ```php
-  $whereBetween = $collection->whereBetween('age', [18, 30]);
-  ```
-
-- `whereNotIn()`, `whereNotInStrict()`: Lọc các phần tử không nằm trong danh sách giá trị.
-
-  ```php
-  $whereNotIn = $collection->whereNotIn('id', [1, 2, 3]);
-  ```
-
-- `whereInstanceOf()`: Lọc các phần tử có kiểu của lớp đã chỉ định.
-
-  ```php
-  $instances = $collection->whereInstanceOf(User::class);
-  ```
-
-- `search()`: Tìm vị trí của một phần tử trong `Collection`.
-
-  ```php
-  $index = $collection->search(4); // 3
-  ```
-
-- `some()`: Kiểm tra xem có phần tử nào thỏa mãn điều kiện không.
-
-  ```php
-  $some = $collection->some(function ($value) {
-      return $value > 3;
-  });
-  ```
-
-- `every()`: Kiểm tra xem tất cả các phần tử có thỏa mãn điều kiện không.
-
-  ```php
-  $every = $collection->every(function ($value) {
-      return $value > 0;
-  });
-  ```
-
-- `has()`: Kiểm tra xem một khóa có tồn tại trong collection hay không.
-
-  ```php
-  $has = $collection->has(2); // true
-  ```
-
-- `isEmpty()`, `isNotEmpty()`: Kiểm tra collection có rỗng hay không.
-
-  ```php
-  $isEmpty = $collection->isEmpty(); // false
-  ```
-
-## 4. Phương Thức Tổng Hợp Và Phân Tích (Aggregation Methods)
-Dùng để tổng hợp hoặc tính toán dữ liệu trong Collection.
-
-- `sum()`: Tính tổng của các phần tử.
-
-  ```php
-  $sum = $collection->sum(); // 15
-  ```
-
-- `max()`: Tìm giá trị lớn nhất.
-
-  ```php
-  $max = $collection->max(); // 5
-  ```
-
-- `min()`: Tìm giá trị nhỏ nhất.
-
-  ```php
-  $min = $collection->min(); // 1
-  ```
-
-- `median()`: Tính trung vị của collection.
-
-  ```php
-  $median = $collection->median(); // 3
-  ```
-
-- `mode()`: Tìm giá trị xuất hiện nhiều nhất trong collection.
-
-  ```php
-  $mode = $collection->mode(); // [2, 4]
-  ```
-
-- `countBy()`: Đếm số lần xuất hiện của các giá trị khác nhau trong collection.
-
-  ```php
-  $countBy = $collection->countBy();
-  ```
-
-## 5. Phương Thức Chuyển Đổi (Conversion Methods)
-Dùng để chuyển đổi collection sang định dạng khác.
-
-- `toArray()`: Chuyển đổi collection thành mảng.
-
-  ```php
-  $array = $collection->toArray();
-  ```
-
-- `toJson()`: Chuyển đổi collection thành chuỗi JSON.
-
-  ```php
-  $json = $collection->toJson();
-  ```
-
-- `implode()`: Nối các giá trị thành một chuỗi với một ký tự phân cách.
-
-  ```php
-  $imploded = $collection->implode(', '); // "1, 2, 3, 4, 5"
-  ```
-
-## 6. Phương Thức Lặp Và Tiện Ích (Iteration and Utility Methods)
-Các phương thức hỗ trợ lặp qua từng phần tử hoặc thực hiện các hành động tiện ích.
-
-- `each()`, `eachSpread()`: Lặp qua từng phần tử và áp dụng một hàm lên chúng.
-
-  ```php
-  $collection->each(function ($item) {
-      echo $item;
-  });
-  ```
-
-- `tap()`: Thực hiện một hành động trên collection mà không làm thay đổi nó.
-
-  ```php
-  $collection->tap(function ($col) {
-      // Do something with $col
-  });
-  ```
-
-- `dump()`, `dd()`: Hiển thị và dừng thực thi, hữu ích cho mục đích gỡ lỗi.
-
-  ```php
-  $collection->dd();
-  ```
-
-- `times()`: Tạo một collection với số lượng phần tử xác định và áp dụng hàm cho mỗi phần tử.
-
-  ```php
-  $times = Collection::times(5, function ($number) {
-      return $number * 2;
-  });
-  ```
-
-- `macro()`: Đăng ký macro để mở rộng các chức năng của collection.
-
-  ```php
-  Collection::macro('toUpper', function () {
-      return $this->map(function ($item) {
-          return strtoupper($item);
-      });
-  });
-  ```
-
-- `make()`: Tạo một collection từ một giá trị cho trước.
-
-  ```php
-  $collection = Collection::make([1, 2, 3]);
-  ```
-
-- `pipe()`: Chuyển collection vào một hàm và trả về kết quả.
-
-  ```php
-  $result = $collection->pipe(function ($col) {
-      return $col->sum();
-  });
-  ```
-
-- `unwrap()`, `wrap()`: Bọc hoặc mở một giá trị thành collection.
-
-  ```php
-  $wrapped = Collection::wrap('Hello');
-  ```
-
-- `shift()`: Lấy và xóa phần tử đầu tiên của collection.
-
-  ```php
-  $firstItem = $collection->shift();
-  // Kết quả của $firstItem: 1
-  // Kết quả của collection: [2, 3, 4, 5]
-  ```
-
-- `pop()`: Lấy và xóa phần tử cuối cùng của collection.
-
-  ```php
-  $lastItem = $collection->pop();
-  // Kết quả của $lastItem: 5
-  // Kết quả của collection: [1, 2, 3, 4]
-  ```
-
-- `prepend()`: Thêm một phần tử vào đầu collection.
-
-  ```php
-  $collection->prepend(0);
-  // Kết quả: [0, 1, 2, 3, 4, 5]
-  ```
-
-- `push()`: Thêm một phần tử vào cuối collection.
-
-  ```php
-  $collection->push(6);
-  // Kết quả: [1, 2, 3, 4, 5, 6]
-  ```
-
-- `put()`: Thêm hoặc cập nhật một phần tử với khóa cụ thể.
-
-  ```php
-  $collection = collect(['name' => 'John']);
-  $collection->put('age', 30);
-  // Kết quả: ['name' => 'John', 'age' => 30]
-  ```
-
-- `set()`: Tương tự như `put()`, được sử dụng để đặt giá trị cho một khóa.
-
-  ```php
-  $collection->set('location', 'Hanoi');
-  // Kết quả: ['name' => 'John', 'age' => 30, 'location' => 'Hanoi']
-  ```
-
-- `forget()`: Xóa một phần tử khỏi collection bằng khóa của nó.
-
-  ```php
-  $collection->forget('age');
-  // Kết quả: ['name' => 'John', 'location' => 'Hanoi']
-  ```
-
-- `pull()`: Lấy ra và xóa một phần tử khỏi collection.
-
-  ```php
-  $value = $collection->pull('name');
-  // Kết quả của $value: 'John'
-  // Kết quả của collection: ['location' => 'Hanoi']
-  ```
-
-## 7. Phương Thức Điều Kiện (Conditional Methods)
-Dùng để thực thi các thao tác dựa trên điều kiện.
-
-- `when()`, `whenEmpty()`, `whenNotEmpty()`: Thực hiện hành động dựa trên điều kiện hoặc tình trạng rỗng của collection.
-
-  ```php
-  $collection->when(true, function ($col) {
-      return $col->push(6);
-  });
-  ```
-
-- `unless()`, `unlessEmpty()`, `unlessNotEmpty()`: Tương tự như `when()`, nhưng là ngược lại.
-
-  ```php
-  $collection->unless(false, function ($col) {
-      return $col->push(7);
-  });
-  ```
-
-## 8. Phương Thức Khác (Miscellaneous Methods)
-Các phương thức khác không thuộc các nhóm trên.
-
-- `concat()`: Nối collection với một tập giá trị khác.
-
-  ```php
-  $concatenated = $collection->concat([6, 7, 8]);
-  ```
-
-- `forPage()`: Chia collection thành các trang dựa trên số lượng phần tử mỗi trang.
-
-  ```php
-  $forPage = $collection->forPage(2, 2);
-  // Kết quả: [3, 4]
-  ```
-
-- `keyBy()`: Đặt lại khóa của collection dựa trên kết quả của hàm cho trước.
-
-  ```php
-  $keyed = $collection->keyBy('id');
-  ```
-
-- `pluck()`: Lấy ra một cột hoặc một tập hợp giá trị dựa trên khóa.
-
-  ```php
   $plucked = $collection->pluck('name');
+
+  $plucked->all();// ['Desk', 'Chair']
   ```
 
-## 9. Phương Thức Phân Vùng (Partitioning Methods)
-Dùng để chia collection thành các phần khác nhau.
-
-- `partition()`: Chia collection thành hai phần dựa trên kết quả của hàm cho trước.
+- **`wrap`**: Bọc giá trị vào trong một collection nếu nó chưa phải là collection.
 
   ```php
-  [$under18, $above18] = $collection->partition(function ($item) {
-      return $item['age'] < 18;
-  });
+  use Illuminate\Support\Collection;
+
+  $collection = Collection::wrap('John Doe');
+
+  $collection->all();// ['John Doe']
+  // dùng mảng
+  $collection = Collection::wrap(['John Doe']);
+
+  $collection->all();// ['John Doe']
+
+  // collection
+  $collection = Collection::wrap(collect('John Doe'));
+
+  $collection->all();// ['John Doe']
   ```
 
-## 10. Phương Thức Nhóm (Grouping Methods)
-Dùng để nhóm các phần tử lại với nhau dựa trên một tiêu chí.
-
-- `groupBy()`: Nhóm các phần tử trong collection lại với nhau.
+- **`unwrap`**: Lấy giá trị bên trong collection. Ngược lại với `wrap`
 
   ```php
-  $grouped = $collection->groupBy('type');
+  Collection::unwrap(collect('John Doe'));// ['John Doe']
+
+  Collection::unwrap(['John Doe']); // ['John Doe']
+
+  Collection::unwrap('John Doe'); // 'John Doe'
   ```
 
-- `mapToGroups()`: Biến đổi và nhóm các phần tử dựa trên kết quả của hàm cho trước.
+- **`ensure`**: Đảm bảo rằng một giá trị là một collection.
 
   ```php
-  $grouped = $collection->mapToGroups(function ($item, $key) {
-      return [$item['category'] => $item['name']];
-  });
+  //  string, int, float, bool, và array
+  // $collection->ensure(Users::class); cũng được
+
+  $collection = collect([1, 2, 3]);
+  $newCollection = $collection->ensure('string'); // lỗi : Collection should only include [string] items, but 'int' found at position 0.
+
+  $newCollection = $collection->ensure('int');
+  var_dump($newCollection->all()); //[1,2,3]
   ```
 
-## 11. Phương Thức Nối (Join Methods)
-Dùng để nối dữ liệu trong collection.
-
-- `join()`: Nối các phần tử thành một chuỗi, với dấu phân cách tùy chỉnh.
-
+- **`pipe`**: Truyền collection qua một hoặc nhiều hàm xử lý.
   ```php
-  $joined = $collection->join(', ');
-  // Kết quả: "1, 2, 3, 4, 5"
+  $collection = collect([1, 2, 3]);
+  $piped = $collection->pipe(function (Collection $collection) {
+      return $collection->sum();
+  });// 6
   ```
+- **`pipeInto`**: Truyền collection vào một lớp cụ thể để xử lý.
+- **`pipeThrough`**: Truyền collection qua một chuỗi các lớp xử lý.
+- **`value`**: Trả về giá trị của collection sau khi đã xử lý.
 
-## 12. Phương Thức Cập Nhật Và Thêm Phần Tử (Update and Add Methods)
-Dùng để cập nhật hoặc thêm phần tử mới vào collection.
+### Tính Toán và Tổng Hợp:
 
-- `push()`: Thêm một phần tử vào cuối collection.
+- **`average`**: Tính giá trị trung bình của các phần tử trong mảng.
+- **`avg`**: Tương tự như `average`, tính giá trị trung bình.
+- **`count`**: Đếm số lượng phần tử trong mảng.
+- **`countBy`**: Đếm số lượng phần tử theo một tiêu chí cụ thể.
+- **`max`**: Tìm giá trị lớn nhất trong mảng.
+- **`median`**: Tính giá trị trung vị của các phần tử trong mảng.
+- **`min`**: Tìm giá trị nhỏ nhất trong mảng.
+- **`mode`**: Tìm giá trị xuất hiện nhiều nhất trong mảng.
+- **`sum`**: Tính tổng các phần tử trong mảng.
+- **`multiply`**: Nhân các phần tử trong mảng với nhau.
+- **`percentage`**: Tính tỷ lệ phần trăm của các phần tử trong mảng.
 
-  ```php
-  $collection->push(6);
-  // Kết quả: [1, 2, 3, 4, 5, 6]
-  ```
+### Nhóm và Tổ Chức:
 
-- `put()`: Đặt một cặp khóa - giá trị vào collection.
+- **`groupBy`**: Nhóm các phần tử theo một khóa nhất định.
+- **`keyBy`**: Tạo khóa cho mảng dựa trên một thuộc tính của phần tử.
+- **`mapToGroups`**: Nhóm các phần tử dựa trên kết quả của một hàm.
 
-  ```php
-  $collection->put(10, 'new value');
-  // Kết quả: [1, 2, 3, 4, 5, 10 => 'new value']
-  ```
+### Sắp Xếp và Trật Tự:
 
-- `prepend()`: Thêm một phần tử vào đầu collection.
+- **`sort`**: Sắp xếp các phần tử trong mảng.
+- **`sortBy`**: Sắp xếp mảng theo một khóa cụ thể.
+- **`sortByDesc`**: Sắp xếp mảng theo một khóa cụ thể theo thứ tự giảm dần.
+- **`sortDesc`**: Sắp xếp mảng theo thứ tự giảm dần.
+- **`sortKeys`**: Sắp xếp các khóa trong mảng.
+- **`sortKeysDesc`**: Sắp xếp các khóa trong mảng theo thứ tự giảm dần.
+- **`sortKeysUsing`**: Sắp xếp các khóa trong mảng bằng một hàm so sánh tùy chỉnh.
+- **`shuffle`**: Xáo trộn thứ tự các phần tử trong mảng.
 
-  ```php
-  $collection->prepend(0);
-  // Kết quả: [0, 1, 2, 3, 4, 5]
-  ```
+### Phân Chia và Chia Nhỏ:
 
-- `add()`: Alias của `push()`.
+- **`chunk`**: Chia mảng thành các mảng con có kích thước cố định.
+- **`chunkWhile`**: Chia mảng thành các mảng con dựa trên điều kiện cho trước.
+- **`partition`**: Phân chia mảng thành hai nhóm dựa trên một điều kiện.
+- **`slice`**: Lấy một phần của mảng bắt đầu từ vị trí cụ thể.
+- **`sliding`**: Tạo các cửa sổ trượt từ mảng.
+- **`splice`**: Thêm hoặc loại bỏ phần tử từ mảng tại vị trí cụ thể.
 
-  ```php
-  $collection->add(7);
-  // Kết quả: [1, 2, 3, 4, 5, 7]
-  ```
+### Kết Nối và Hợp Nhất:
 
-- `forget()`: Xóa một phần tử dựa trên khóa.
+- **`concat`**: Kết hợp hai hoặc nhiều mảng lại với nhau.
+- **`merge`**: Hợp nhất mảng với mảng khác.
+- **`mergeRecursive`**: Hợp nhất mảng một cách đệ quy.
+- **`union`**: Kết hợp mảng mà không trùng lặp các khóa.
 
-  ```php
-  $collection->forget(1);
-  // Kết quả: [0 => 1, 2 => 3, 3 => 4, 4 => 5]
-  ```
+### Truy Cập và Kiểm Tra Phần Tử:
 
-- `set()`: Cập nhật giá trị cho một khóa cụ thể.
+- **`first`**: Lấy phần tử đầu tiên của mảng.
+- **`firstOrFail`**: Lấy phần tử đầu tiên hoặc trả về lỗi nếu mảng rỗng.
+- **`firstWhere`**: Lấy phần tử đầu tiên thỏa mãn điều kiện.
+- **`last`**: Lấy phần tử cuối cùng của mảng.
+- **`get`**: Truy cập giá trị tại một khóa cụ thể.
+- **`nth`**: Lấy phần tử thứ n trong mảng.
+- **`only`**: Lấy các phần tử chỉ với các khóa được chỉ định.
+- **`except`**: Loại bỏ các phần tử với các khóa được chỉ định.
+- **`all`**: Lấy toàn bộ các phần tử trong collection.
 
-  ```php
-  $collection->set(2, 'updated value');
-  // Kết quả: [1, 'updated value', 3, 4, 5]
-  ```
+### Quản Lý Phần Tử:
 
-- `update()`: Cập nhật nhiều giá trị trong collection.
+- **`each`**: Thực hiện một hành động cho mỗi phần tử trong mảng.
+- **`eachSpread`**: Giải nén các mảng con và thực hiện hành động cho từng phần tử.
+- **`tap`**: Thực hiện một hành động trên mảng mà không làm thay đổi nó.
+- **`push`**: Thêm một phần tử vào cuối mảng.
+- **`pull`**: Lấy và loại bỏ một phần tử khỏi mảng dựa trên khóa.
+- **`prepend`**: Thêm một phần tử vào đầu mảng.
+- **`pop`**: Lấy và loại bỏ phần tử cuối cùng của mảng.
+- **`shift`**: Lấy và loại bỏ phần tử đầu tiên của mảng.
 
-  ```php
-  $collection = collect(['name' => 'John', 'age' => 30]);
-  $updated = $collection->update(['age' => 31, 'city' => 'New York']);
-  // Kết quả: ['name' => 'John', 'age' => 31, 'city' => 'New York']
-  ```
+### Các Hàm Hỗ Trợ Khác:
+
+- **`collect`**: Tạo một collection từ một mảng hoặc đối tượng.
+- **`make`**: Tạo một collection mới.
+- **`macro`**: Định nghĩa một macro mới cho collection.
+- **`lazy`**: Tạo một collection theo cách lười (lazy).
+- **`times`**: Tạo một collection chứa một số phần tử dựa trên số lần lặp.
+- **`range`**: Tạo một collection chứa các số trong khoảng xác định.
+- **`forPage`**: Lấy một trang cụ thể của mảng dựa trên số phần tử mỗi trang.
+- **`dump`**: Hiển thị nội dung của collection để debug.
+- **`dd`**: Dump và kết thúc script (Dump and Die).
+- **`toArray`**: Chuyển đổi collection thành mảng.
+- **`toJson`**: Chuyển đổi collection thành JSON.
+
+## 2. Hàm Thường Dùng Với Cơ Sở Dữ Liệu (Databases)
+
+Các hàm này thường được sử dụng trong việc xây dựng các truy vấn cơ sở dữ liệu, thường thông qua các ORM như Eloquent trong Laravel. Chúng giúp tương tác với dữ liệu được lưu trữ trong hệ quản trị cơ sở dữ liệu.
+
+### Lọc và Điều Kiện:
+
+- **`where`**: Thêm điều kiện lọc vào truy vấn.
+- **`whereStrict`**: Thêm điều kiện lọc với so sánh nghiêm ngặt.
+- **`whereBetween`**: Lọc các bản ghi trong khoảng giá trị xác định.
+- **`whereIn`**: Lọc các bản ghi có giá trị thuộc một tập hợp xác định.
+- **`whereInStrict`**: Lọc các bản ghi có giá trị thuộc một tập hợp xác định với so sánh nghiêm ngặt.
+- **`whereNotBetween`**: Lọc các bản ghi không nằm trong khoảng giá trị xác định.
+- **`whereNotIn`**: Lọc các bản ghi có giá trị không thuộc một tập hợp xác định.
+- **`whereNotInStrict`**: Lọc các bản ghi có giá trị không thuộc một tập hợp xác định với so sánh nghiêm ngặt.
+- **`whereNull`**: Lọc các bản ghi có giá trị NULL ở một cột cụ thể.
+- **`whereNotNull`**: Lọc các bản ghi có giá trị không NULL ở một cột cụ thể.
+- **`whereInstanceOf`**: Lọc các bản ghi thuộc một kiểu đối tượng cụ thể.
+
+### Kết Nối và Hợp Nhất:
+
+- **`join`**: Thực hiện phép kết nối (JOIN) giữa các bảng trong truy vấn.
+- **`crossJoin`**: Thực hiện phép kết nối chéo giữa các bảng.
+- **`zip`**: Kết hợp các kết quả truy vấn lại với nhau.
+
+### Nhóm và Tổ Chức:
+
+- **`groupBy`**: Nhóm các bản ghi theo một hoặc nhiều cột.
+
+### Tổng Hợp và Đếm:
+
+- **`count`**: Đếm số lượng bản ghi thỏa mãn điều kiện.
+- **`countBy`**: Đếm số lượng bản ghi theo một tiêu chí cụ thể.
+- **`sum`**: Tính tổng giá trị của một cột cụ thể.
+- **`avg`**: Tính giá trị trung bình của một cột cụ thể.
+- **`max`**: Tìm giá trị lớn nhất của một cột cụ thể.
+- **`min`**: Tìm giá trị nhỏ nhất của một cột cụ thể.
+
+### Truy Cập và Kiểm Tra:
+
+- **`get`**: Lấy tất cả các bản ghi thỏa mãn truy vấn.
+- **`first`**: Lấy bản ghi đầu tiên thỏa mãn truy vấn.
+- **`firstOrFail`**: Lấy bản ghi đầu tiên hoặc trả về lỗi nếu không tìm thấy.
+- **`firstWhere`**: Lấy bản ghi đầu tiên thỏa mãn điều kiện cụ thể.
+- **`exists`**: Kiểm tra sự tồn tại của các bản ghi thỏa mãn truy vấn.
+
+### Hàm Debug và Kiểm Tra:
+
+- **`dd`**: Dump và kết thúc script (Dump and Die), thường dùng để kiểm tra truy vấn.
+
+## 3. Hàm Có Thể Dùng Cả Với Mảng và Cơ Sở Dữ Liệu
+
+Một số hàm có thể được sử dụng trong cả hai ngữ cảnh, tùy thuộc vào cách thức áp dụng. Chúng có thể thao tác trên các collections trong bộ nhớ hoặc được sử dụng trong các truy vấn cơ sở dữ liệu.
+
+- **`all`**: Lấy toàn bộ các phần tử trong collection hoặc bản ghi trong DB.
+- **`average`**: Tính giá trị trung bình của các phần tử trong mảng hoặc một cột trong DB.
+- **`avg`**: Tương tự như `average`.
+- **`count`**: Đếm phần tử trong mảng hoặc đếm số bản ghi trong DB.
+- **`dd`**: Dump và kết thúc script.
+- **`dump`**: Hiển thị nội dung để debug.
+- **`filter`**: Lọc mảng hoặc áp dụng điều kiện trong truy vấn.
+- **`first`**: Lấy phần tử đầu tiên từ mảng hoặc từ kết quả truy vấn.
+- **`firstWhere`**: Lấy phần tử đầu tiên thỏa mãn điều kiện.
+- **`get`**: Truy cập giá trị hoặc lấy bản ghi.
+- **`groupBy`**: Nhóm mảng hoặc nhóm trong truy vấn.
+- **`has`**: Kiểm tra có phần tử trong mảng hoặc trong DB.
+- **`hasAny`**: Kiểm tra có bất kỳ phần tử nào trong mảng hoặc trong DB.
+- **`join`**: Kết nối mảng hoặc bảng trong truy vấn.
+- **`last`**: Lấy phần tử cuối cùng từ mảng hoặc từ kết quả truy vấn.
+- **`map`**: Biến đổi mảng hoặc các trường trong truy vấn.
+- **`max`**: Tìm giá trị lớn nhất trong mảng hoặc một cột trong DB.
+- **`merge`**: Hợp nhất mảng hoặc kết quả truy vấn.
+- **`mergeRecursive`**: Hợp nhất mảng một cách đệ quy.
+- **`min`**: Tìm giá trị nhỏ nhất trong mảng hoặc một cột trong DB.
+- **`pipe`**: Truyền collection hoặc truy vấn qua các hàm xử lý.
+- **`pluck`**: Trích xuất giá trị từ mảng hoặc từ kết quả truy vấn.
+- **`sort`**: Sắp xếp mảng hoặc sắp xếp kết quả truy vấn.
+- **`sortBy`**: Sắp xếp mảng theo khóa hoặc sắp xếp truy vấn theo cột cụ thể.
+- **`sortByDesc`**: Sắp xếp mảng theo khóa giảm dần hoặc truy vấn giảm dần.
+- **`sortDesc`**: Sắp xếp giảm dần.
+- **`sum`**: Tính tổng trong mảng hoặc trên một cột trong DB.
+- **`tap`**: Thực hiện hành động mà không thay đổi dữ liệu.
+- **`unless`**: Thực hiện hành động nếu điều kiện không thỏa mãn.
+- **`unlessEmpty`**: Thực hiện hành động nếu collection không rỗng.
+- **`unlessNotEmpty`**: Thực hiện hành động nếu collection rỗng.
+- **`value`**: Trả về giá trị của collection hoặc truy vấn sau khi đã xử lý.
+- **`when`**: Thực hiện hành động dựa trên điều kiện.
+- **`whenEmpty`**: Thực hiện hành động nếu collection rỗng.
+- **`whenNotEmpty`**: Thực hiện hành động nếu collection không rỗng.
+- **`where`**: Thêm điều kiện lọc vào truy vấn hoặc lọc mảng.
+- **`whereStrict`**: Thêm điều kiện lọc nghiêm ngặt vào truy vấn hoặc lọc mảng.
+- **`whereIn`**: Lọc bản ghi trong DB hoặc mảng dựa trên tập hợp.
+- **`whereInStrict`**: Lọc bản ghi với so sánh nghiêm ngặt.
+- **`whereInstanceOf`**: Lọc bản ghi thuộc một kiểu đối tượng cụ thể hoặc kiểm tra trong mảng.
+- **`whereNotIn`**: Lọc bản ghi không thuộc tập hợp hoặc mảng.
+- **`whereNotInStrict`**: Lọc bản ghi không thuộc tập hợp với so sánh nghiêm ngặt.
+- **`whereNotNull`**: Lọc bản ghi có giá trị không NULL hoặc kiểm tra trong mảng.
+- **`whereNull`**: Lọc bản ghi có giá trị NULL hoặc kiểm tra trong mảng.
+
+## Tổng Quan
+
+- **Hàm Thường Dùng Với Mảng / Collections:** 97 hàm
+- **Hàm Thường Dùng Với Cơ Sở Dữ Liệu:** 7 hàm
+- **Hàm Có Thể Dùng Cả Với Mảng và Cơ Sở Dữ Liệu:** 42 hàm
+
+---
+
+**Ghi chú:**
+
+- Một số hàm có thể xuất hiện trong nhiều danh mục khác nhau do tính linh hoạt trong việc sử dụng.
+- Các hàm như `groupBy`, `sort`, và `map` thường xuyên được sử dụng cả trong xử lý mảng/collections và xây dựng truy vấn cơ sở dữ liệu.
+- Hàm `last` có thể được sử dụng trong cả hai ngữ cảnh tùy thuộc vào cách triển khai cụ thể.
+- Hàm `dd` và `dump` thường được sử dụng để debug dữ liệu, áp dụng cho cả collections và kết quả truy vấn.
+- Các hàm như `macro`, `lazy` liên quan đến việc mở rộng hoặc tối ưu hóa collections, nhưng cũng có thể ảnh hưởng đến cách thức các truy vấn được xây dựng hoặc thực thi.
