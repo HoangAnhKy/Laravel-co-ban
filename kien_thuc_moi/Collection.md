@@ -3,7 +3,13 @@
 # Tạo Collection
 
 ```php
-$collection = collect([1,2,3,4,5]);
+$collection = collect([1,2,3,4,5]); 
+/* hoặc dùng biến tĩnh `make`
+  
+  use Illuminate\Support\Collection;
+  $collection = Collection::make([1, 2, 3, 4, 5]);
+
+*/
 ```
 
 # Phân Loại Các Hàm Theo Ngữ Cảnh Sử Dụng
@@ -198,7 +204,7 @@ Các hàm này thường được sử dụng để thao tác trực tiếp trê
   $currencies = $collection->mapInto(Currency::class);
   $currencies->all(); // [Currency('USD'), Currency('EUR'), Currency('GBP')]
   ```
-- **`mapSpread`**: Giải nén các mảng con và áp dụng hàm cho từng phần tử.
+- **`mapSpread`**: Giải nén các mảng con và áp dụng hàm cho từng phần tử. Ứng với mỗi biến bên trong hàm `callback` sẽ là phần tử trong mảng đa chiều
 
   ```php
   $collection = collect([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
@@ -968,33 +974,166 @@ Các hàm này thường được sử dụng để thao tác trực tiếp trê
   // ['product_id' => 1]
   ```
 - **`all`**: Lấy toàn bộ các phần tử trong collection.
+  
   ```php 
   collect([1, 2, 3])->all();// [1, 2, 3]
   ```
 ### Quản Lý Phần Tử:
 
-- **`each`**: Thực hiện một hành động cho mỗi phần tử trong mảng.
-- **`eachSpread`**: Giải nén các mảng con và thực hiện hành động cho từng phần tử.
+- **`each`**: Thực hiện một hành động cho mỗi phần tử (loop) trong mảng một chiều.
+ 
+  ```php
+  $collection = collect([1, 2, 3, 4]);
+ 
+  $collection->each(function (int $item, int $key) {
+      // ...
+  });
+  ```
+- **`eachSpread`**: Giải nén các mảng con và thực hiện hành động cho từng phần tử. Ứng với mỗi biến bên trong hàm `callback` sẽ là phần tử trong mảng đa chiều
+  
+  ```php
+  $collection = collect([[1,2], [3,4], [5]]);
+  $collection->eachSpread(function ($value_f, $value_l = null) {
+      echo $value_f; // 135
+      echo $value_l; // 123452 vì ở mục 3 sẽ ko có $value_l nên nó lấy về thằng đầu tiên.
+  });
+
+  ```
 - **`tap`**: Thực hiện một hành động trên mảng mà không làm thay đổi nó.
+  
+  ```php
+  $first = collect([2, 4, 3, 1, 5])
+            ->sort()
+            ->tap(function (Collection $collection) {
+                print_r( $collection->values()->all()); // Array ( [0] => 1 [1] => 2 [2] => 3 [3] => 4 [4] => 5 ) 
+            })
+            ->shift();
+
+  echo $first;// 1
+  ```
 - **`push`**: Thêm một phần tử vào cuối mảng.
+
+  ```php
+  $collection = collect([1, 2, 3, 4]);
+ 
+  $collection->push(5);
+  
+  $collection->all();// [1, 2, 3, 4, 5]
+  ```
 - **`pull`**: Lấy và loại bỏ một phần tử khỏi mảng dựa trên khóa.
+
+  ```php
+  $collection = collect(['product_id' => 'prod-100', 'name' => 'Desk']);
+  $collection->pull('name');// 'Desk'
+  $collection->all();// ['product_id' => 'prod-100']
+  ```
 - **`prepend`**: Thêm một phần tử vào đầu mảng.
+
+  ```php
+  $collection = collect([1, 2, 3, 4, 5]);
+  $collection->prepend(0);
+  $collection->all();// [0, 1, 2, 3, 4, 5]
+
+  // truyền biến thứ 2 thành key
+  $collection = collect(['one' => 1, 'two' => 2]);
+  $collection->prepend(0, 'zero');
+  $collection->all();// ['zero' => 0, 'one' => 1, 'two' => 2]
+  ```
 - **`pop`**: Lấy và loại bỏ phần tử cuối cùng của mảng.
+  ```php
+  $collection = collect([1, 2, 3, 4, 5]);
+  $collection->pop();// 5
+  $collection->all();// [1, 2, 3, 4]
+
+  // truyền index
+  $collection->pop(3);// collect([5, 4, 3])
+  $collection->all();// [1, 2]
+  ```
 - **`shift`**: Lấy và loại bỏ phần tử đầu tiên của mảng.
+  ```php
+    $collection = collect([1, 2, 3, 4, 5]);
+ 
+  $collection->shift();// 1
+  $collection->all();// [2, 3, 4, 5]
+  
+  // truyền index
+  $collection->shift(3);// [1,2,3]
+  $collection->all();// [4, 5]
+  ```
 
 ### Các Hàm Hỗ Trợ Khác:
-
-- **`collect`**: Tạo một collection từ một mảng hoặc đối tượng.
-- **`make`**: Tạo một collection mới.
+- **`make`**: Phương thức tĩnh tạo ra một `collection` mới.
+  ```php
+  use Illuminate\Support\Collection;
+  $collection = Collection::make([1, 2, 3, 4, 5]); // giống collect()
+  ```
 - **`macro`**: Định nghĩa một macro mới cho collection.
+
+  ```php
+  Collection::macro('toUpper', function () {
+      return $this->map(function (string $value) {
+          return Str::upper($value);
+      });
+  });
+  
+  $collection = collect(['first', 'second']);
+  
+  $upper = $collection->toUpper();
+  ```
 - **`lazy`**: Tạo một collection theo cách lười (lazy).
+  
+  ```php
+  $lazyCollection = collect([1, 2, 3, 4])->lazy();
+
+  $lazyCollection::class;  
+  // Illuminate\Support\LazyCollection
+  $lazyCollection->all();// [1, 2, 3, 4]
+  ```
 - **`times`**: Tạo một collection chứa một số phần tử dựa trên số lần lặp.
+  ```php
+  $collection = Collection::times(10, function (int $number) {
+      return $number * 9;
+  });
+  $collection->all();// [9, 18, 27, 36, 45, 54, 63, 72, 81, 90]
+  ```
 - **`range`**: Tạo một collection chứa các số trong khoảng xác định.
+  ```php
+  $collection = collect()->range(3, 6);
+  $collection->all();// [3, 4, 5, 6]
+  ```
 - **`forPage`**: Lấy một trang cụ thể của mảng dựa trên số phần tử mỗi trang.
+  ```php
+  $collection = collect([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  $chunk = $collection->forPage(2, 3); // (page, perpage(limit on page))
+  $chunk->all();// [4, 5, 6]
+  ```
 - **`dump`**: Hiển thị nội dung của collection để debug.
+
+  ```php
+  $collection = collect(['John Doe', 'Jane Doe']);
+
+  $collection->dump();
+  ```
 - **`dd`**: Dump và kết thúc script (Dump and Die).
+
+  ```php
+  $collection = collect(['John Doe', 'Jane Doe']);
+
+  $collection->dd();
+  ```
 - **`toArray`**: Chuyển đổi collection thành mảng.
+  ```php
+  $collection = collect([1, 2, 3, 4, 5]);
+  $chunks = $collection->sliding(2);
+  $chunks->toArray();
+  ```
 - **`toJson`**: Chuyển đổi collection thành JSON.
+
+  ```php
+  $collection = collect([1, 2, 3, 4, 5]);
+  $chunks = $collection->sliding(2);
+  $chunks->toArray();
+  ```
 
 ## 2. Hàm Thường Dùng Với Cơ Sở Dữ Liệu (Databases)
 
@@ -1002,48 +1141,207 @@ Các hàm này thường được sử dụng trong việc xây dựng các truy
 
 ### Lọc và Điều Kiện:
 
-- **`where`**: Thêm điều kiện lọc vào truy vấn.
-- **`whereStrict`**: Thêm điều kiện lọc với so sánh nghiêm ngặt.
+- **`where`** và **`whereStrict`**: Thêm điều kiện lọc vào truy vấn. 
+  ```php
+  // hỗ trợ là: '===', '!==', '!=', '==', '=', '<>', '>', '<', '>=' và '<=':
+  $collection = collect([
+      ['name' => 'Jim', 'deleted_at' => '2019-01-01 00:00:00'],
+      ['name' => 'Sally', 'deleted_at' => '2019-01-02 00:00:00'],
+      ['name' => 'Sue', 'deleted_at' => null],
+  ]);
+  
+  $filtered = $collection->where('deleted_at', '!=', null);
+  
+  $filtered->all();
+  ```
 - **`whereBetween`**: Lọc các bản ghi trong khoảng giá trị xác định.
-- **`whereIn`**: Lọc các bản ghi có giá trị thuộc một tập hợp xác định.
-- **`whereInStrict`**: Lọc các bản ghi có giá trị thuộc một tập hợp xác định với so sánh nghiêm ngặt.
-- **`whereNotBetween`**: Lọc các bản ghi không nằm trong khoảng giá trị xác định.
-- **`whereNotIn`**: Lọc các bản ghi có giá trị không thuộc một tập hợp xác định.
-- **`whereNotInStrict`**: Lọc các bản ghi có giá trị không thuộc một tập hợp xác định với so sánh nghiêm ngặt.
-- **`whereNull`**: Lọc các bản ghi có giá trị NULL ở một cột cụ thể.
-- **`whereNotNull`**: Lọc các bản ghi có giá trị không NULL ở một cột cụ thể.
-- **`whereInstanceOf`**: Lọc các bản ghi thuộc một kiểu đối tượng cụ thể.
+  ```php
+  $collection = collect([
+      ['product' => 'Desk', 'price' => 200],
+      ['product' => 'Chair', 'price' => 80],
+      ['product' => 'Bookcase', 'price' => 150],
+      ['product' => 'Pencil', 'price' => 30],
+      ['product' => 'Door', 'price' => 100],
+  ]);
+  
+  $filtered = $collection->whereBetween('price', [100, 200]);
+  
+  $filtered->all();
+  
+  /*
+      [
+          ['product' => 'Desk', 'price' => 200],
+          ['product' => 'Bookcase', 'price' => 150],
+          ['product' => 'Door', 'price' => 100],
+      ]
+  */
+  ```
+- **`whereIn`** và  **`whereInStrict`**: Lọc các bản ghi có giá trị thuộc một tập hợp xác định.
 
+  ```php
+  $collection = collect([
+      ['product' => 'Desk', 'price' => 200],
+      ['product' => 'Chair', 'price' => 80],
+      ['product' => 'Bookcase', 'price' => 150],
+      ['product' => 'Pencil', 'price' => 30],
+      ['product' => 'Door', 'price' => 100],
+  ]);
+  
+  $filtered = $collection->whereBetween('price', [100, 200]);
+  
+  $filtered->all();
+  
+  /*
+      [
+          ['product' => 'Desk', 'price' => 200],
+          ['product' => 'Bookcase', 'price' => 150],
+          ['product' => 'Door', 'price' => 100],
+      ]
+  */
+  ```
+- **`whereNotBetween`**: Lọc các bản ghi không nằm trong khoảng giá trị xác định.
+  
+  ```php
+  $collection = collect([
+      ['product' => 'Desk', 'price' => 200],
+      ['product' => 'Chair', 'price' => 80],
+      ['product' => 'Bookcase', 'price' => 150],
+      ['product' => 'Pencil', 'price' => 30],
+      ['product' => 'Door', 'price' => 100],
+  ]);
+  
+  $filtered = $collection->whereNotBetween('price', [100, 200]);
+  
+  $filtered->all();
+  
+  /*
+      [
+          ['product' => 'Chair', 'price' => 80],
+          ['product' => 'Pencil', 'price' => 30],
+      ]
+  */
+  ```
+
+- **`whereNotIn`** và **`whereNotInStrict`**: Lọc các bản ghi có giá trị không thuộc một tập hợp xác định.
+  ```php
+    $collection = collect([
+      ['product' => 'Desk', 'price' => 200],
+      ['product' => 'Chair', 'price' => 100],
+      ['product' => 'Bookcase', 'price' => 150],
+      ['product' => 'Door', 'price' => 100],
+    ]);
+
+    $filtered = $collection->whereNotIn('price', [150, 200]);
+
+    $filtered->all();
+
+    /*
+      [
+          ['product' => 'Chair', 'price' => 100],
+          ['product' => 'Door', 'price' => 100],
+      ]
+    */
+  ```
+- **`whereNull`**: Lọc các bản ghi có giá trị NULL ở một cột cụ thể.
+  ```php
+  $collection = collect([
+      ['name' => 'Desk'],
+      ['name' => null],
+      ['name' => 'Bookcase'],
+  ]);
+  
+  $filtered = $collection->whereNull('name');
+  
+  $filtered->all();
+  
+  /*
+      [
+          ['name' => null],
+      ]
+  */
+  ```
+- **`whereNotNull`**: Lọc các bản ghi có giá trị không NULL ở một cột cụ thể.
+
+  
+  ```php
+    $collection = collect([
+      ['name' => 'Desk'],
+      ['name' => null],
+      ['name' => 'Bookcase'],
+    ]);
+
+    $filtered = $collection->whereNotNull('name');
+
+    $filtered->all();
+
+    /*
+      [
+          ['name' => 'Desk'],
+          ['name' => 'Bookcase'],
+      ]
+    */
+  ```
+
+- **`whereInstanceOf`**: Lọc các bản ghi thuộc một kiểu đối tượng cụ thể.
+  ```php
+  use App\Models\User;
+  use App\Models\Post;
+
+  $collection = collect([
+    new User,
+    new User,
+    new Post,
+  ]);
+
+  $filtered = $collection->whereInstanceOf(User::class);
+
+  $filtered->all();// [App\Models\User, App\Models\User]
+  ```
 ### Kết Nối và Hợp Nhất:
 
 - **`join`**: Thực hiện phép kết nối (JOIN) giữa các bảng trong truy vấn.
+
+  ```php
+  collect(['a', 'b', 'c'])->join(', '); // 'a, b, c'
+
+  collect(['a', 'b', 'c'])->join(', ', ', and '); // 'a, b, and c'
+
+  collect(['a', 'b'])->join(', ', ' and '); // 'a and b'
+
+  collect(['a'])->join(', ', ' and '); // 'a'
+
+  collect([])->join(', ', ' and '); // ''
+  ```
 - **`crossJoin`**: Thực hiện phép kết nối chéo giữa các bảng.
+
+  ```php
+  $collection = collect([1, 2]);
+  $matrix = $collection->crossJoin(['a', 'b'], ['I', 'II']);
+
+  $matrix->all();
+
+  /*
+    [
+        [1, 'a', 'I'],
+        [1, 'a', 'II'],
+        [1, 'b', 'I'],
+        [1, 'b', 'II'],
+        [2, 'a', 'I'],
+        [2, 'a', 'II'],
+        [2, 'b', 'I'],
+        [2, 'b', 'II'],
+    ]
+  */
+  ```
 - **`zip`**: Kết hợp các kết quả truy vấn lại với nhau.
 
-### Nhóm và Tổ Chức:
-
-- **`groupBy`**: Nhóm các bản ghi theo một hoặc nhiều cột.
-
-### Tổng Hợp và Đếm:
-
-- **`count`**: Đếm số lượng bản ghi thỏa mãn điều kiện.
-- **`countBy`**: Đếm số lượng bản ghi theo một tiêu chí cụ thể.
-- **`sum`**: Tính tổng giá trị của một cột cụ thể.
-- **`avg`**: Tính giá trị trung bình của một cột cụ thể.
-- **`max`**: Tìm giá trị lớn nhất của một cột cụ thể.
-- **`min`**: Tìm giá trị nhỏ nhất của một cột cụ thể.
-
-### Truy Cập và Kiểm Tra:
-
-- **`get`**: Lấy tất cả các bản ghi thỏa mãn truy vấn.
-- **`first`**: Lấy bản ghi đầu tiên thỏa mãn truy vấn.
-- **`firstOrFail`**: Lấy bản ghi đầu tiên hoặc trả về lỗi nếu không tìm thấy.
-- **`firstWhere`**: Lấy bản ghi đầu tiên thỏa mãn điều kiện cụ thể.
-- **`exists`**: Kiểm tra sự tồn tại của các bản ghi thỏa mãn truy vấn.
-
-### Hàm Debug và Kiểm Tra:
-
-- **`dd`**: Dump và kết thúc script (Dump and Die), thường dùng để kiểm tra truy vấn.
+  ```php
+  $collection = collect(['Chair', 'Desk']);
+  
+  $zipped = $collection->zip([100, 200]);
+  
+  $zipped->all();// [['Chair', 100], ['Desk', 200]]
+  ```
 
 ## 3. Hàm Có Thể Dùng Cả Với Mảng và Cơ Sở Dữ Liệu
 
@@ -1077,20 +1375,82 @@ Một số hàm có thể được sử dụng trong cả hai ngữ cảnh, tùy
 - **`sortDesc`**: Sắp xếp giảm dần.
 - **`sum`**: Tính tổng trong mảng hoặc trên một cột trong DB.
 - **`tap`**: Thực hiện hành động mà không thay đổi dữ liệu.
-- **`unless`**: Thực hiện hành động nếu điều kiện không thỏa mãn.
-- **`unlessEmpty`**: Thực hiện hành động nếu collection không rỗng.
-- **`unlessNotEmpty`**: Thực hiện hành động nếu collection rỗng.
+
 - **`value`**: Trả về giá trị của collection hoặc truy vấn sau khi đã xử lý.
-- **`when`**: Thực hiện hành động dựa trên điều kiện.
+- **`unless`**: Thực hiện hành động nếu điều kiện không thỏa mãn.
+
+  ```php
+    $collection = collect([1, 2, 3]);
+ 
+    $collection->unless(true, function (Collection $collection) {
+        return $collection->push(4);
+    });
+    
+    $collection->unless(false, function (Collection $collection) {
+        return $collection->push(5);
+    });
+    
+    $collection->all();// [1, 2, 3, 5]
+  ```
+- **`when`**: Thực hiện hành động dựa trên điều kiện. Ngược lại của `unless`
+  ```php
+  $collection = collect([1, 2, 3]);
+ 
+  $collection->when(true, function (Collection $collection, int $value) {
+      return $collection->push(4);
+  });
+  
+  $collection->when(false, function (Collection $collection, int $value) {
+      return $collection->push(5);
+  });
+  
+  $collection->all();// [1, 2, 3, 4]
+  ```
 - **`whenEmpty`**: Thực hiện hành động nếu collection rỗng.
-- **`whenNotEmpty`**: Thực hiện hành động nếu collection không rỗng.
+  
+  ```php
+  $collection = collect(['Michael', 'Tom']);
+ 
+  $collection->whenEmpty(function (Collection $collection) {
+      return $collection->push('Adam');
+  });
+  
+  $collection->all();// ['Michael', 'Tom']
+  
+  
+  $collection = collect();
+  
+  $collection->whenEmpty(function (Collection $collection) {
+      return $collection->push('Adam');
+  });
+  
+  $collection->all();// ['Adam']
+  ```
+- **`whenNotEmpty`**: Thực hiện hành động nếu collection không rỗng. Ngược lại của `whenEmpty`
+
+  ```php
+  $collection = collect(['michael', 'tom']);
+ 
+  $collection->whenNotEmpty(function (Collection $collection) {
+      return $collection->push('adam');
+  });
+  
+  $collection->all();// ['michael', 'tom', 'adam']
+  
+  
+  $collection = collect();
+  
+  $collection->whenNotEmpty(function (Collection $collection) {
+      return $collection->push('adam');
+  });
+  
+  $collection->all();// []
+  ```
 - **`where`**: Thêm điều kiện lọc vào truy vấn hoặc lọc mảng.
 - **`whereStrict`**: Thêm điều kiện lọc nghiêm ngặt vào truy vấn hoặc lọc mảng.
-- **`whereIn`**: Lọc bản ghi trong DB hoặc mảng dựa trên tập hợp.
-- **`whereInStrict`**: Lọc bản ghi với so sánh nghiêm ngặt.
+- **`whereIn`** và **`whereInStrict`**: Lọc bản ghi trong DB hoặc mảng dựa trên tập hợp.
 - **`whereInstanceOf`**: Lọc bản ghi thuộc một kiểu đối tượng cụ thể hoặc kiểm tra trong mảng.
-- **`whereNotIn`**: Lọc bản ghi không thuộc tập hợp hoặc mảng.
-- **`whereNotInStrict`**: Lọc bản ghi không thuộc tập hợp với so sánh nghiêm ngặt.
+- **`whereNotIn`** và **`whereNotInStrict`**: Lọc bản ghi không thuộc tập hợp với so sánh , `whereNotInStrict` là chế độ nghiêm ngặt.
 - **`whereNotNull`**: Lọc bản ghi có giá trị không NULL hoặc kiểm tra trong mảng.
 - **`whereNull`**: Lọc bản ghi có giá trị NULL hoặc kiểm tra trong mảng.
 
@@ -1098,8 +1458,4 @@ Một số hàm có thể được sử dụng trong cả hai ngữ cảnh, tùy
 
 **Ghi chú:**
 
-- Một số hàm có thể xuất hiện trong nhiều danh mục khác nhau do tính linh hoạt trong việc sử dụng.
-- Các hàm như `groupBy`, `sort`, và `map` thường xuyên được sử dụng cả trong xử lý mảng/collections và xây dựng truy vấn cơ sở dữ liệu.
-- Hàm `last` có thể được sử dụng trong cả hai ngữ cảnh tùy thuộc vào cách triển khai cụ thể.
-- Hàm `dd` và `dump` thường được sử dụng để debug dữ liệu, áp dụng cho cả collections và kết quả truy vấn.
 - Các hàm như `macro`, `lazy` liên quan đến việc mở rộng hoặc tối ưu hóa collections, nhưng cũng có thể ảnh hưởng đến cách thức các truy vấn được xây dựng hoặc thực thi.
