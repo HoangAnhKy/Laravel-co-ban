@@ -175,6 +175,170 @@ Các hàm này thường được sử dụng để thao tác trực tiếp trê
   });// 2
   ```
 
+- **`diff`**: so sánh collection với collection khác hoặc array với array khác dựa trên các giá trị của nó
+
+  ```php
+  $collection = collect([1, 2, 3, 4, 5]);
+  $diff = $collection->diff([2, 4, 6, 8]);
+  $diff->all();// [1, 3, 5]
+  ```
+- **`diffAssoc`**: so sánh collection với collection khác hoặc array với array khác dựa trên các khóa và giá trị của nó
+
+  ```php
+  $collection = collect([
+      'color' => 'orange',
+      'type' => 'fruit',
+      'remain' => 6,
+  ]);
+  
+  $diff = $collection->diffAssoc([
+      'color' => 'yellow',
+      'type' => 'fruit',
+      'remain' => 3,
+      'used' => 6,
+  ]);
+  
+  $diff->all();// ['color' => 'orange', 'remain' => 6]
+  ```
+- **`diffAssocUsing`**: Sẽ so sánh collection với collection khác hoặc array với array khác dựa trên **tên hàm callback** có sẵn hoặc tự code
+
+  ```php
+  $collection = collect([
+      'color' => 'orange',
+      'type' => 'fruit',
+      'remain' => 6,
+  ]);
+  
+  $diff = $collection->diffAssocUsing([
+      'Color' => 'yellow',
+      'Type' => 'fruit',
+      'Remain' => 3,
+  ], 'strnatcasecmp');
+  
+  $diff->all();// ['color' => 'orange', 'remain' => 6]
+  ```
+
+- **`diffKeys`**: so sánh dựa trên khóa của nó
+
+  ```php
+  $collection = collect([
+      'one' => 10,
+      'two' => 20,
+      'three' => 30,
+      'four' => 40,
+      'five' => 50,
+  ]);
+  
+  $diff = $collection->diffKeys([
+      'two' => 2,
+      'four' => 4,
+      'six' => 6,
+      'eight' => 8,
+  ]);
+  
+  $diff->all();// ['one' => 10, 'three' => 30, 'five' => 50]
+  ```
+
+- **`duplicates`** và **`duplicatesStrict`**: truy xuất và trả về các giá trị trùng lặp từ bộ sưu tập
+
+  ```php
+  // Có thể sử dụng key để check với object
+  $collection = collect(['a', 'b', 'a', 'c', 'b']);
+  
+  $collection->duplicates();// [2 => 'a', 4 => 'b']
+  ```
+
+- **`intersect`**: xóa bất kỳ giá trị nào khỏi collection gốc không có trong collection đã cho
+
+  ```php
+    $collection = collect(['Desk', 'Sofa', 'Chair']);
+  
+    $intersect = $collection->intersect(['Desk', 'Chair', 'Bookcase']);
+    
+    $intersect->all();// [0 => 'Desk', 2 => 'Chair']
+  ```
+- **`intersectAssoc`**: xóa bất kỳ giá trị nào khỏi collection gốc không có trong collection đã cho. Dựa trên key/value.
+
+  ```php
+  $collection = collect([
+      'color' => 'red',
+      'size' => 'M',
+      'material' => 'cotton'
+  ]);
+  
+  $intersect = $collection->intersectAssoc([
+      'color' => 'blue',
+      'size' => 'M',
+      'material' => 'polyester'
+  ]);
+  
+  $intersect->all();// ['size' => 'M']
+  ```
+- **`intersectByKeys`**: xóa bất kỳ giá trị nào khỏi collection gốc không có trong collection đã cho. Dựa trên key.
+
+  ```php
+  $collection = collect([
+      'serial' => 'UX301', 'type' => 'screen', 'year' => 2009,
+  ]);
+  
+  $intersect = $collection->intersectByKeys([
+      'reference' => 'UX404', 'type' => 'tab', 'year' => 2011,
+  ]);
+  
+  $intersect->all();// ['type' => 'screen', 'year' => 2009]
+  ```
+- **`random`**: trả về một mục ngẫu nhiên từ collection
+
+  ```php
+    $collection = collect([1, 2, 3, 4, 5]);
+ 
+    $collection->random();// 4 - (retrieved randomly)
+  ```
+- **`take`**: lấy collection mới với số lượng mục được chỉ định
+
+  ```php
+  $collection = collect([0, 1, 2, 3, 4, 5]);
+  
+  $chunk = $collection->take(3);
+  
+  $chunk->all();// [0, 1, 2]
+  ```
+- **`takeUntil`** giống như `take` nhưng lọc qua callback trả về true mới dừng
+
+  ```php
+  $collection = collect([1, 2, 3, 4]);
+  
+  $subset = $collection->takeUntil(function (int $item) {
+      return $item >= 3;
+  });
+  
+  $subset->all();// [1, 2]
+  ```
+- **`takeWhile`**: ngược lại của `takeUntil` khi callback trả false nó mới dừng
+
+  ```php
+  $collection = collect([1, 2, 3, 4]);
+  
+  $subset = $collection->takeWhile(function (int $item) {
+      return $item < 3;
+  });
+  
+  $subset->all();// [1, 2]
+  ```
+
+- **`unique`** và **`uniqueStrict`**: trả về collection không bị trùng phần tử
+
+  ```php
+  // có thể sử dụng thêm key hoặc callback, mặc định là với giá trị của mảng một chiều
+
+  $collection = collect([1, 1, 2, 2, 3, 4, 2]);
+  
+  $unique = $collection->unique();
+  
+  $unique->values()->all();// [1, 2, 3, 4]
+  ```
+
+
 ### Biến Đổi và Chuyển Đổi:
 
 - **`map`**: Áp dụng một hàm cho mỗi phần tử trong mảng và trả về mảng mới với kết quả.
@@ -526,7 +690,64 @@ Các hàm này thường được sử dụng để thao tác trực tiếp trê
       ]
   */
   ```
+- **`reduce`**: biến collection thành một giá trị duy nhất, truyền kết quả của mỗi lần lặp vào lần lặp tiếp theo
 
+  ```php
+    $collection = collect([1, 2, 3]);
+    
+    $total = $collection->reduce(function (?int $carry, int $item) {
+        return $carry + $item;
+    }); // 6
+    
+    // đặt giá trị mặc định
+    $total = $collection->reduce(function (?int $carry, int $item) {
+        return $carry + $item;
+    },4); // 10
+  ```
+- **`reduceSpread`**:  tương tự như `reduce`, nhưng với khả năng giải nén các giá trị từ collection thành nhiều tham số để truyền vào hàm callback
+
+  ```php
+  $collection = collect([
+      [1, 2],
+      [3, 4],
+      [5, 6]
+  ]);
+
+  $result = $collection->reduceSpread(function ($carry, $a, $b) {
+      return [$carry[0] + $a, $carry[1] + $b];
+  }, [0, 0]);
+
+  print_r($result); // [9, 12]
+
+  ```
+- **`skip`**: trả về một collection mới, trong đó số lượng phần tử nhất định được xóa khỏi phần đầu của collection.
+
+  ```php
+  $collection = collect([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  $collection = $collection->skip(4);
+  $collection->all();// [5, 6, 7, 8, 9, 10]
+  ```
+
+- **`skipUntil`** và **`skipWhile`**: Giống như `skip` nhưng sử dụng callback, bắt đầu bỏ qua khi điều kiện trong callback là true.
+
+  ```php
+    $collection = collect([1, 2, 3, 4]);
+  
+
+    // sẽ trả về 3,4 do là 3 thỏa mãn nó 
+    $subset = $collection->skipUntil(function (int $item) {
+        return $item >= 3;
+    });
+    
+    $subset->all();// [3, 4]
+
+    // sẽ trả về 4 do là 4 không thỏa mãn nó nữa
+    $subset = $collection->skipWhile(function (int $item) {
+        return $item <= 3;
+    });
+    
+    $subset->all();// [4]
+  ```
 ### Tính Toán và Tổng Hợp:
 
 - **`avg`** và **`average`**: Tính giá trị trung bình của các phần tử trong mảng.
@@ -836,6 +1057,26 @@ Các hàm này thường được sử dụng để thao tác trực tiếp trê
   
   $collection->all();// [1, 2, 4, 5]
   ```
+
+- **`split`** : Chia một tập hợp thành số nhóm nhất định. Nó sẽ chia đều các phần tử rồi nếu dư nó sẽ thêm trừ trên xuống
+
+  ```php
+  $collection = collect([1, 2, 3, 4, 5, 6, 7]);
+
+  $split = $collection->split(3);
+  $split->all(); // [[1,2,3],[4,5],[6,7]];
+
+  ```
+- **`splitIn`**: Giống như `split`nhưng nó chia đều hơn.
+
+  ```php
+  $collection = collect([1, 2, 3, 4, 5, 6, 7]);
+
+  $split = $collection->splitIn(3);
+  $split->all(); // [[1,2,3],[4,5,6],[7]];
+
+  ```
+
 ### Kết Nối và Hợp Nhất:
 
 - **`concat`**: Kết hợp hai hoặc nhiều mảng lại với nhau.
@@ -847,6 +1088,38 @@ Các hàm này thường được sử dụng để thao tác trực tiếp trê
   
   $concatenated->all();// ['John Doe', 'Jane Doe', 'Johnny Doe']
   ```
+
+- **`replace`**: hoạt động tương tự như `merge`, nhưng nó có thể ghi đè vào index đó, nếu không có sẽ thêm vào
+
+  ```php
+  $collection = collect(['Taylor', 'Abigail', 'James']);
+  
+  $replaced = $collection->replace([1 => 'Victoria', 3 => 'Finn']);
+  
+  $replaced->all();// ['Taylor', 'Victoria', 'James', 'Finn']
+  ```
+- **`replaceRecursive`**: hoạt động giống như `replace`, nhưng nó sẽ đệ quy vào mảng và áp dụng cùng một quy trình thay thế cho các giá trị bên trong phần tử (mảng đa chiều).
+
+  ```php
+  $collection = collect([
+      'Taylor',
+      'Abigail',
+      [
+          'James',
+          'Victoria',
+          'Finn'
+      ]
+  ]);
+  
+  $replaced = $collection->replaceRecursive([
+      'Charlie',
+      2 => [1 => 'King'] // Số 2 ở đây đại diện cho index 2
+  ]);
+  
+  $replaced->all();
+  // ['Charlie', 'Abigail', ['James', 'King', 'Finn']]
+  ```
+
 - **`merge`**: Hợp nhất mảng với mảng khác.
 
   ```php
@@ -880,6 +1153,15 @@ Các hàm này thường được sử dụng để thao tác trực tiếp trê
   $union->all();// [1 => ['a'], 2 => ['b'], 3 => ['c']]
   ```
 
+- **`combine`**: kết hợp các giá trị của collection, dưới dạng khóa, với các giá trị của một mảng hoặc collection:
+
+  ```php
+  $collection = collect(['name', 'age']);
+ 
+  $combined = $collection->combine(['George', 29]);
+  
+  $combined->all();// ['name' => 'George', 'age' => 29]
+  ```
 ### Truy Cập và Kiểm Tra Phần Tử:
 
 
@@ -1060,6 +1342,40 @@ Các hàm này thường được sử dụng để thao tác trực tiếp trê
   $collection->shift(3);// [1,2,3]
   $collection->all();// [4, 5]
   ```
+- **`put`**: thêm key/value vào collection
+
+  ```php
+  $collection = collect(['product_id' => 1, 'name' => 'Desk']);
+  
+  $collection->put('price', 100);
+  
+  $collection->all();// ['product_id' => 1, 'name' => 'Desk', 'price' => 100]
+  ```
+- **`forget`**: xóa một mục khỏi collection theo khóa của nó
+
+  ```php
+  $collection = collect(['name' => 'taylor', 'framework' => 'laravel']);
+ 
+  // Forget a single key...
+  $collection->forget('name');// ['framework' => 'laravel']
+  
+  // Forget multiple keys...
+  $collection->forget(['name', 'framework']);  // []
+  ```
+
+- **`pad`**:  điền giá trị đã cho vào mảng cho đến khi mảng đạt đến kích thước đã chỉ định
+
+  ```php
+  $collection = collect(['A', 'B', 'C']);
+  
+  $filtered = $collection->pad(5, 0);
+  
+  $filtered->all();// ['A', 'B', 'C', 0, 0]
+  
+  $filtered = $collection->pad(-5, 0);
+  
+  $filtered->all();// [0, 0, 'A', 'B', 'C']
+  ```
 
 ### Các Hàm Hỗ Trợ Khác:
 - **`make`**: Phương thức tĩnh tạo ra một `collection` mới.
@@ -1140,6 +1456,31 @@ Các hàm này thường được sử dụng để thao tác trực tiếp trê
 Các hàm này thường được sử dụng trong việc xây dựng các truy vấn cơ sở dữ liệu, thường thông qua các ORM như Eloquent trong Laravel. Chúng giúp tương tác với dữ liệu được lưu trữ trong hệ quản trị cơ sở dữ liệu.
 
 ### Lọc và Điều Kiện:
+
+- **`search`**: Tìm kiếm giá trị đã cho trong collection  trả về khóa của nó nếu tìm thấy, không sẽ trả về flase.
+
+  ```php
+    $collection = collect([2, 4, 6, 8]);
+  
+    $collection->search(4);// 1
+  ```
+- **`select`**: chọn các khóa đã cho từ collection, tương tự như SELECT câu lệnh SQL:
+
+  ```php
+  $users = collect([
+      ['name' => 'Taylor Otwell', 'role' => 'Developer', 'status' => 'active'],
+      ['name' => 'Victoria Faith', 'role' => 'Researcher', 'status' => 'active'],
+  ]);
+  
+  $users->select(['name', 'role']);
+  
+  /*
+      [
+          ['name' => 'Taylor Otwell', 'role' => 'Developer'],
+          ['name' => 'Victoria Faith', 'role' => 'Researcher'],
+      ],
+  */
+  ```
 
 - **`where`** và **`whereStrict`**: Thêm điều kiện lọc vào truy vấn. 
   ```php
