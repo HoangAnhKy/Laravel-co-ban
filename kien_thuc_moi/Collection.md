@@ -830,7 +830,7 @@ Các hàm này thường được sử dụng để thao tác trực tiếp trê
       ['foo' => 40]
   ])->sum('foo'); // 80
   ```
-- **`multiply`**: Nhân các phần tử trong mảng với nhau.
+- **`multiply`**: lặp các giá trị tong collection tới n lần.
 
   ```php
   collect([3])->multiply(3);// [3,3,3]
