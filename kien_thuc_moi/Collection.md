@@ -1521,23 +1521,21 @@ Các hàm này thường được sử dụng trong việc xây dựng các truy
 
   ```php
   $collection = collect([
-      ['product' => 'Desk', 'price' => 200],
-      ['product' => 'Chair', 'price' => 80],
-      ['product' => 'Bookcase', 'price' => 150],
-      ['product' => 'Pencil', 'price' => 30],
-      ['product' => 'Door', 'price' => 100],
+    ['product' => 'Desk', 'price' => 200],
+    ['product' => 'Chair', 'price' => 100],
+    ['product' => 'Bookcase', 'price' => 150],
+    ['product' => 'Door', 'price' => 100],
   ]);
-  
-  $filtered = $collection->whereBetween('price', [100, 200]);
-  
+
+  $filtered = $collection->whereIn('price', [150, 200]);
+
   $filtered->all();
-  
+
   /*
-      [
-          ['product' => 'Desk', 'price' => 200],
-          ['product' => 'Bookcase', 'price' => 150],
-          ['product' => 'Door', 'price' => 100],
-      ]
+    [
+        ['product' => 'Desk', 'price' => 200],
+        ['product' => 'Bookcase', 'price' => 150],
+    ]
   */
   ```
 - **`whereNotBetween`**: Lọc các bản ghi không nằm trong khoảng giá trị xác định.
