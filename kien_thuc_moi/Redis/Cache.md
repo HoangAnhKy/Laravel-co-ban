@@ -3,6 +3,14 @@ Kiểm tra cache ở redis
 ```sh
 php artisan tinker
 ```
+
+và kiểm tra file `env` nơi lưu 
+
+```env
+CACHE_REDIS_DB=1
+QUEUE_REDIS_DB=2
+SESSION_REDIS_DB=3
+```
 # Một số lệnh cli res
 
 ##  quản lý key
