@@ -132,6 +132,21 @@ php artisan ide-helper:models "App\Models\[model cần hỗ trợ]" -w
 
 ## **Phân trang**
 
+-   Sử dụng thư viện `LengthAwarePaginator`.
+
+    ```php
+    use Illuminate\Pagination\LengthAwarePaginator;
+    $res = new LengthAwarePaginator(
+                    $query->values(), // Dữ liệu cho trang hiện tại
+                    $total_value, // Tổng số bản ghi sau khi lọc
+                    LIMIT, // Số bản ghi trên mỗi trang
+                    $page, // Trang hiện tại
+                    ['path' => request()->url(), 'query' => request()->query()] // Đường dẫn và các query parameters cho liên kết phân trang
+                );
+    ```
+
+
+**khác**
 -   Sử dụng `response` để tạo trả về kiểu api để dễ tạo phân trang tùy ý
 
 ```js
