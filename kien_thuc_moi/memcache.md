@@ -179,6 +179,7 @@ Ví dụ:
 Mô tả: Bật hoặc tắt tùy chọn TCP_NODELAY để tối ưu hóa việc truyền dữ liệu thông qua TCP.
 
 Mặc định: false.
+
 Ví dụ:
 ```php
 'options' => [
