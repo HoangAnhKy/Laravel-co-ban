@@ -279,7 +279,7 @@ $usersJson = User::all()->toJson(); // Chuyển kết quả thành JSON
     // Kết quả sẽ thêm thuộc tính profile_count, nếu người dùng có hồ sơ (profile), thì giá trị là 1, nếu không có thì giá trị là 0
     ```
 
-- `load` và `loadMissing`
+- `load` và `loadMissing`: nó sẽ tải sau khi truy vấn
     - `load()`: Luôn tải mối quan hệ, ngay cả khi nó đã được load trước đó.
     
     ```php
@@ -301,10 +301,23 @@ $usersJson = User::all()->toJson(); // Chuyển kết quả thành JSON
     $user->loadMissing('comments');
     ```
 
-- `with`: liên kết bảng
+- `with`: liên kết bảng, sử dụng eager load (nạp trước) mối quan hệ trong lúc thực thi câu truy vấn.
   
     ```php
     $users = User::with('posts')->get();    
+    // Có thể sử dụng trong modal
+    /* 
+        class Post extends Model
+        {
+            protected $with = ['user'];
+
+            public function user()
+            {
+                return $this->belongsTo(User::class)->withDefault();
+            }
+        }
+
+    */
     ```
 
     - `hasOne()`: Thiết lập quan hệ 1-1.
@@ -343,7 +356,7 @@ $usersJson = User::all()->toJson(); // Chuyển kết quả thành JSON
             return $this->belongsToMany(Role::class);
         }
         ```
-    - `hasManyThrough()`: Quan hệ 1-Nhiều thông qua một model trung gian
+    - `hasManyThrough()` và `hasOneThrough()`: Quan hệ 1-Nhiều thông qua một model trung gian và 1-1
 
         ```php
         class Country extends Model
@@ -351,6 +364,23 @@ $usersJson = User::all()->toJson(); // Chuyển kết quả thành JSON
             public function posts()
             {
                 return $this->hasManyThrough(Post::class, User::class);
+
+                /*
+                return $this->hasManyThrough(
+                    Model::class,   // Model cuối mà muốn lấy dữ liệu
+                    ModelThrough::class, // Model trung gian
+                    'foreign_key_on_intermediate', // Khóa ngoại trên bảng trung gian
+                    'foreign_key_on_target', // Khóa ngoại trên bảng đích
+                    'local_key_on_source', // Khóa cục bộ trên bảng nguồn
+                    'local_key_on_intermediate' // Khóa cục bộ trên bảng trung gian
+                );
+
+                // String based syntax...
+                return $this->through('Posts')->has('Users');
+                
+                // Dynamic syntax...
+                return $this->throughPosts()->hasUsers();
+                */
             }
         }
 
