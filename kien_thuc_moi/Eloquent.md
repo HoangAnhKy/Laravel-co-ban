@@ -29,10 +29,12 @@
 -   `validated()` dùng để validate dữ liệu khi đã validation dữ liệu
 
 -   `find(giá trị cần tìm)` dùng để tìm kiếm dữ liệu
+
     ```php
     $user = User::find(1); // Tìm kiếm theo ID
     ```
 - `exists` và `doesntExist`: dùng để kiểm tra xem có bất kỳ bản ghi nào tồn tại dựa trên điều kiện hay không.
+  
     ```php
     $exists = User::where('email', 'example@example.com')->exists(); // Trả về true hoặc false
     $notExists = User::where('email', 'nonexistent@example.com')->doesntExist(); // Trả về true nếu không có bản ghi nào
@@ -57,6 +59,7 @@
     ```
 
 -   `paginate(số trang)` dùng để phân trang
+  
     ```php
     $users = User::paginate(10); // Lấy 10 user trên mỗi trang
     ```
@@ -108,6 +111,7 @@
     ```
 
 -   `setAttribute('key', value)` dùng để thêm mới một giá trị nào đó trong khi xử lý.
+
     ```php
     $user = new User;
     $user->setAttribute('full_name', 'John Doe');
@@ -122,6 +126,7 @@
     $newPost->save();
     ```
 - `tap` : thực hiện các hành động trên model trước khi lưu nó vào cơ sở dữ liệu mà không cần thay đổi bản thân truy vấn.
+  
     ```php
     User::find(1)->tap(function ($user) {
         $user->name = 'Updated Name';
@@ -143,6 +148,7 @@ là hai phương thức rất hữu ích trong Laravel Eloquent, đặc biệt k
         ```
 
     - chuckById: trong Laravel được thiết kế để chunk theo cột id mặc định, hoặc một cột mà muốn sử dụng như chỉ số tuần tự để lấy dữ liệu theo từng phần
+
         ```php
         Model::chunkById($size, function ($items) {
             // Xử lý từng chunk dữ liệu
@@ -185,6 +191,7 @@ $maxSalary = Employee::max('salary'); // Lấy lương cao nhất
     ```
 
 -   `orWhere` dùng để tìm kiếm hoặc
+  
     ```php
         if (!empty($list_search)){
             $query->where(...array_shift($list_search));
@@ -229,7 +236,8 @@ $usersJson = User::all()->toJson(); // Chuyển kết quả thành JSON
 
 # Liên kết bảng
 
--   `whereHas` dùng để search các cột trong bảng liên kết 
+-   `whereHas` dùng để search các cột trong bảng liên kết
+  
     ```php
     $query->whereHas('Course', function ($query) use ($key_search){
                 $query->where('name_course', 'like', '%'.$key_search.'%');
@@ -294,11 +302,13 @@ $usersJson = User::all()->toJson(); // Chuyển kết quả thành JSON
     ```
 
 - `with`: liên kết bảng
+  
     ```php
     $users = User::with('posts')->get();    
     ```
 
     - `hasOne()`: Thiết lập quan hệ 1-1.
+      
         ```php
         public function phone()
         {
@@ -326,6 +336,7 @@ $usersJson = User::all()->toJson(); // Chuyển kết quả thành JSON
       ```
 
     - `belongsToMany()`: Thiết lập quan hệ nhiều-nhiều.
+      
         ```php
         public function roles()
         {
@@ -381,6 +392,7 @@ $usersJson = User::all()->toJson(); // Chuyển kết quả thành JSON
     $res->save(); // Khúc này mới lưu.
     ```
 - `firstOr`: Tìm bản ghi đầu tiên thỏa mãn điều kiện. Nếu không tìm thấy, có thể chỉ định một giá trị thay thế hoặc một hành động (callback) được thực thi.
+  
     ```php
     $user = User::where('email', 'example@example.com')->firstOr(function () {
         // Thực hiện callback nếu không tìm thấy bản ghi
