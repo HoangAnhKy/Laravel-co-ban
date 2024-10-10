@@ -63,7 +63,76 @@ SESSION_REDIS_DB=3
 - `FLUSHALL`: Xóa tất cả các key trong tất cả các database.
 - `KEYS pattern`: Tìm kiếm các key phù hợp với một mẫu cụ thể. Ví dụ: `KEYS user:*`
 
-# Một số phương thức cơ bản:
+# Làm việc với cache
+
+## Một số phương thức cơ bản với Redis
+
+```php
+use Illuminate\Support\Facades\Redis;
+
+// Xóa hết ở tất cả db
+Redis::connection("cache")->flushall()
+
+// Xóa ở db hiện tại
+Redis::select(2);
+Redis::flushdb();
+
+// Lưu giá trị vào Redis
+Redis::set('key', 'value');
+
+// Lưu nhiều
+Redis::mset(['key1' => 'value1', 'key2' => 'value2']);
+
+// Lưu trữ một giá trị vào trong hash với một field cụ thể.
+Redis::hset('user:1000', 'name', 'John Doe');
+
+// Lưu giá trị vào Redis với thời gian hết hạn (600 giây)
+Redis::setex('temp_key', 600, 'Temporary Value');
+
+// Thêm thời gian cho key có sẵn
+Redis::expire('key', 300); // Key sẽ hết hạn sau 300 giây
+
+// Lấy giá trị từ Redis
+$value = Redis::get('key');
+
+// Lấy nhiều
+Redis::mget(['key1', 'key2', 'key3']);
+
+// lấy một giá trị vào trong hash với một field cụ thể.
+Redis::hget('user:1000', 'name')
+
+Redis::hgetall('user:1000');
+
+// Kiểm tra xem giá trị có tồn tại không
+if (Redis::exists('key')) {
+    echo "The key exists!";
+}
+
+// Xóa giá trị khỏi Redis
+Redis::del('key');
+
+// Tăng giá trị của một khóa
+Redis::incr('counter');
+
+// Giảm giá trị của một khóa
+Redis::decr('counter');
+
+// Lưu viễn viên một key đã tồn tại không hết hạn
+Redis::persist('key');
+
+// Lấy toàn bộ keys
+Redis::connection('cache')->keys("*")
+
+// scan
+Redis::connection('cache')->scan('0') // key ở index 1
+Redis::connection('cache')->scan('0', ['MATCH' => "laravel_database_student_"]) // Tìm kiếm key bắt đầu bằng laravel_database_student_
+/*
+: ['MATCH' => "search_key"] // Tìm kiếm
+: ['COUNT' => $count] // lấy số lượng key khi quét
+*/
+```
+
+## Một số phương thức cơ bản vơi cache:
 
 + `Cache::put()`          // Lưu trữ giá trị vào cache
 + `Cache::get()`          // Lấy giá trị từ cache
@@ -71,6 +140,8 @@ SESSION_REDIS_DB=3
 + `Cache::rememberForever()`     // Dùng để lưu vĩnh viễn
 + `Cache::forget()`       // Xóa cache
 + `Cache::has()`          // Kiểm tra tồn tại
++ `Cache::increment()`          // Tăng key lên
++ `Cache::decrement()`          // Giảm key đi
 
 ví dụ
 ```php
@@ -86,4 +157,8 @@ $value = Cache::remember('key', 600, function () {
 });
 // Xóa cache
 Cache::forget('key');
+// Tăng counter lên 5
+Cache::increment('counter', 5);
+// giảm đi
+Cache::decrement('counter', 2);
 ```

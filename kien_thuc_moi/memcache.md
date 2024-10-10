@@ -246,6 +246,8 @@ Ví dụ:
 + `Cache::rememberForever()`     // Dùng để lưu vĩnh viễn
 + `Cache::forget()`       // Xóa cache
 + `Cache::has()`          // Kiểm tra tồn tại
++ `Cache::increment()`          // Tăng key lên
++ `Cache::decrement()`          // Giảm key đi
 
 ví dụ
 ```php
@@ -261,6 +263,10 @@ $value = Cache::remember('key', 600, function () {
 });
 // Xóa cache
 Cache::forget('key');
+// Tăng counter lên 5
+Cache::increment('counter', 5);
+// giảm đi
+Cache::decrement('counter', 2);
 ```
 
 + `Cache::tags('key')` nhóm các cache liên quan đến một tag
