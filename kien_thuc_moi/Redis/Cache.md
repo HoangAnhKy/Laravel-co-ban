@@ -78,6 +78,16 @@ Redis::select(2);
 Redis::flushdb();
 
 // Lưu giá trị vào Redis
+
+/*
+    dùng serialize và unserialize khi set dữ liệu là object hay mảng nó sẽ giữ nguyên 
+
+    $res =  $query->paginate(LIMIT);
+    Redis::set($cacheKey, serialize($res));
+
+    $res = unserialize(Redis::get($cacheKey));
+
+*/
 Redis::set('key', 'value');
 
 // Lưu nhiều
@@ -108,7 +118,7 @@ if (Redis::exists('key')) {
     echo "The key exists!";
 }
 
-// Xóa giá trị khỏi Redis
+// Xóa giá trị khỏi Redis, Xóa chữ laravel_database_
 Redis::del('key');
 
 // Tăng giá trị của một khóa
