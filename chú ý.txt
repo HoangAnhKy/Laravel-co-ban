@@ -87,7 +87,13 @@ xử dụng View::share() để share tên title (use Illuminate\Support\Facades
 Rule::unique(Course::class)->ignore($this->course), kiểm tra trừ thằng trùng nó
 
 
+- đặt lại trang 404
 
+	Route::fallback(function () {
+		return response()->view('errors.404', [], 404);
+	})->name('404');
 
+-  Lấy tên route hiện tại
 
+	Route::currentRouteName
 
