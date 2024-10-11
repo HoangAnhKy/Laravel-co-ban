@@ -44,6 +44,189 @@
     ],
     ```
 
+# Sử dụng
+
+## Tạo middeware check login
+
+```sh
+php artisan make:middleware name
+```
+
+Vào cấu hình cho nó
+
+```php
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
+
+class CheckRole
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        if (!Auth::check()){
+            return redirect()->route("login");
+        }
+
+        if (Auth::check()){
+            return $next($request);
+        }
+
+        return redirect()->back();
+    }
+}
+```
+
+## Khai báo trên roter
+
+```php
+Route::group(['prefix' => '/users', "middleware" => CheckRole::class], function(){
+    Route::get('/',[UsersController::class, 'index'] )->name("users.index");
+    Route::get('/create',[UsersController::class, 'create'] )->name("users.create");
+    Route::post('/store',[UsersController::class, 'store'] )->name("users.store");
+    Route::get('/edit/{user}',[UsersController::class, 'edit'] )->name("users.edit");
+    Route::put('/update/{user}',[UsersController::class, 'update'] )->name("users.update");
+    Route::get('/delete/{user}',[UsersController::class, 'delete'] )->name("users.delete");
+});
+```
+
+
+## Sử dụng Police với AUTH
+
+- Khởi tạo `police`
+
+    ```sh
+    php artisan make:policy UserPolicy --model=User
+    ```
+    
+- Cấu trúc của Policy: Policy chứa các phương thức đại diện cho các hành động mà người dùng có thể thực hiện. Mỗi phương thức trả về true nếu người dùng có quyền thực hiện hành động, và false nếu không có quyền.
+
+    ví dụ:
+
+    ```php
+    namespace App\Policies;
+
+    use App\Models\User;
+    use Illuminate\Auth\Access\HandlesAuthorization;
+
+    class UserPolicy
+    {
+        use HandlesAuthorization;
+
+        /**
+         * Determine whether the user can view any users.
+         */
+        public function viewAny(User $user)
+        {
+            // Ví dụ: Cho phép tất cả người dùng xem danh sách users
+            return true;
+        }
+
+        /**
+         * Determine whether the user can view the model.
+         */
+        public function view(User $user, User $model)
+        {
+            // Ví dụ: Người dùng có thể xem thông tin nếu là chính họ hoặc là admin
+            return $user->id === $model->id || $user->position === 'admin';
+        }
+
+        /**
+         * Determine whether the user can create users.
+         */
+        public function create(User $user)
+        {
+            // Chỉ admin mới có thể tạo user mới
+            return $user->position === 'admin';
+        }
+
+        /**
+         * Determine whether the user can update the model.
+         */
+        public function update(User $user, User $model)
+        {
+            // Chỉ cho phép admin hoặc chính người dùng đó sửa thông tin
+            return $user->id === $model->id || $user->position === 'admin';
+        }
+
+        /**
+         * Determine whether the user can delete the model.
+         */
+        public function delete(User $user, User $model)
+        {
+            // Chỉ cho phép admin xóa người dùng
+            return $user->position === 'admin';
+        }
+    }
+    ```
+
+    có thể thêm hàm mới
+
+    ```php
+
+    public function before(User $user, $ability)
+    {
+        if ($user->position === 'super_admin') {
+            return true; // Super admin có quyền thực hiện tất cả hành động
+        }
+    }
+
+    public function approve(User $user, Courses $courses): bool
+    {
+        // Ví dụ: Chỉ admin hoặc người tạo course mới có quyền phê duyệt
+        return $user->position === 'admin' || $user->id === $courses->created_by;
+    }
+    ```
+
+- Đăng ký Policy: Mở file `app/Providers/AuthServiceProvider.php` và thêm trong `register`
+
+    ```php
+    protected $register = [
+        // Đăng ký policy với model User
+        User::class => UserPolicy::class,
+    ];
+    ```
+
+- Sử dụng Policy trong Controller
+
+    ```php
+    public function update(Request $request, User $user)
+    {
+        // Sử dụng policy để kiểm tra quyền trước khi thực hiện cập nhật
+        $this->authorize('update', $user);
+        
+        // ... 
+    }
+
+    ```
+-  Sử dụng Policy trong Blade
+
+    ```php
+    @can('update', $user)
+    <a href="{{ route('users.edit', $user) }}">Chỉnh sửa</a>
+    @endcan
+
+    @can('delete', $user)
+        <form action="{{ route('users.destroy', $user) }}" method="POST">
+            @csrf
+            @method('DELETE')
+            <button type="submit">Xóa</button>
+        </form>
+    @endcan
+
+    ```
+
+
+
 # Một Số hàm cơ bản
 
 ### 1. **Auth::attempt()**
