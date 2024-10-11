@@ -44,6 +44,7 @@
     ],
     ```
 
+***
 # Sử dụng
 
 ## Tạo middeware check login
@@ -187,28 +188,35 @@ Route::group(['prefix' => '/users', "middleware" => CheckRole::class], function(
     }
     ```
 
-- Đăng ký Policy: Mở file `app/Providers/AuthServiceProvider.php` và thêm trong `register`
+
+- Sử dụng Policy trong `Controller`
 
     ```php
-    protected $register = [
-        // Đăng ký policy với model User
-        User::class => UserPolicy::class,
-    ];
-    ```
+    use Illuminate\Support\Facades\Gate;
 
-- Sử dụng Policy trong Controller
-
-    ```php
     public function update(Request $request, User $user)
     {
         // Sử dụng policy để kiểm tra quyền trước khi thực hiện cập nhật
-        $this->authorize('update', $user);
+        Gate::authorize('viewAny', Users::class);
         
         // ... 
     }
 
     ```
--  Sử dụng Policy trong Blade
+-  Sử dụng trong `route`
+
+    ```php
+    Route::group(['prefix' => '/users', "middleware" => CheckRole::class], function(){
+        Route::get('/',[UsersController::class, 'index'] )
+        // check police
+        ->can("viewAny", "users")
+        // end check
+        ->name("users.index");
+        // ...
+    });
+    ```
+
+-  Sử dụng Policy trong `Blade`
 
     ```php
     @can('update', $user)
@@ -225,9 +233,100 @@ Route::group(['prefix' => '/users', "middleware" => CheckRole::class], function(
 
     ```
 
+***
 
+# Các Lệnh Gate Trong Laravel
 
-# Một Số hàm cơ bản
+## 1. Define a Gate
+Xác định quyền cho một hành động cụ thể.
+
+```php
+Gate::define('update-post', function (User $user, Post $post) {
+    return $user->id === $post->user_id;
+});
+```
+
+## 2. Check Permissions with `allows`
+Kiểm tra nếu người dùng có quyền thực hiện hành động.
+
+```php
+if (Gate::allows('update-post', $post)) {
+    // The user can update the post
+}
+```
+
+## 3. Check Permissions with `denies`
+Kiểm tra nếu người dùng không có quyền thực hiện hành động.
+
+```php
+if (Gate::denies('update-post', $post)) {
+    // The user cannot update the post
+}
+```
+
+## 4. Check Permissions in Blade
+Kiểm tra quyền trong view Blade.
+
+```blade
+@can('update-post', $post)
+    <!-- The user can update the post -->
+@endcan
+```
+
+## 5. For Multiple Gates
+Sử dụng nhiều hành động cùng một lúc.
+
+```php
+Gate::before(function (User $user, $ability) {
+    if ($user->isAdmin()) {
+        return true; // Admins have access to everything
+    }
+});
+```
+
+## 6. Authorize Action (Exception)
+Ném ngoại lệ nếu người dùng không có quyền.
+
+```php
+Gate::authorize('update-post', $post);
+```
+
+## 7. Define Gate Inline
+Định nghĩa quyền trực tiếp trong middleware.
+
+```php
+$this->middleware('can:update-post,post');
+```
+
+## 8. Any/None
+Kiểm tra nếu người dùng có quyền thực hiện bất kỳ hành động nào trong danh sách (any) hoặc không có quyền thực hiện bất kỳ hành động nào (none).
+
+```php
+if (Gate::any(['update-post', 'delete-post'], $post)) {
+    // Nếu người dùng có quyền thực hiện một trong các hành động
+}
+
+if (Gate::none(['update-post', 'delete-post'], $post)) {
+    // Nếu người dùng không có quyền thực hiện bất kỳ hành động nào
+}
+```
+
+## 9. Allow/Forbid Actions Globally
+Thực hiện hành động cho tất cả các quyền hoặc từ chối quyền toàn bộ.
+
+```php
+Gate::before(function ($user, $ability) {
+    // Điều kiện cho phép thực hiện mọi hành động
+});
+
+Gate::after(function ($user, $ability, $result) {
+    // Điều kiện thực hiện sau khi một hành động đã được kiểm tra
+});
+```
+
+***
+
+# Một Số hàm cơ bản Với AUTH
 
 ### 1. **Auth::attempt()**
 - **Mục đích**: Xác thực người dùng bằng cách kiểm tra email và mật khẩu.
