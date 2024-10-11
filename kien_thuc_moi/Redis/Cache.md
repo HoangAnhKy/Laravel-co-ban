@@ -142,6 +142,27 @@ Redis::connection('cache')->scan('0', ['MATCH' => "laravel_database_student_"]) 
 */
 ```
 
+## Với mảng dữ liệu
+
+```php
+use Illuminate\Support\Facades\Redis;
+
+// cách thao tác phải có chuyển đổi như là json_encode/json_decode hay serialize/unserialize
+
+// Thêm vào trái hoặc phải
+Redis::rpush('queue_name', 'value1', 'value2', ...); // right
+Redis::lpush('queue_name', 'value1', 'value2', ...); // left
+
+// Lấy và xóa danh sách
+Redis::lpop('task_queue') // lấy đầu
+Redis::rpop('task_queue') // lấy cuối
+
+// blocking: chặn và chờ khi hàng đợi trống, tức là không phải liên tục kiểm tra queue mà chỉ cần chờ cho đến khi có phần tử mới xuất hiện
+
+Redis::blpop($key, $timeout); // Tên danh sách, Thời gian chờ
+Redis::brpop($key, $timeout); // Tên danh sách, Thời gian chờ
+```
+
 ## Một số phương thức cơ bản vơi cache:
 
 + `Cache::put()`          // Lưu trữ giá trị vào cache
