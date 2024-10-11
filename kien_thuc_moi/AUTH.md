@@ -55,6 +55,7 @@
       // Đăng nhập thành công
       return redirect()->intended('dashboard');
   }
+  // Auth::attempt($credentials, $remember)
   ```
 
 ### 2. **Auth::check()**
