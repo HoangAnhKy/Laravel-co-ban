@@ -351,11 +351,19 @@ $usersJson = User::all()->toJson(); // Chuyển kết quả thành JSON
     - `belongsToMany()`: Thiết lập quan hệ nhiều-nhiều.
       
         ```php
-        public function roles()
+        public function relatedModel()
         {
-            return $this->belongsToMany(Role::class);
+            return $this->belongsToMany(RelatedModel::class, 'pivot_table', 'foreign_key', 'related_key');
+            /*
+                Các tham số
+                RelatedModel::class: Tên của model liên quan (đối tác trong mối quan hệ nhiều-nhiều).
+                pivot_table (Tùy chọn): Tên của bảng trung gian. Nếu không cung cấp, Laravel sẽ mặc định sử dụng tên hai bảng chính nối với nhau, ví dụ: model_a_model_b.
+                foreign_key (Tùy chọn): Tên của khóa ngoại trong bảng trung gian tham chiếu đến model hiện tại. Mặc định là model_id.
+                related_key (Tùy chọn): Tên của khóa ngoại trong bảng trung gian tham chiếu đến model liên quan. Mặc định là related_model_id.
+            */
         }
         ```
+
     - `hasManyThrough()` và `hasOneThrough()`: Quan hệ 1-Nhiều thông qua một model trung gian và 1-1
 
         ```php
