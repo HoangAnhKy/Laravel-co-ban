@@ -171,3 +171,31 @@ class ValueRequestUser implements ValidationRule
 }
 
 ```
+
+Hoặc code thẳng vô
+
+```php
+
+$validate = $request->validate([
+    "user_id" => [
+        Rule::unique(courseDetail::class, 'user_id')->where('course_id', $request->input('course_id')),
+        function ($attribute, $value, $fail) use ($request) {
+            $course_id = $request->input('course_id');
+
+            // Kiểm tra xem user_id và course_id có tồn tại cùng nhau trong cơ sở dữ liệu không
+            $exists = DB::table('courseDetails')
+                ->where('user_id', $value)
+                ->where('course_id', $course_id)
+                ->exists();
+
+            if ($exists) {
+                // Nếu đã tồn tại, trả về lỗi
+                $fail('The ' . $attribute . ' has already been registered for this course.');
+            }
+        }
+    ],
+    "course_id" => [
+        Rule::unique(courseDetail::class, 'course_id')->where('user_id', $request->input('user_id')),
+    ],
+]);
+```
