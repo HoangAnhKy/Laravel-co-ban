@@ -1,3 +1,10 @@
+
+Muốn dùng `Storage` để lấy file thì phải chạy lệnh sau để đưa nó ra public.
+
+```sh
+php artisan storage:link
+```
+
 ## 1. **Lưu file**
 
 Sử dụng `store()` hoặc `storeAs()` để lưu file vào thư mục được chỉ định.
