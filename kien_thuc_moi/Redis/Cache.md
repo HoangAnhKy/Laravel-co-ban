@@ -35,6 +35,8 @@ SESSION_REDIS_DB=3
     ```sh
     DEL mykey
     ```
+- `HDEL key`: xóa các trường nhỏ
+
 - `EXISTS key`: Kiểm tra sự tồn tại của một key, trả về 1 nếu key tồn tại, 0 nếu không tồn tại.
 
     ```sh
