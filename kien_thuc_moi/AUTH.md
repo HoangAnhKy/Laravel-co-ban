@@ -418,7 +418,21 @@ Gate::after(function ($user, $ability, $result) {
     @endguest
     ```
 
+- **Lưu ý**: phải thay nó trong `config/auth`
 
+    ```php
+    'guards' => [
+            'web' => [
+                'driver' => 'session',
+                'provider' => 'users',
+            ],
+
+            'admin' => [
+                'driver' => 'jwt', // Thay thế "session" thành "jwt"
+                'provider' => 'users',
+            ],
+        ],
+    ```
 ### 9. **Auth::validate()**
 - **Mục đích**: Kiểm tra thông tin xác thực của người dùng mà không đăng nhập.
 
