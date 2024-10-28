@@ -82,51 +82,83 @@ $expired = JWTAuth::parseToken()->isExpired();
 
 ## Ví dụ: Tạo AuthController với JWTAuth
 
-```php
-namespace App\Http\Controllers;
+- Thêm Guard cho JWT vào `config/auth.php`
 
-use Illuminate\Http\Request;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use Tymon\JWTAuth\Exceptions\JWTException;
-use Illuminate\Support\Facades\Auth;
+    ```php
+    'guards' => [
+        // ...
 
-class AuthController extends Controller
-{
-    public function login(Request $request)
+        'api' => [
+            'driver' => 'jwt', // Thay thế "session" thành "jwt"
+            'provider' => 'users',
+        ],
+    ],
+    ```
+
+- Cài đặt Package JWT
+
+    ```sh
+    composer require tymon/jwt-auth
+    ```
+
+- xuất file cấu hình JWT:
+
+    ```sh
+    php artisan vendor:publish --provider="Tymon\JWTAuth\Providers\LaravelServiceProvider"
+    ```
+- secret key cho JWT trong `env`
+
+    ```sh
+    php artisan jwt:secret
+    ```
+
+- controller
+
+    ```php
+    namespace App\Http\Controllers;
+
+    use Illuminate\Http\Request;
+    use Tymon\JWTAuth\Facades\JWTAuth;
+    use Tymon\JWTAuth\Exceptions\JWTException;
+    use Illuminate\Support\Facades\Auth;
+
+    class AuthController extends Controller
     {
-        $credentials = $request->only('email', 'password');
+        public function login(Request $request)
+        {
+            $credentials = $request->only('email', 'password');
 
-        try {
-            if (!$token = Auth::guard('api')->attempt($credentials)) {
-                return response()->json(['error' => 'Unauthorized'], 401);
+            try {
+                if (!$token = Auth::guard('api')->attempt($credentials)) {
+                    return response()->json(['error' => 'Unauthorized'], 401);
+                }
+            } catch (JWTException $e) {
+                return response()->json(['error' => 'Could not create token'], 500);
             }
-        } catch (JWTException $e) {
-            return response()->json(['error' => 'Could not create token'], 500);
+
+            return response()->json(['token' => $token]);
         }
 
-        return response()->json(['token' => $token]);
-    }
+        public function logout()
+        {
+            JWTAuth::invalidate(JWTAuth::getToken());
 
-    public function logout()
-    {
-        JWTAuth::invalidate(JWTAuth::getToken());
+            return response()->json(['message' => 'Logged out successfully']);
+        }
 
-        return response()->json(['message' => 'Logged out successfully']);
-    }
+        public function getUser(Request $request)
+        {
+            $user = JWTAuth::parseToken()->authenticate();
+            return response()->json($user);
+        }
 
-    public function getUser(Request $request)
-    {
-        $user = JWTAuth::parseToken()->authenticate();
-        return response()->json($user);
+        public function refresh()
+        {
+            $newToken = JWTAuth::refresh(JWTAuth::getToken());
+            return response()->json(['token' => $newToken]);
+        }
     }
-
-    public function refresh()
-    {
-        $newToken = JWTAuth::refresh(JWTAuth::getToken());
-        return response()->json(['token' => $newToken]);
-    }
-}
-```
+    ```
 
 ---
 
