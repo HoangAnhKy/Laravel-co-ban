@@ -112,6 +112,39 @@ $expired = JWTAuth::parseToken()->isExpired();
     php artisan jwt:secret
     ```
 
+- modal
+    - Thêm 2 function `getJWTIdentifier` và `getJWTCustomClaims`
+
+    - thêm 2 interface `JWTSubject` và `AuthenticatableContract`
+
+    - thêm use `Authenticatable`
+
+    ```php
+    <?php
+
+    namespace App\Models;
+
+    use Illuminate\Auth\Authenticatable;
+    use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+    use Tymon\JWTAuth\Contracts\JWTSubject;
+
+    class Users extends Table implements JWTSubject, AuthenticatableContract
+    {
+        use Authenticatable;
+    
+        public function getJWTIdentifier()
+        {
+            return $this->getKey(); // Trả về ID của người dùng
+        }
+        public function getJWTCustomClaims()
+        {
+            return []; // Trả về mảng rỗng nếu không cần thêm claims
+        }
+
+    }
+
+    ```
+
 - controller
 
     ```php
