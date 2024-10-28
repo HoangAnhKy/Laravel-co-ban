@@ -197,6 +197,8 @@ $expired = JWTAuth::parseToken()->isExpired();
 
 ## Tóm tắt Các Phương thức của `JWTAuth`
 
+**Lưu ý** tất cả phải cài middleware `auth:guard` đó
+
 | **Phương thức**                | **Mô tả**                           |
 | ------------------------------ | ----------------------------------- |
 | `getToken()`                   | Lấy token từ request.               |
