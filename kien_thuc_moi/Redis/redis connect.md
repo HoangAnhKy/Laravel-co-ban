@@ -69,3 +69,111 @@ sau khi chạy được redis chúng ta kiểm tra nó bằng cách chạy nó r
 #   127.0.0.1:6379> ping
 #   PONG
 ```
+
+# Cài đặt trên linux
+
+Bước 1: Cài đặt các phụ thuộc cần thiết
+
+```sh
+sudo apt update
+sudo apt install build-essential pkg-config libjemalloc-dev libssl-dev -y
+```
+
+Bước 2: Tải mã nguồn Redis
+
+```sh
+curl -O http://download.redis.io/redis-stable.tar.gz
+```
+Giải nén
+
+```sh
+tar xzvf redis-stable.tar.gz
+cd redis-stable
+```
+
+Bước 3: Biên dịch Redis
+
+```sh
+make
+```
+
+```sh
+sudo make install
+```
+
+Bước 4: Tạo cấu trúc thư mục và tệp cấu hình
+
+```sh
+sudo mkdir /etc/redis
+sudo mkdir /var/redis
+sudo mkdir /var/redis/6379
+```
+
+Sao chép tệp cấu hình mẫu vào thư mục cấu hình:
+
+```sh
+sudo cp redis.conf /etc/redis
+```
+
+chỉnh sửa tệp copy
+
+```sh
+sudo nano /etc/redis/redis.conf
+```
+
+Thay đổi các thiết lập sau:
+
++ Thay đổi chế độ giám sát (supervised) thành systemd: chỗ comment supervised no
+
+    ```conf
+    supervised systemd
+    ```
+
+Bước 5: Tạo tệp dịch vụ systemd cho Redis
+
+```sh
+sudo nano /etc/systemd/system/redis.service
+```
+
+với nội dung
+
+```conf
+[Unit]
+Description=Redis In-Memory Data Store
+After=network.target
+
+[Service]
+User=redis
+Group=redis
+ExecStart=/usr/local/bin/redis-server /etc/redis/redis.conf
+ExecStop=/usr/local/bin/redis-cli shutdown
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Bước 6: Tạo người dùng và quyền truy cập cho Redis
+
+```sh
+sudo adduser --system --group --no-create-home redis
+sudo mkdir /var/lib/redis
+sudo chown redis:redis /var/lib/redis
+sudo chmod 770 /var/lib/redis
+```
+
+Bước 7: Khởi động và kích hoạt Redis
+
+Nạp lại systemd để nhận diện tệp dịch vụ mới
+
+```sh
+sudo systemctl daemon-reload
+```
+
+Khởi động dịch vụ Redis:
+
+```bash
+sudo systemctl start redis
+sudo systemctl enable redis
+```
+
