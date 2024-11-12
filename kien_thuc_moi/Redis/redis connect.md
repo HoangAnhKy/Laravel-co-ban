@@ -312,3 +312,60 @@ Tải và Cài Đặt phpRedisAdmin
     cd /var/www/html/redisadmin
     sudo composer install
     ```
+## Cài giao diện reids với node js
+
+Cài Đặt Node.js và npm
+
+```sh
+sudo apt update
+sudo apt upgrade -y
+
+# cài node
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs
+```
+
+Cài redis
+
+```sh
+sudo npm install -g redis-commander
+```
+
+chạy redis
+
+```sh
+redis-commander
+```
+- Cấu Hình Redis Commander Làm Dịch Vụ systemd. Để nó tự chạy  khi khởi động hệ thống
+
+    ```sh
+    sudo nano /etc/systemd/system/redis-commander.service
+    ```
+
+    ```ini
+    [Unit]
+    Description=Redis Commander
+    After=network.target
+
+    [Service]
+    ExecStart=/usr/bin/redis-commander --redis-host 192.168.129.130 --redis-port 6379 --redis-password your_redis_password
+    Restart=always
+    User=www-data
+    Environment=PATH=/usr/bin:/usr/local/bin
+    Environment=NODE_ENV=production
+
+    [Install]
+    WantedBy=multi-user.target
+    ```
+    Lưu Ý:
+    - Thay 192.168.129.130, 6379, và your_redis_password bằng thông tin thực tế của Redis server.
+    - Đảm bảo rằng đường dẫn đến redis-commander là chính xác. Nếu cần, có thể tìm đường dẫn bằng cách chạy which redis-commander.
+
+chạy tự động redis
+
+```sh
+sudo systemctl daemon-reload
+sudo systemctl start redis-commander
+sudo systemctl enable redis-commander
+sudo systemctl status redis-commander
+```
