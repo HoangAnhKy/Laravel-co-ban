@@ -67,6 +67,56 @@ SESSION_REDIS_DB=3
 
 # Làm việc với cache
 
+
+# Tóm Tắt Các Cờ Lệnh SET
+
+| Cờ      | Ý Nghĩa                       | Mô Tả                                                                 |
+|---------|-------------------------------|----------------------------------------------------------------------|
+| EX      | Expire Time in Seconds        | Đặt TTL (thời gian sống) cho key tính bằng giây                       |
+| PX      | Expire Time in Milliseconds   | Đặt TTL cho key tính bằng mili giây                                   |
+| NX      | Set If Not Exists             | Chỉ thiết lập key nếu chưa tồn tại                                    |
+| XX      | Set If Exists                 | Chỉ thiết lập key nếu đã tồn tại                                      |
+| KEEPTTL | Keep Time-to-Live             | Giữ nguyên TTL hiện tại khi cập nhật giá trị                          |
+| GET     | Set and Return Old Value      | Đặt giá trị mới và trả về giá trị cũ của key nếu có (từ Redis 6.2+)    |
+
+## Ví dụ sử dụng các cờ lệnh:
+
+### 1. Sử dụng cờ EX
+```redis
+SET mykey "value" EX 10
+```
+Thiết lập key `mykey` với giá trị `"value"` và TTL là 10 giây.
+
+### 2. Sử dụng cờ PX
+```redis
+SET mykey "value" PX 5000
+```
+Thiết lập key `mykey` với giá trị `"value"` và TTL là 5000 mili giây.
+
+### 3. Sử dụng cờ NX
+```redis
+SET mykey "value" NX
+```
+Chỉ thiết lập `mykey` nếu nó chưa tồn tại.
+
+### 4. Sử dụng cờ XX
+```redis
+SET mykey "value" XX
+```
+Chỉ thiết lập `mykey` nếu nó đã tồn tại.
+
+### 5. Sử dụng cờ KEEPTTL
+```redis
+SET mykey "newvalue" KEEPTTL
+```
+Cập nhật giá trị của `mykey` nhưng giữ nguyên TTL hiện tại.
+
+### 6. Sử dụng cờ GET
+```redis
+SET mykey "newvalue" GET
+```
+Thiết lập `mykey` với giá trị mới `"newvalue"` và trả về giá trị cũ.
+
 ## Một số phương thức cơ bản với Redis
 
 ```php
