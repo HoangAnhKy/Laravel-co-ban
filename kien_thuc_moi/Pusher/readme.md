@@ -110,8 +110,13 @@ B2. Cấu hình laravel
 
     ```
 
--   khi dùng chỉ gọi 
+-   khi dùng gọi 
 
     ```php
     event(new MyEvent('hello world'));
+    ```
+    lưu ý đã phải chạy lệnh 
+
+    ```sh
+    php artisan queue:work
     ```
