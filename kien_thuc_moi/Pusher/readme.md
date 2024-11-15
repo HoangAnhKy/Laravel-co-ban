@@ -35,7 +35,7 @@ B2. Cấu hình laravel
     ```sh
     composer require pusher/pusher-php-server
     php artisan install:broadcasting
-    php artisan make:event MyEvent
+        php artisan make:event MyEvent
     ```
 
 -  Cấu hình file `event`
@@ -74,7 +74,7 @@ B2. Cấu hình laravel
 
     ```
 
--   Cấu hình file
+-   Cấu hình file `config/broadcasting.php`
 
     ```php
     <?php
