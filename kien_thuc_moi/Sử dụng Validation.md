@@ -117,6 +117,22 @@ public function validated($key = null, $default = null)
     }
     ```
 
+- hoặc dùng 
+
+    ```php
+    $request = new StoreCourseDetailRequest();
+    $request->merge($data);
+
+    $rules = $request->rules();
+
+    $validator = Validator::make($data, $rules);
+
+    if ($validator->fails()) {
+        Log::error('Validation failed at row ' . ($i + 1), $validator->errors()->toArray());
+        continue;
+    }
+    ```
+
 # custom validated
 - Sử dụng câu lệnh sau để tạo ra Rule theo ý muốn của mình, có thể sử dụng lại nhiều lần
 
