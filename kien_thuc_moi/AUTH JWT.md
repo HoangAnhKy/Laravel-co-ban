@@ -4,6 +4,7 @@
 
 ```php
 JWTAuth::getToken();
+use dd( (string)JWTAuth::getToken());
 ```
 
 **Mô tả**: Lấy **JWT token** từ request hiện tại (thường từ **header** của HTTP request).
@@ -89,6 +90,14 @@ $expiresAt = $payload->get('exp'); // Thời gian hết hạn
 $factory = JWTAuth::factory();
 $factory->setTTL(120); // Đặt thời gian sống của token là 120 phút
 $factory->getTTL();     // trả về thời gian sống của token
+```
+
+---
+
+## 10. Xác thực người dùng qua token
+
+```php
+JWTAuth::setToken($token)->authenticate()
 ```
 
 ---
