@@ -73,10 +73,23 @@ $valid = JWTAuth::parseToken()->check();
 ## 8. Kiểm Tra Token Đã Hết Hạn Chưa
 
 ```php
-$expired = JWTAuth::parseToken()->isExpired();
+$payload = JWTAuth::parseToken()->getPayload();
+
+$issuedAt = $payload->get('iat'); // Thời gian phát hành
+$expiresAt = $payload->get('exp'); // Thời gian hết hạn
 ```
 
 **Mô tả**: Kiểm tra xem token đã hết hạn hay chưa.
+
+--- 
+
+## 9. Thời gian tồn tại cho token
+
+```php
+$factory = JWTAuth::factory();
+$factory->setTTL(120); // Đặt thời gian sống của token là 120 phút
+$factory->getTTL();     // trả về thời gian sống của token
+```
 
 ---
 
