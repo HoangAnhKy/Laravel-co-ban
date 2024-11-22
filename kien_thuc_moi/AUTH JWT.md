@@ -221,4 +221,3 @@ $factory->getTTL();     // trả về thời gian sống của token
 | `invalidate($token)`           | Vô hiệu hóa token (logout).         |
 | `refresh($token)`              | Làm mới token đã hết hạn.           |
 | `parseToken()->check()`        | Kiểm tra xem token có hợp lệ không. |
-| `parseToken()->isExpired()`    | Kiểm tra xem token đã hết hạn chưa. |
