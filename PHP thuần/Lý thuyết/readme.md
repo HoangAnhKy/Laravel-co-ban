@@ -132,7 +132,7 @@ Gồm 4 tính chất:
     | **Có thể có constructor**       | Có thể chứa hàm khởi tạo (constructor).                              | Không thể có constructor.                                         |
     | **Có thể kế thừa từ lớp khác**   | Có thể kế thừa từ một lớp (class) khác (PHP chỉ hỗ trợ kế thừa đơn).  | Không thể kế thừa từ lớp khác. Nhưng một lớp có thể thực thi nhiều interface. |
     | **Có thể thực thi nhiều interface không?** | Không thể thực thi nhiều interface.                                  | Có thể thực thi nhiều interface.                                  |
-    | **Sử dụng khi nào?**            | Khi bạn muốn định nghĩa một lớp cơ sở chung cho các lớp con, có thể chứa cả phương thức đã cài đặt và phương thức trừu tượng. | Khi bạn muốn định nghĩa một hợp đồng (contract) mà các lớp thực thi phải tuân theo, mà không quan tâm đến cách các phương thức được cài đặt. |
+    | **Sử dụng khi nào?**            | Khi muốn định nghĩa một lớp cơ sở chung cho các lớp con, có thể chứa cả phương thức đã cài đặt và phương thức trừu tượng. | Khi muốn định nghĩa một hợp đồng (contract) mà các lớp thực thi phải tuân theo, mà không quan tâm đến cách các phương thức được cài đặt. |
     | **Kế thừa**                     | Lớp kế thừa từ một lớp abstract có thể kế thừa một số phương thức đã cài đặt trong lớp cha. | Lớp thực thi interface phải cài đặt tất cả các phương thức trong interface. |
     | **Có thể có hằng số**          | Có thể chứa hằng số (constants).                                    | Có thể chứa hằng số (constants).                                  |
     | **Tính linh hoạt**             | Một lớp chỉ có thể kế thừa một lớp abstract (PHP chỉ hỗ trợ kế thừa đơn), nhưng có thể sử dụng các interface. | Lớp có thể thực thi nhiều interface cùng lúc, giúp tăng tính linh hoạt. |
@@ -173,7 +173,7 @@ get_object_vars(object);
 
 ## call_user_func / call_user_func_array
 
-Mô tả: dùng để gọi một hàm thông qua biến hoặc tên hàm được lưu trong biến, đặc biệt là khi bạn có danh sách các đối số động.
+Mô tả: dùng để gọi một hàm thông qua biến hoặc tên hàm được lưu trong biến, đặc biệt là khi có danh sách các đối số động.
 - call_user_func_array (trường hợp có nhiều tham số)
 - call_user_func (trường hợp có một số)
 
