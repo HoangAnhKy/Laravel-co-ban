@@ -1,27 +1,27 @@
-create table if not exists courses
+CREATE TABLE IF NOT EXISTS courses
 (
-    id         int auto_increment constraint `PRIMARY` primary key,
-    name       varchar(255)                        not null,
-    created_at timestamp default CURRENT_TIMESTAMP null,
-    updated_at timestamp                           null on update CURRENT_TIMESTAMP
-    );
+    id         INT AUTO_INCREMENT PRIMARY KEY,
+    name       VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP
+);
 
-create table if not exists students
+CREATE TABLE IF NOT EXISTS students
 (
-    id         int auto_increment constraint `PRIMARY` primary key,
-    course_id  int                                 not null,
-    name       varchar(255)                        not null,
-    birthday   timestamp                           not null,
-    created_at timestamp default CURRENT_TIMESTAMP not null,
-    updated_at timestamp                           null on update CURRENT_TIMESTAMP
-    );
+    id         INT AUTO_INCREMENT PRIMARY KEY,
+    course_id  INT NOT NULL,
+    name       VARCHAR(255) NOT NULL,
+    birthday   TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (course_id) REFERENCES courses(id)
+);
 
-create table if not exists users
+CREATE TABLE IF NOT EXISTS users
 (
-    id        int auto_incrementconstraint `PRIMARY` primary key,
-    full_name varchar(50) charset utf8mb3 not null,
-    email     varchar(255)                not null,
-    password  varchar(255)                not null,
-    token     varchar(255)                null
-    );
-
+    id        INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(50) CHARACTER SET utf8mb3 NOT NULL,
+    email     VARCHAR(255) NOT NULL,
+    password  VARCHAR(255) NOT NULL,
+    token     VARCHAR(255) NULL
+);
