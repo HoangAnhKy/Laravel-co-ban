@@ -215,3 +215,37 @@ $validate = $request->validate([
     ],
 ]);
 ```
+
+# Tùy chỉnh lỗi trả về
+
+Vì valdiate `FormRequest` nó sẽ trả về ngay sau khi kiếm được lỗi nên chúng ta sẽ fix như sau
+
+```php
+<?php
+
+namespace App\Http\Requests;
+
+use App\Models\Courses;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
+
+use Illuminate\Http\Exceptions\HttpResponseException;
+
+class ValidateCourse extends FormRequest
+{
+    // ....
+
+    public function failedValidation(Validator $validator)
+    {
+        // logic sử lý
+
+        // trả về
+        throw new HttpResponseException(
+            redirect()->route('course-index')
+                ->withErrors($validator)
+                ->withInput()
+        );
+    }
+}
+
+```
