@@ -97,3 +97,6 @@ Rule::unique(Course::class)->ignore($this->course), kiểm tra trừ thằng tr�
 
 	Route::currentRouteName
 
+- truyền biến qua @include
+
+	@include('header', ['title' => 'Trang Chủ'])
