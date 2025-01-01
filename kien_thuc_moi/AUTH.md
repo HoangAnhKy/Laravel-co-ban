@@ -1,3 +1,17 @@
+# Chức năng lưu ý thêm
+- Trong Laravel được sử dụng để tạo một phiên làm việc (session) mới cho người dùng, đồng thời vô hiệu hóa phiên làm việc hiện tại. Hành động này giúp tăng cường bảo mật ứng dụng.
+ 
+    - **Phòng chống tấn công Session Fixation** : Session fixation là một loại tấn công mà kẻ xấu cố gắng lợi dụng ID phiên của người dùng để chiếm quyền truy cập vào tài khoản của họ. Bằng cách tái tạo session, Laravel sẽ tạo ra một ID phiên mới cho người dùng, đảm bảo rằng ID cũ không thể bị sử dụng để xâm nhập.
+
+    ```php
+    request()->session()->regenerate(); // Tái tạo session sau khi đăng nhập thành công
+
+    request()->session()->invalidate(); // hủy bỏ toàn bộ dữ liệu của session hiện tại
+
+    request()->session()->regenerateToken(); // Tạo CSRF token mới
+    ```
+
+
 # Cấu hình
 
 - Với `model` để dùng được **AUTH** phải dùng thêm 
