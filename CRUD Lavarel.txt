@@ -10,7 +10,8 @@ vd:khởi tạo đối tượng thêm hoặc sửa
 muốn dùng loại nào thì dùng except để loại trừ cột không mong muốn
 và dùng thêm 
 
-protected 	$fillable = [ các cột mong muốn] để trống bằng all
+protected 	$fillable = [ các cột được phép gán] để trống bằng all
+protected 	$guarded = [ các cột không được phép gán] để trống bằng all
 
 
 C2 lưu: Course::create($request->except('_token'));
