@@ -94,9 +94,17 @@ Rule::unique(Course::class)->ignore($this->course), kiểm tra trừ thằng tr�
 	})->name('404');
 
 -  Lấy tên route hiện tại
-
 	Route::currentRouteName
 
 - truyền biến qua @include
 
 	@include('header', ['title' => 'Trang Chủ'])
+
+- sử dụng forelse, cú pháp và cách thức hoạt động giống foreach nhưng khác có hỗ trợ empty
+	@forelse ($items as $item)
+	    <!-- Nội dung để hiển thị khi $items không rỗng -->
+	    <p>{{ $item }}</p>
+	@empty
+	    <!-- Nội dung để hiển thị khi $items rỗng -->
+	    <p>Không có phần tử nào!</p>
+	@endforelse
