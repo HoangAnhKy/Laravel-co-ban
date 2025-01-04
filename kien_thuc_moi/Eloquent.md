@@ -407,6 +407,34 @@ $usersJson = User::all()->toJson(); // Chuyển kết quả thành JSON
 
         ```
 
+    **Lưu ý**: trong các mối quan hệ nhiều-nhiều có thể sài chiêu `attach` để lưu dữ liệu
+
+    ```php
+
+        // controller 
+
+        public funtion follow (User $user){
+            
+            $follower = auth()->user();
+
+            $follower->followings()->attach($user, [
+                // nếu có cột khác ngoài các cột được quy định
+            ]);
+
+            return redirect()->route("profile", $user->id)->with("success", "follow user success");
+        }
+
+        // modal user
+        public function followings(){
+            return $this->belongsToMany(
+                User::class, // Liên kết với mô hình User
+                Follower::class, // Bảng pivot là bảng follower
+                "user_id", // Khóa ngoại trong bảng pivot trỏ đến user thực hiện follow
+                "user_follow" // Khóa ngoại trong bảng pivot trỏ đến user bị follow
+            )->withTimestamps();
+        }
+    ``
+
 # Truy vấn nâng cao
 
 - `findOrFail` và `firstOrFail`: Dùng để tìm kiếm nến có thì lấy ko có thì báo lỗi về
