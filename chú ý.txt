@@ -96,6 +96,9 @@ Rule::unique(Course::class)->ignore($this->course), kiểm tra trừ thằng tr�
 -  Lấy tên route hiện tại
 	Route::currentRouteName
 
+- Dùng để kiểm tra xem route hiện tại có khớp với tên: Route::is('dashboard'):
+- Dùng để kiểm tra xem url có khớp với mẫu không: Request::is("profile/*") 
+
 - truyền biến qua @include
 
 	@include('header', ['title' => 'Trang Chủ'])
