@@ -379,9 +379,22 @@ $usersJson = User::all()->toJson(); // Chuyển kết quả thành JSON
                     ModelThrough::class, // Model trung gian
                     'foreign_key_on_intermediate', // Khóa ngoại trên bảng trung gian
                     'foreign_key_on_target', // Khóa ngoại trên bảng đích
-                    'local_key_on_source', // Khóa cục bộ trên bảng nguồn
-                    'local_key_on_intermediate' // Khóa cục bộ trên bảng trung gian
+                    'local_key_on_source', // Khóa chính trên bảng nguồn
+                    'local_key_on_intermediate' // Khóa chính trên bảng trung gian
                 );
+
+                ví dụ: Hàm `profile` trong Model `Comment`
+                    public function profile()
+                    {
+                        return $this->hasOneThrough(
+                            Profile::class, // Model đích (profiles)
+                            User::class,    // Model trung gian (users)
+                            'id',           // Khóa chính trong bảng users
+                            'user_id',      // Khóa ngoại trong bảng profiles trỏ đến bảng users
+                            'user_id',      // Khóa ngoại trong bảng comments trỏ đến bảng users
+                            'id'            // Khóa chính trong bảng profiles
+                        );
+                    }
 
                 // String based syntax...
                 return $this->through('Posts')->has('Users');
