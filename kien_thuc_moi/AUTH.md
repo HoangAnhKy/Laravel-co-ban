@@ -211,7 +211,8 @@ Route::group(['prefix' => '/users', "middleware" => CheckRole::class], function(
     public function update(Request $request, User $user)
     {
         // Sử dụng policy để kiểm tra quyền trước khi thực hiện cập nhật
-        Gate::authorize('viewAny', Users::class); // hoặc this->authorize(..., ...) với policy
+        Gate::authorize('viewAny', Users::class); 
+        // Gate::authorize(ability, arguments)  khi Gate::authorize("create") không có arguments, Laravel tìm một quyền (ability) trực tiếp chứ không phải policy của model.
         
         // ... 
     }
