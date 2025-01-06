@@ -82,7 +82,7 @@ muốn dùng patigation theo bootrap thì ta vô App->providers->AppServiceProvi
 - dùng thẻ old() trong input để lấy lại giá trị cũ
 - dùng $this->tên truyền bên route để lấy giá trị mong muốn
 
-xử dụng View::share() để share tên title (use Illuminate\Support\Facades\View;)
+xử dụng View::share() để share tên title (use Illuminate\Support\Facades\View;), hay nói cách khác là xét **Global Blade variable** nếu để nó ở controller lớn hoặc AppServiceProvider
 
 Rule::unique(Course::class)->ignore($this->course), kiểm tra trừ thằng trùng nó
 
