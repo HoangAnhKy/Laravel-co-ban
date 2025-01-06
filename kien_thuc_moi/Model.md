@@ -65,3 +65,12 @@ class User extends Authenticatable
 }
 
 ```
+- Dùng ở controller hay policies cũng được, mục đích như ví dụ
+```php
+return $user->is($ideas->userPost); // ngược lại là isNot
+        /*
+         * Kiểm tra xem người dùng hiện tại có phải là chủ sở hữu của Idea hay không.
+         * $idea->userPost là một quan hệ giữa Idea và User (sử dụng Eloquent relationship). Quan hệ này thường được định nghĩa trong model Idea
+         * $user->is($ideas->userPost) sử dụng phương thức is() của Eloquent để so sánh xem $user có khớp với $idea->user (người tạo ra Idea) hay không.
+         * */
+```
