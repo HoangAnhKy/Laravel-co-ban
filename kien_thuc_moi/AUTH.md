@@ -211,7 +211,7 @@ Route::group(['prefix' => '/users', "middleware" => CheckRole::class], function(
     public function update(Request $request, User $user)
     {
         // Sử dụng policy để kiểm tra quyền trước khi thực hiện cập nhật
-        Gate::authorize('viewAny', Users::class);
+        Gate::authorize('viewAny', Users::class); // hoặc this->authorize(..., ...) với policy
         
         // ... 
     }
@@ -250,6 +250,13 @@ Route::group(['prefix' => '/users', "middleware" => CheckRole::class], function(
 ***
 
 # Các Lệnh Gate Trong Laravel
+
+- Khi nào nên dùng Policy và Gate
+    
+    - Policy: Khi kiểm tra quyền liên quan đến một model (CRUD trên một tài nguyên cụ thể).
+    
+    - Gate: Khi kiểm tra quyền chung, không liên quan đến một model cụ thể (ví dụ: quyền admin, quyền truy cập một phần trong ứng dụng).
+
 
 ## 1. Define a Gate
 Xác định quyền cho một hành động cụ thể.
