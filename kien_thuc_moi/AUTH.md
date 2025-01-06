@@ -215,6 +215,21 @@ Route::group(['prefix' => '/users', "middleware" => CheckRole::class], function(
         
         // ... 
     }
+    // hoặc 
+    public function __construct()
+    {
+        $this->authorizeResource(Ideas::class, 'idea');
+        /*
+            Laravel sẽ tự động kiểm tra các quyền tương ứng:
+            index -> viewAny
+            show -> view
+            create -> create
+            store -> create
+            edit -> update
+            update -> update
+            destroy -> delete
+        */
+    }
 
     ```
 -  Sử dụng trong `route`
