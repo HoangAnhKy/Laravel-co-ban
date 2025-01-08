@@ -90,7 +90,7 @@ Rule::unique(Course::class)->ignore($this->course), kiểm tra trừ thằng tr�
 - đặt lại trang 404
 
 	Route::fallback(function () {
-		return response()->view('errors.404', [], 404);
+		return response()->view('errors.404', [], 404); // phải để view html ở views/errors/404.blade.php
 	})->name('404');
 
 -  Lấy tên route hiện tại
