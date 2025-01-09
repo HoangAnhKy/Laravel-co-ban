@@ -1,3 +1,30 @@
+# Dùng flash session
+
+- ở component
+
+    ```php
+    // ...
+    public function createUser(){
+            $validate = $this->validate();
+
+            $validate['birthdate'] = '2003-02-'.str_pad(rand(1, 31), 2, '0', STR_PAD_LEFT);
+            $validate['password'] = bcrypt($validate['password']);
+            $validate['position'] = 1;
+            User::create($validate);
+
+            $this->reset(["email"]);
+            request()->session()->flash('message', 'save success');
+        }
+    // ...
+    ```
+
+- ở view
+
+    ```html
+    @if (session()->has('message'))
+        <p>{{ session('message') }}</p>
+    @endif
+    ```
 # Lệnh nhúng Livewire
 
 - Sử dụng để nhúng một Livewire component vào view Blade trong Laravel

@@ -10,3 +10,7 @@
 ```
 
 ![alt text](../image/example%20proprety%20in%20component.png)
+
+- wire:modal có thể sử dụng Modifier như `.lazy` hoặc `.defer`.
+
+- tham khảo thêm [Một số Modifier khác](./click.md#một-số-modifier-khác)

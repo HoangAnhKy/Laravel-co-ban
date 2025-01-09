@@ -1,6 +1,6 @@
- `wire:click`: nó sẽ gửi yêu cầu AJAX đến server và thực thi phương thức được chỉ định trong `class component`. Ví dụ `wire:click = "createUser"` nó sẽ gọi tới `method createUser` trong class component.
+`wire:click`: nó sẽ gửi yêu cầu AJAX đến server và thực thi phương thức được chỉ định trong `class component`. Ví dụ `wire:click = "createUser"` nó sẽ gọi tới `method createUser` trong class component.
     
-#  Một số Modifier khác
+# Một số Modifier khác
 
 ## `.prevent`
 - Mô tả: Ngăn hành vi mặc định của sự kiện (như submit form hoặc điều hướng link).
