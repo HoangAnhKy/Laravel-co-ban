@@ -260,7 +260,7 @@
 - Cách dùng:
 
     ```html
-    <button wire:click.defer="method">Click</button>
+    <button wire:model.defer="method">Click</button>
     ```
 
 - Ví dụ: Dữ liệu chỉ được đồng bộ từ input đến $name khi nhấn nút "Save".
@@ -295,6 +295,7 @@
 
 
     ```
+
 ## `.default`
 
 - Mô tả: Giữ lại hành vi mặc định của sự kiện (cho phép hành vi mặc định xảy ra cùng với sự kiện Livewire).
