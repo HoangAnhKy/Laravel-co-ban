@@ -13,4 +13,7 @@
 
 - wire:modal có thể sử dụng Modifier như `.lazy` hoặc `.defer`.
 
-- tham khảo thêm [Một số Modifier khác](./click.md#một-số-modifier-khác)
+- `wire.modal.live` cập nhật trực tiếp vào `proprety`
+- `wire.modal.change` cập nhật trực tiếp vào `proprety`
+
+- tham khảo thêm [Một số Modifier khác](https://livewire.laravel.com/docs/wire-model)
