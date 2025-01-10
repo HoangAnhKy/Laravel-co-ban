@@ -25,6 +25,7 @@
         <p>{{ session('message') }}</p>
     @endif
     ```
+
 # Lệnh nhúng Livewire
 
 - Sử dụng để nhúng một Livewire component vào view Blade trong Laravel
