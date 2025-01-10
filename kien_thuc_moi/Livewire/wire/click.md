@@ -1,4 +1,10 @@
 `wire:click`: nó sẽ gửi yêu cầu AJAX đến server và thực thi phương thức được chỉ định trong `class component`. Ví dụ `wire:click = "createUser"` nó sẽ gọi tới `method createUser` trong class component.
+
+![alt text](../image/action.png)
+
+# Một số phím cho wire.keyup or keydown
+
+![alt text](../image/keyboard.png)
     
 # Một số Modifier khác
 
