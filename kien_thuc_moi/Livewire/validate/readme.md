@@ -82,6 +82,22 @@ class Clicker extends Component
 }
 ```
 
+# Validate Riêng cho một  cột 
+
+```php
+
+    public function update(){
+
+        $validate = $this->validateOnly("todo_edit_name");
+
+        $data = Todo::find($this->TODO_ID_EDIT);
+        $data->name = $this->todo_edit_name;
+        $data->save();
+        $this->edit();
+    }
+
+```
+
 # Lấy vaildate ở View 
 
 - Giống laravel 
