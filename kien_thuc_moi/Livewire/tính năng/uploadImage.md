@@ -56,3 +56,20 @@ Sử dụng `temporaryUrl()` để lấy lại image cũ
     @endif
 </div>
 ```
+
+# Để upload nhiều file
+
+```html
+<div>
+    <label for="profile_picture" class="block text-sm font-medium leading-6 text-gray-900">Profile Picture</label>
+    <input multiple type="file" id="profile_picture" name="profile_picture" wire:model="image"
+            class="mt-1 block w-full rounded border-gray-300 text-gray-900 text-sm">
+    @error('image')
+        <span class="text-red-500 text-xs">{{ $message }} </span>
+    @enderror
+
+    @if(!empty($image))
+        <img src="{{$image->temporaryUrl()}}">
+    @endif
+</div>
+```

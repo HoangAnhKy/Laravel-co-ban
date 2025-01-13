@@ -61,6 +61,9 @@ class Clicker extends Component
     #[Rule("required|min:6")]
     public $password;
 
+    #[Rule("image.*" => image)] // validate cho tất cả image
+    public $image
+
     public function createUser(){
         $validate = $this->validate();
 
