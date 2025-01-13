@@ -59,7 +59,19 @@ class SearchUsers extends Component
 {
     public $query;
 
-    public function updatingQuery($value)
+    // Nếu gọi updating hoặc  updated thôi thì
+
+    /*
+        public function updated($property, $value)
+        { 
+            if ($property === 'username') {
+                nó trùng cái nào thì mới thực thi
+            }
+        }
+
+    */
+
+    public function updatingQuery($value) // updating + proprety
     {
         // Trước khi `query` được cập nhật
         if (strlen($value) < 3) {
@@ -67,7 +79,7 @@ class SearchUsers extends Component
         }
     }
 
-    public function updatedQuery($value)
+    public function updatedQuery($value) // updated + proprety
     {
         // Sau khi `query` được cập nhật
         session()->flash('message', "Từ khóa tìm kiếm: $value");
