@@ -98,3 +98,14 @@ Mở `resources/views/livewire/counter.blade.php` và thay thế nội dung củ
         </body>
     </html>
     ```
+
+# Xác định layout
+
+```php
+use Livewire\Attributes\Layout;
+
+#[Layout("components.layouts.app")] // layout mặc định
+class ViewUser extends Component{
+
+}
+```
