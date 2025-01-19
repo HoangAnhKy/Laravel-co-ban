@@ -93,3 +93,17 @@ axios.get('http://127.0.0.1:8000/sanctum/csrf-cookie')
         });
     });
 ```
+### Lưu ý phải kiểm trả file config/corf.php
+
+```php
+return [
+    'paths' => ['api/*', 'login', 'sanctum/csrf-cookie'], // Các endpoint áp dụng CORS
+    'allowed_methods' => ['*'], // Cho phép tất cả phương thức HTTP (GET, POST, PUT, DELETE, ...)
+    'allowed_origins' => ['http://localhost:3000'], // Domain của frontend (React/Vue)
+    'allowed_origins_patterns' => [], // Không dùng pattern phức tạp
+    'allowed_headers' => ['*'], // Cho phép tất cả header
+    'exposed_headers' => [], // Không expose thêm header nào
+    'max_age' => 0, // Không giới hạn thời gian cache của trình duyệt
+    'supports_credentials' => true, // Bật để hỗ trợ cookie và CSRF
+];
+```
