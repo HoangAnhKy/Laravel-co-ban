@@ -51,3 +51,45 @@ return Application::configure(basePath: dirname(__DIR__))
     })->create();
 
 ```
+
+# Lấy CSRF 
+
+### Khởi tạo sanctum
+
+
+```sh
+php artisan install:api
+```
+
+### sử dụng
+
+Khi dùng nó sẽ tạo ra một chỗ để lấy `cookie` token
+
+```txt
+GET http://127.0.0.1:8000/sanctum/csrf-cookie
+```
+
+Cookie `XSRF-TOKEN` sẽ được gửi từ server và lưu vào trình duyệt hoặc Postman
+
+### ví dụ dùng POST REACTJS
+
+```js
+import axios from 'axios';
+
+// Bật gửi cookie trong các yêu cầu
+axios.defaults.withCredentials = true;
+
+// Gọi /sanctum/csrf-cookie trước khi login
+axios.get('http://127.0.0.1:8000/sanctum/csrf-cookie')
+    .then(() => {
+        // Sau khi lấy CSRF cookie, gửi request POST
+        axios.post('http://127.0.0.1:8000/api/login', {
+            email: 'test@example.com',
+            password: 'password',
+        }).then(response => {
+            console.log('Login success:', response.data);
+        }).catch(error => {
+            console.error('Login failed:', error.response.data);
+        });
+    });
+```
