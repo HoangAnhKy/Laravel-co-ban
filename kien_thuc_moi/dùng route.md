@@ -95,6 +95,13 @@ axios.get('http://127.0.0.1:8000/sanctum/csrf-cookie')
 ```
 ### Lưu ý phải kiểm trả file config/corf.php
 
+- nếu chưa public 
+
+    ```sh
+    php artisan config:publish cors
+    ```
+
+Ví dụ:
 ```php
 return [
     'paths' => ['api/*', 'login', 'sanctum/csrf-cookie'], // Các endpoint áp dụng CORS
