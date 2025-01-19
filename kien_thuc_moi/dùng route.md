@@ -114,3 +114,93 @@ return [
     'supports_credentials' => true, // Bật để hỗ trợ cookie và CSRF
 ];
 ```
+
+### Dùng sanctum để xác thực
+
+- Thêm interface cho Modal
+
+    ```php
+    <?php
+
+    namespace App\Models;
+
+    use Illuminate\Auth\Authenticatable;
+    use Illuminate\Database\Eloquent\Model;
+    use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+    use Laravel\Sanctum\HasApiTokens; // thêm 2 đoạn này
+
+    class Users extends Model  implements AuthenticatableContract
+    {
+        use Authenticatable, HasApiTokens; // thêm 2 đoạn này
+    }
+    ```
+
+- Ở controller khởi tạo
+
+    ```php
+     public function Login(Request $req){
+        if (!empty($req->all())){
+            $validate = $req->validate([
+                "email" => "required|email|exists:App\Models\Users,email",
+                "password" => "required|min:6",
+            ]);
+
+            if (Auth::attempt($validate)){
+                $token = \auth()->user()->createToken('api-token')->plainTextToken;
+                dd($token);
+            }
+        }
+    }
+    ```
+- Sử dụng đối với reactJS
+
+    ```js
+    import axios from 'axios';
+
+    // Lấy token từ localStorage (hoặc bất cứ nơi nào bạn lưu trữ token)
+    const token = localStorage.getItem('access_token');
+
+    // Cấu hình Axios để thêm header Authorization
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+    // Cấu hình Axios gửi cookie cùng với request (nếu cần Sanctum)
+    axios.defaults.withCredentials = true;
+
+    // Ví dụ gửi một request đến API
+    axios.get('http://127.0.0.1:8000/api/user')
+        .then(response => {
+            console.log('User data:', response.data);
+        })
+        .catch(error => {
+            console.error('Error:', error.response.data);
+        });
+    ```
+### Một số lệnh cơ bản
+
+```php
+// Tạo token
+$token = $user->createToken('api-token-name');
+$plainTextToken = $token->plainTextToken;
+
+
+// Gán quyền
+$token = $user->createToken('api-token-name', ['view-profile', 'edit-settings']);
+$plainTextToken = $token->plainTextToken;
+
+
+// kiểm tra quyền
+if ($request->user()->tokenCan('view-profile')) {
+    return response()->json(['message' => 'You can view the profile']);
+} else {
+    return response()->json(['message' => 'Access denied'], 403);
+}
+
+
+// Thu hồi quyền (xóa)
+$user->tokens()->where('id', $tokenId)->delete(); // xóa 1 bỏ where xóa all
+
+
+// tokern hiện tại
+$currentToken = $request->user()->currentAccessToken();
+
+```
