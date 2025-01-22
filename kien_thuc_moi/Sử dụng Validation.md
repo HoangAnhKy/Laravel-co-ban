@@ -249,3 +249,57 @@ class ValidateCourse extends FormRequest
 }
 
 ```
+
+
+# Dùng try catch với  validate
+Nếu code có lỗi không có lỗi mà bị sai sẽ vô cache Exception còn không sẽ vô lỗi ValidationException
+```php
+// use Illuminate\Validation\ValidationException;
+
+public function Register(Request $req){
+	if (!empty($req->all())) {
+	    try {
+		$validate = $req->validate([
+		    "name" => "bail|required|string|unique:App\Models\Users,name",
+		    "email" => "bail|required|email|unique:App\Models\Users,email",
+		    "password" => "required|min:3",
+		]);
+
+		if (Users::create($validate)){
+		    return response()->json([
+			'message' => 'register user successful'
+		    ], 200);
+		}
+		throw new \Exception("Can not register user");
+	    }
+	    catch (ValidationException $e) {
+		return response()->json([
+		    'errors' => $e->errors(),
+		    'message' => 'Validation failed',
+		    'user' => [],
+		], 422);
+	    }
+	    catch (\Exception $e){
+		return response()->json([
+		    'message' => 'Login error: '. $e->getMessage(),
+		    'user' => [],
+		], 400);
+	    }
+	}
+    }
+
+
+/*{
+"errors": {
+	"name": [
+	    "The name has already been taken."
+	],
+	"email": [
+	    "The email has already been taken."
+	]
+	},
+"message": "Validation failed",
+"user": []
+}
+*/
+```
