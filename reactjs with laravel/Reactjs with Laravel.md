@@ -46,7 +46,7 @@ export default defineConfig({
 
 ```
 
-B6: Vào `resources/components` tạo file `App.jsx`
+B6: Vào `resources/js/components` tạo file `App.jsx`
 
 ```js
 import React from 'react';
@@ -68,12 +68,13 @@ B7: Đổi tên `app.js` thành `app.jsx` rồi vào đó khai báo như sau
 import './bootstrap';
 
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
+import App from './components/App.jsx';
 
-import App from './components/App';
-
-if (document.getElementById('app')) {
-    ReactDOM.render(<App />, document.getElementById('app'));
+const rootElement = document.getElementById('root'); // Đảm bảo khớp với id trong HTML
+if (rootElement) {
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(<App />);
 }
 ```
 
@@ -96,7 +97,7 @@ vd: views/welcome.blade.php
         @vite(['resources/css/app.css', 'resources/js/app.jsx'])
     </head>
     <body>
-       <div id="app"></div>
+       <div id="root"></div>
     </body>
 </html>
 
