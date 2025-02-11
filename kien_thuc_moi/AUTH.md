@@ -122,6 +122,18 @@ Route::group(['prefix' => '/users', "middleware" => CheckRole::class], function(
     ```sh
     php artisan make:policy UserPolicy --model=User
     ```
+- Đăng ký
+
+    ```php
+    class AppServiceProvider extends ServiceProvider
+    {
+        public function boot(): void
+        {
+            Gate::policy(Users::class, UserPolicy::class);
+        }
+    }
+
+    ```
     
 - Cấu trúc của Policy: Policy chứa các phương thức đại diện cho các hành động mà người dùng có thể thực hiện. Mỗi phương thức trả về true nếu người dùng có quyền thực hiện hành động, và false nếu không có quyền.
 
