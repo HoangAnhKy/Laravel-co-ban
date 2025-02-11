@@ -258,8 +258,7 @@ Route::group(['prefix' => '/users', "middleware" => CheckRole::class], function(
     });
     ```
 
--  Sử dụng Policy trong `Blade`
-
+-  Sử dụng Policy trong `Blade`, lưu ý ` @can("policeCus", [\App\Models\Users::class, true])` thêm modal với các props thì nó mới nhận của police nào và props nào
     ```php
     @can('update', $user)
     <a href="{{ route('users.edit', $user) }}">Chỉnh sửa</a>
