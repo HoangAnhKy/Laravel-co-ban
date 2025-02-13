@@ -1,6 +1,6 @@
 # Đăng ký Service
 
-đăng ký tại `AppServiceProvider`
+đăng ký tại `AppServiceProvider`, lưu ý [cách dùng các phương](./phương%20thức%20đăng%20ký.md) để sự dụng phù hợp
 
 ```php
 public function register(): void
@@ -102,6 +102,8 @@ class HomeController extends Controller
 
     public function index()
     {
+        // dd(app(LoggerInterface::class)->log("hi")); // hoặc
+
         $this->logger->log("Hello from Laravel Service Container!");
         return view('welcome');
     }
