@@ -20,8 +20,7 @@ Route::resource('articles', ArticleController::class)->parameters([
 Route::resource('posts', PostController::class)->middleware('auth');
 ```
 
-**chỉ dùng được cho controller có các action sau: index, create, store, show, edit, destroy, update** 
-
+**chỉ dùng được cho controller có các action sau: index, create, store, show, edit, destroy, update**
 
 # bỏ qua csrf
 
@@ -52,10 +51,18 @@ return Application::configure(basePath: dirname(__DIR__))
 
 ```
 
-# Lấy CSRF 
+# Lấy CSRF bằng sanctum
+
+### Khái niệm sancturm
+
+Là một package của Laravel được thiết kế để đơn giản hóa quá trình xác thực API và các ứng dụng SPA (Single Page Application). Dưới đây là một số tác dụng chính của Sanctum:
+
+- `API Token Authentication`: cho phép người dùng tạo ra các token API cá nhân để xác thực các request đến API
+- `Xác thực cho SPA`: có thể xác thực các ứng dụng `SPA` sử dụng `cookie-based authentication`. Điều này cho phép `SPA` có thể thực hiện các yêu cầu đến API một cách an toàn mà không cần phải xây dựng một hệ thống xác thực phức tạp.
+
+- `Quản lý Token`:dễ dàng tạo, thu hồi và quản lý các API token. Mỗi token được liên kết với người dùng, cho phép theo dõi và kiểm soát việc sử dụng API của từng người dùng.
 
 ### Khởi tạo sanctum
-
 
 ```sh
 php artisan install:api
@@ -74,34 +81,38 @@ Cookie `XSRF-TOKEN` sẽ được gửi từ server và lưu vào trình duyệt
 ### ví dụ dùng POST REACTJS
 
 ```js
-import axios from 'axios';
+import axios from "axios";
 
 // Bật gửi cookie trong các yêu cầu
 axios.defaults.withCredentials = true;
 
 // Gọi /sanctum/csrf-cookie trước khi login
-axios.get('http://127.0.0.1:8000/sanctum/csrf-cookie')
-    .then(() => {
-        // Sau khi lấy CSRF cookie, gửi request POST
-        axios.post('http://127.0.0.1:8000/api/login', {
-            email: 'test@example.com',
-            password: 'password',
-        }).then(response => {
-            console.log('Login success:', response.data);
-        }).catch(error => {
-            console.error('Login failed:', error.response.data);
-        });
+axios.get("http://127.0.0.1:8000/sanctum/csrf-cookie").then(() => {
+  // Sau khi lấy CSRF cookie, gửi request POST
+  axios
+    .post("http://127.0.0.1:8000/api/login", {
+      email: "test@example.com",
+      password: "password",
+    })
+    .then((response) => {
+      console.log("Login success:", response.data);
+    })
+    .catch((error) => {
+      console.error("Login failed:", error.response.data);
     });
+});
 ```
+
 ### Lưu ý phải kiểm trả file config/corf.php
 
-- nếu chưa public 
+- nếu chưa public
 
-    ```sh
-    php artisan config:publish cors
-    ```
+  ```sh
+  php artisan config:publish cors
+  ```
 
 Ví dụ:
+
 ```php
 return [
     'paths' => ['api/*', 'login', 'sanctum/csrf-cookie'], // Các endpoint áp dụng CORS
@@ -117,64 +128,69 @@ return [
 
 ### Dùng sanctum để xác thực
 
+Lưu ý nên [đọc thêm token-abilities](https://laravel.com/docs/11.x/sanctum#token-abilities) để thêm xem có quyền sử dụng tính năng đó hay không
+
 - Thêm interface cho Modal
 
-    ```php
-    <?php
+  ```php
+  <?php
 
-    namespace App\Models;
+  namespace App\Models;
 
-    use Illuminate\Auth\Authenticatable;
-    use Illuminate\Database\Eloquent\Model;
-    use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-    use Laravel\Sanctum\HasApiTokens; // thêm 2 đoạn này
+  use Illuminate\Auth\Authenticatable;
+  use Illuminate\Database\Eloquent\Model;
+  use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+  use Laravel\Sanctum\HasApiTokens; // thêm 2 đoạn này
 
-    class Users extends Model  implements AuthenticatableContract
-    {
-        use Authenticatable, HasApiTokens; // thêm 2 đoạn này
-    }
-    ```
+  class Users extends Model  implements AuthenticatableContract
+  {
+      use Authenticatable, HasApiTokens; // thêm 2 đoạn này
+  }
+  ```
 
 - Ở controller khởi tạo
 
-    ```php
-     public function Login(Request $req){
-        if (!empty($req->all())){
-            $validate = $req->validate([
-                "email" => "required|email|exists:App\Models\Users,email",
-                "password" => "required|min:6",
-            ]);
+  ```php
+   public function Login(Request $req){
+      if (!empty($req->all())){
+          $validate = $req->validate([
+              "email" => "required|email|exists:App\Models\Users,email",
+              "password" => "required|min:6",
+          ]);
 
-            if (Auth::attempt($validate)){
-                $token = \auth()->user()->createToken('api-token')->plainTextToken;
-                dd($token);
-            }
-        }
-    }
-    ```
+          if (Auth::attempt($validate)){
+              $token = \auth()->user()->createToken('api-token')->plainTextToken;
+              dd($token);
+          }
+      }
+  }
+  ```
+
 - Sử dụng đối với reactJS
 
-    ```js
-    import axios from 'axios';
+  ```js
+  import axios from "axios";
 
-    // Lấy token từ localStorage (hoặc bất cứ nơi nào bạn lưu trữ token)
-    const token = localStorage.getItem('access_token');
+  // Lấy token từ localStorage (hoặc bất cứ nơi nào bạn lưu trữ token)
+  const token = localStorage.getItem("access_token");
 
-    // Cấu hình Axios để thêm header Authorization
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  // Cấu hình Axios để thêm header Authorization
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-    // Cấu hình Axios gửi cookie cùng với request (nếu cần Sanctum)
-    axios.defaults.withCredentials = true;
+  // Cấu hình Axios gửi cookie cùng với request (nếu cần Sanctum)
+  axios.defaults.withCredentials = true;
 
-    // Ví dụ gửi một request đến API
-    axios.get('http://127.0.0.1:8000/api/user')
-        .then(response => {
-            console.log('User data:', response.data);
-        })
-        .catch(error => {
-            console.error('Error:', error.response.data);
-        });
-    ```
+  // Ví dụ gửi một request đến API
+  axios
+    .get("http://127.0.0.1:8000/api/user")
+    .then((response) => {
+      console.log("User data:", response.data);
+    })
+    .catch((error) => {
+      console.error("Error:", error.response.data);
+    });
+  ```
+
 ### Một số lệnh cơ bản
 
 ```php
