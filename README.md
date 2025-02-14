@@ -776,7 +776,7 @@ class InvoicesExport implements FromQuery, WithMapping
 
 ---
 
-#Transaction
+# Transaction
 
 ```php
   public function store(ValidateCourse $request)
@@ -792,7 +792,7 @@ class InvoicesExport implements FromQuery, WithMapping
     }
 ```
 
-#CronJob
+# CronJob
 
 B1: câu lệnh khởi tạo `command`. file command sẽ được khởi tạo bên trong `/app/Console/Command/`
 
