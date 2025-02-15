@@ -8,6 +8,8 @@
 
 - `Tăng khả năng bảo trì và mở rộng`: Với Facade, nếu cần thay đổi cách hoạt động hoặc thay thế service cụ thể, chỉ cần thay đổi trong phần cấu hình hoặc trong lớp service, mà không cần phải sửa đổi nhiều chỗ trong code gọi.
 
+- `Sử dụng khi` muốn một giao diện truy cập tĩnh tới các service trong container, giúp code gọn gàng mà không cần tự quản lý việc khởi tạo đối tượng.
+
 # Ví dụ dùng
 
 ## Tạo một Service

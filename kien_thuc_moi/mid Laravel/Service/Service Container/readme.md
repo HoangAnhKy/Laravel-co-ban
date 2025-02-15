@@ -1,3 +1,7 @@
+**`Khi nào khởi tạo`**: Service Container được Laravel khởi tạo tự động ngay từ khi ứng dụng bắt đầu chạy (bootstrapping). Không cần phải khởi tạo nó theo cách thủ công.
+
+**`Mục đích`**: Nó dùng để quản lý dependency injection, giúp tự động tiêm các phụ thuộc cần thiết vào class khi chúng được yêu cầu.
+
 # Đăng ký Service
 
 đăng ký tại `AppServiceProvider`, lưu ý [cách dùng các phương](./phương%20thức%20đăng%20ký.md) để sự dụng phù hợp

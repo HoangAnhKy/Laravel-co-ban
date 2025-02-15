@@ -6,6 +6,10 @@ Cụ thể, Service Provider có các vai trò sau:
 - `Khởi tạo (Bootstrapping)`: Trong phương thức boot(), có thể thực hiện các công việc như đăng ký các sự kiện, middleware, hoặc cấu hình route, view,... sau khi tất cả các dịch vụ khác đã được đăng ký.
 - `Tổ chức mã nguồn`: Bằng cách sử dụng Service Provider, có thể tách riêng các chức năng, module của ứng dụng thành các phần độc lập, dễ quản lý và bảo trì hơn.
 
+Khi nào nên dùng:
+
+- khi có các thành phần hoặc dịch vụ mới cần đăng ký vào container, hoặc khi cần thực hiện các công việc bootstrapping (ví dụ: đăng ký event listeners, cấu hình package, …).
+
 # lệnh khởi tạo
 
 ```sh
