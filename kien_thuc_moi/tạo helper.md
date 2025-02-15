@@ -1,10 +1,10 @@
 dùng để tạo hàm để dễ dàng sửa.
 
-cách  dùng 
+cách dùng
 
 B1: Tạo helper trong app
 
-B2: Lấy đường dẫn truyền vào comporser (auto load) 
+B2: Lấy đường dẫn truyền vào comporser (auto load)
 
 ```json
 "autoload": {
@@ -18,7 +18,8 @@ B2: Lấy đường dẫn truyền vào comporser (auto load)
 }
 ```
 
-B3: sau đó chạy lệnh 
+B3: sau đó chạy lệnh
+
 ```sh
 composer dump-autoload
 ```
