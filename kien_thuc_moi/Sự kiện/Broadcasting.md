@@ -34,3 +34,5 @@ php artisan install:broadcasting
 ```
 
 file chỉnh sửa ở `config/broadcasting`
+
+và nếu dùng `pusher` thì sài theo hướng dẫn của nó [demo](../package/Pusher/readme.md)
