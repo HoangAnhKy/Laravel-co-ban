@@ -25,3 +25,12 @@ Trong Laravel là cơ chế giúp phát (broadcast) các sự kiện (event) rea
 - `Broadcast Driver`: hỗ trợ các driver như Pusher, Ably, Laravel WebSockets (package BeyondCode), hoặc Redis (dùng kèm socket.io hoặc tương tự). cần cấu hình trong file `.env` và `config/broadcasting.php` để kết nối với dịch vụ real-time tương ứng.
 
 - `Frontend – Client`: dùng một thư viện như `Laravel Echo` để lắng nghe các event từ channel đã khai báo. Khi sự kiện được broadcast, client sẽ nhận ngay lập tức dữ liệu (ví dụ: chat message mới, thông báo mới, …) và cập nhật giao diện.
+
+# Lệnh cài
+
+```sh
+php artisan install:broadcasting
+# chọn no hết
+```
+
+file chỉnh sửa ở `config/broadcasting`
