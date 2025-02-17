@@ -61,7 +61,7 @@ hoặc khai báo ở trên cùng file như sau
 
 # Dùng 2 database với QueryBuilder
 
--   Khởi tạo `$connection` trong model
+- Khởi tạo `$connection` trong model
 
 ```php
 class ModelName extends Model { // extend changed
@@ -69,4 +69,10 @@ class ModelName extends Model { // extend changed
     protected $connection = 'pgsql';
 
 }
+```
+
+# chạy lệnh tạo
+
+```sh
+php artisan migrate --database=mysql2
 ```
