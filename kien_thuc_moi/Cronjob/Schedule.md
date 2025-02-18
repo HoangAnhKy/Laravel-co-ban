@@ -27,10 +27,18 @@ $schedule->call(function () {
 })->everyFiveMinutes(); // Chạy mỗi 5 phút
 
 
+
 Schedule::call(function (){
     Log::info("test schedule");
-    Artisan::call("task:run"); // command
-})->everyMinute();
+    Artisan::call("task:run");
+})
+    ->everyMinute()
+    ->onSuccess(function () {
+        Log::info("ok success");
+    })
+    ->onFailure(function () {
+        Log::error("fail");
+    });
 ```
 
 ### Các tần suất chạy Schedule
