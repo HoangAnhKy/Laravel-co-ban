@@ -2,6 +2,12 @@
 
 Trong Laravel là cơ chế giúp phát (broadcast) các sự kiện (event) real-time đến các client, thường là trình duyệt (JavaScript client) hoặc các ứng dụng khác. Nhờ đó, người dùng có thể cập nhật dữ liệu ngay lập tức mà không cần tải lại trang, tạo ra trải nghiệm real-time tương tự các ứng dụng chat, thông báo live, hoặc cập nhật trạng thái theo thời gian thực.
 
+# Các thành phần chính của Broadcasting trong Laravel
+
+- Event: Sự kiện mà bạn muốn gửi đến client.
+- Channel: Một "kênh" để gửi dữ liệu đến client. Bạn có thể sử dụng kênh riêng tư hoặc công cộng.
+- Listener (Client-side): Các script phía client để lắng nghe và xử lý sự kiện khi nó được gửi từ server.
+
 # Cách hoạt động của Broadcasting
 
 - `Event Broadcasting`: tạo một event Laravel như bình thường, sau đó đánh dấu event này có thể broadcast (thường thông qua `interface` `ShouldBroadcast` hoặc `ShouldBroadcastNow`). Khi phát (dispatch) event, Laravel sẽ broadcast sự kiện đó đến channel và dữ liệu được khai báo trong event.
