@@ -77,13 +77,104 @@ composer require maatwebsite/excel
   ```
 
 - Chạy export
+
   ```php
-  public function export()
-      {
-          Excel::queue(new UsersExport, 'users.xlsx');
-          return response()->json(['message' => 'Export job đã được dispatch']);
-      }
+    public function export()
+    {
+        Excel::queue(new UsersExport, 'users.xlsx');
+        return response()->json(['message' => 'Export job đã được dispatch']);
+    }
+
+    // sử dụng thêm chain gọi qua job khác
+    function exportChain () {
+        ini_set('memory_limit', '2G');
+        $chunksize = 5000;
+
+        DB::table("users")->chunkById($chunksize, function($users, $loop) use($chunksize) {
+
+            $fileName = "users_$loop.xlsx";
+            $path = "app/public/";
+
+            $row = $chunksize *($loop - 1);
+            $old_row = 0;
+            Log::info("Row: $old_row");
+            Excel::queue(new UsersExport($users), $fileName, "public")->chain([
+                new MergeExcelFilesJob($path.$fileName, $row, $path."users.xlsx")
+            ]);
+        });
+    }
   ```
+
+- Mere file
+
+  ```php
+  <?php
+
+  namespace App\Jobs;
+
+  use Illuminate\Contracts\Queue\ShouldQueue;
+  use Illuminate\Foundation\Queue\Queueable;
+  use PhpOffice\PhpSpreadsheet\IOFactory;
+  use PhpOffice\PhpSpreadsheet\Spreadsheet;
+
+
+  class MergeExcelFilesJob implements ShouldQueue
+  {
+      use Queueable;
+
+      /**
+       * Create a new job instance.
+       */
+      private $files;
+      private $output;
+      private $row_start;
+
+      public function __construct($files, $row_start = 3, $output)
+      {
+          $this->files = $files;
+          $this->row_start = $row_start;
+          $this->output = $output;
+      }
+
+      /**
+       * Execute the job.
+       */
+      public function handle(): void
+      {
+          if(isset($this->files)){
+              // check file
+              if(!file_exists(storage_path($this->output)))
+              {
+                  $spreadsheet = new Spreadsheet();
+                  $mergedSheet = $spreadsheet->getActiveSheet();
+                  $mergedSheet->fromArray( ["ID", "Full Name", "Email"], null, "A1");
+                  $rowNumber = 3;
+              }else{
+                  $spreadsheet = IOFactory::load(storage_path($this->output));
+                  $mergedSheet = $spreadsheet->getActiveSheet();
+                  $rowNumber = $this->row_start;
+              }
+
+              $file = storage_path($this->files);
+              $sheet_merge = IOFactory::load($file);
+              $get_sheet = $sheet_merge->getActiveSheet();
+              // merge file
+              foreach ($get_sheet->toArray() as $row) {
+                  $mergedSheet->fromArray($row, null, "A$rowNumber");
+                  $rowNumber++;
+              }
+              // Remove file after merging
+              unlink($file);
+
+              $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+              $writer->save(storage_path($this->output));
+          }
+      }
+  }
+  ```
+
+# tùy chỉnh thêm
+
 - **lưu ý**
 
   - sử dụng thêm `WithStyles` Thêm màu cho đẹp
