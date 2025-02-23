@@ -173,7 +173,7 @@ composer require maatwebsite/excel
   }
   ```
 
-# tùy chỉnh thêm
+## tùy chỉnh thêm
 
 - **lưu ý**
 
@@ -274,3 +274,41 @@ composer require maatwebsite/excel
         }
     }
     ```
+
+# import data
+
+```php
+<?php
+
+namespace App\Imports;
+
+use App\Models\Users;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Concerns\ToArray;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+
+class UsersImport implements ToArray, ShouldQueue, WithChunkReading
+{
+
+    public function array(array $row)
+    {
+        foreach ($row as $each) {
+            try {
+                Users::query()->firstOrCreate([
+                    'email' => $each['email'],
+                    'full_name' => $each['full_name'],
+                    'password' => Hash::make("123"),
+                ]);
+            } catch (\Exception $e) {
+                Log::error($e->getMessage());
+            }
+        }
+    }
+    public function chunkSize(): int
+    {
+        return 1000;
+    }
+}
+```
