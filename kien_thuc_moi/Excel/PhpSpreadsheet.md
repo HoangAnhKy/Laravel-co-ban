@@ -58,3 +58,119 @@ public function export(array $data, $output_type = "F"){
 
 }
 ```
+
+# import
+
+### tạo file chunk
+
+```php
+<?php
+namespace App\Service;
+
+use PhpOffice\PhpSpreadsheet\Reader\IReadFilter;
+
+class ChunkReadFilter implements IReadFilter
+{
+    private $startRow;
+    private $chunkSize;
+
+    public function __construct() {
+    }
+
+    public function setRow($startRow = 1 , $chunkSize = 1000) {
+        $this->startRow = $startRow;
+        $this->chunkSize = $chunkSize;
+    }
+
+    public function readCell($column, $row, $worksheetName = '') {
+        return ($row >= $this->startRow && $row < ($this->startRow + $this->chunkSize));
+    }
+
+}
+```
+
+### Tạo job
+
+```php
+<?php
+namespace App\Jobs;
+
+use App\Models\Users;
+use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+use App\Service\ChunkReadFilter;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+
+class ImportExcelChunkJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    protected $filePath;
+    protected $startRow;
+    protected $chunkSize;
+    public function __construct($filePath, $startRow, $chunkSize)
+    {
+        $this->filePath = $filePath;
+        $this->startRow = $startRow;
+        $this->chunkSize = $chunkSize;
+    }
+
+    public function handle()
+    {
+        $reader = new Xlsx();
+        $reader->setReadDataOnly(true);
+
+        $filter = new ChunkReadFilter();
+        $filter->setRow($this->startRow, $this->chunkSize);
+        $reader->setReadFilter($filter);
+
+        $spreadsheet = $reader->load($this->filePath);
+        $worksheet = $spreadsheet->getActiveSheet();
+        foreach ($worksheet->getRowIterator($this->startRow, $this->startRow + $this->chunkSize - 1) as $row) {
+            $cellIterator = $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false);
+
+            $data = [];
+            foreach ($cellIterator as $cell) {
+                $data[] = $cell->getValue();
+            }
+
+            if (!empty($data)) {
+                Users::query()->create( [
+                    'full_name' => $data[1],
+                    'email' => $data[2],
+                    "password" => "123"
+                ]);
+            }
+        }
+        Log::info("Đã import từ dòng {$this->startRow} đến " . ($this->startRow + $this->chunkSize - 1));
+    }
+}
+```
+
+### function import
+
+```php
+function import () {
+    $filePath = storage_path("app/public/user.xlsx");
+
+    $reader = new Xlsx();
+    $reader->setReadDataOnly(true);
+    $sheetInfo = $reader->listWorksheetInfo($filePath); // lấy file nhanh
+    $totalRows = $sheetInfo[0]['totalRows']; // Lấy số dòng từ metadata
+    $chunkSize = 5000; // Số dòng đọc mỗi lần
+
+
+     for($start = 1; $start <= $totalRows; $start += $chunkSize){
+        dispatch(new ImportExcelChunkJob($filePath, $start, $chunkSize));
+     }
+
+    return response()->json(['success' => 'Import đang chạy nền!']);
+}
+```

@@ -12,6 +12,17 @@ DB::table('users')->get()->toArray();
 $allData = User::all()->select($select)->toArray();
 ```
 
+### Lấy số dòng chỉ áp dung với file xlsx
+
+```php
+$reader = new Xlsx();
+$reader->setReadDataOnly(true);
+$sheetInfo = $reader->listWorksheetInfo($filePath); // lấy file nhanh
+$totalRows = $sheetInfo[0]['totalRows']; // Lấy số dòng từ metadata
+```
+
+Nếu muốn dùng csv thì dùng `fopen`
+
 ### chunk hoặc lazy
 
 ```php
