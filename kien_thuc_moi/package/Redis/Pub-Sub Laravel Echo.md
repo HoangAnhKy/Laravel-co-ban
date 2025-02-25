@@ -2,6 +2,8 @@
 
 - Cài redis và source trước
 
+- Sau khi cài source nhớ vào `config/database` để xóa `prefix` của redis
+
 ### .env
 
 - Sửa `env` dùng redis
