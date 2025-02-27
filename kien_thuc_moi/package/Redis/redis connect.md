@@ -1,21 +1,23 @@
 # kết nối
+
 Laravel hỗ trợ kết nối tới `redis` qua **`predis`** với **`phpredis`**
 
 - **`predis`**: Dễ dàng cài đặt và sử dụng, nhưng hiệu suất có thể không nhanh bằng **phpredis**.
 
-    ```sh
-    composer require predis/predis
-    ```
+  ```sh
+  composer require predis/predis
+  ```
 
 - **`phpredis`**: Có hiệu suất tốt hơn, nhưng cần cài đặt thêm tiện ích mở rộng PHP. [Tải tiện ích mở rộng](https://pecl.php.net/package/redis/6.0.2/windows)
 
-# Sử dụng docker 
+# Sử dụng docker
 
 ## lệnh cài redis
 
 ```sh
 docker run -d --name redis-stack -p 6379:6379 -p 8001:8001 redis/redis-stack:latest
 ```
+
 **Mô tả lệnh**
 
 - `--name redis-container`: Đặt tên cho container là redis-container.
@@ -38,26 +40,23 @@ docker exec -it redis-container redis-cli
 
 - Cài file yml
 
-    ```yaml
-    version: '3'
-    services:
-    redis:
-        image: redis
-        container_name: redis-container
-        ports:
-        - "6379:6379"
-        volumes:
-        - redis-data:/data
-
+  ```yaml
+  version: "3"
+  services:
+  redis:
+    image: redis/redis-stack:latest
+    container_name: redis-container
+    ports:
+      - "6379:6379"
     volumes:
-    redis-data:
-    ```
+      - ./redis-data:/data
+  ```
 
 - Sau khi có file yml chạy câu lệnh để bật redis
 
-    ```sh
-    docker-compose up -d
-    ```
+  ```sh
+  docker-compose up -d
+  ```
 
 ## kiểm tra kết nối
 
@@ -84,6 +83,7 @@ Bước 2: Tải mã nguồn Redis
 ```sh
 curl -O http://download.redis.io/redis-stable.tar.gz
 ```
+
 Giải nén
 
 ```sh
@@ -123,11 +123,11 @@ sudo nano /etc/redis/redis.conf
 
 Thay đổi các thiết lập sau:
 
-+ Thay đổi chế độ giám sát (supervised) thành systemd: chỗ comment supervised no
+- Thay đổi chế độ giám sát (supervised) thành systemd: chỗ comment supervised no
 
-    ```conf
-    supervised systemd
-    ```
+  ```conf
+  supervised systemd
+  ```
 
 Bước 5: Tạo tệp dịch vụ systemd cho Redis
 
@@ -181,7 +181,7 @@ sudo systemctl enable redis
 
 **Xác Nhận Cấu Hình Redis Cho Kết Nối Từ Xa**
 
-mở cấu hình 
+mở cấu hình
 
 ```sh
 sudo nano /etc/redis/redis.conf
@@ -197,7 +197,7 @@ supervised systemd
 requirepass your_redis_password
 ```
 
-khởi động lại 
+khởi động lại
 
 ```sh
 sudo systemctl restart redis
@@ -229,89 +229,93 @@ Tải và Cài Đặt phpRedisAdmin
 
 - Clone phpRedisAdmin
 
-    ```sh
-    cd /var/www/html
-    sudo git clone https://github.com/erikdubbelboer/phpRedisAdmin.git redisadmin
-    ```
+  ```sh
+  cd /var/www/html
+  sudo git clone https://github.com/erikdubbelboer/phpRedisAdmin.git redisadmin
+  ```
+
 - Cấu Hình phpRedisAdmin:
 
-    - Đổi người sở hữu
+  - Đổi người sở hữu
 
-        ```sh
-        sudo chown -R www-data:www-data /var/www/html/redisadmin
-        ```
-    - Chỉnh Sửa File Cấu Hình:
-    
-        ```sh
-        sudo nano /var/www/html/redisadmin/config.php
-        ```
-        
-        Thay đổi các thông số kết nối Redis như sau:
+    ```sh
+    sudo chown -R www-data:www-data /var/www/html/redisadmin
+    ```
 
-        ```php
-        <?php
-        // Hostname hoặc IP của Redis server
-        $redis_host = '192.168.129.130';
+  - Chỉnh Sửa File Cấu Hình:
 
-        // Port của Redis server
-        $redis_port = 6379;
+    ```sh
+    sudo nano /var/www/html/redisadmin/config.php
+    ```
 
-        // Mật khẩu Redis (nếu có)
-        $redis_password = '';
+    Thay đổi các thông số kết nối Redis như sau:
 
-        // Cơ sở dữ liệu Redis (mặc định là 0)
-        $redis_database = 0;
-        ?>
-        ```
+    ```php
+    <?php
+    // Hostname hoặc IP của Redis server
+    $redis_host = '192.168.129.130';
+
+    // Port của Redis server
+    $redis_port = 6379;
+
+    // Mật khẩu Redis (nếu có)
+    $redis_password = '';
+
+    // Cơ sở dữ liệu Redis (mặc định là 0)
+    $redis_database = 0;
+    ?>
+    ```
+
 - Cấu Hình Apache Cho phpRedisAdmin
 
-    - tạo htaccess
+  - tạo htaccess
 
-        ```sh
-        sudo nano /var/www/html/redisadmin/.htaccess
-        ```
+    ```sh
+    sudo nano /var/www/html/redisadmin/.htaccess
+    ```
 
-        ```.htaccess
-        AuthType Basic
-        AuthName "Restricted Access"
-        AuthUserFile /etc/apache2/.htpasswd
-        Require valid-user
-        ```
-    
-    - Tạo File .htpasswd và Thêm Người Dùng:
+    ```.htaccess
+    AuthType Basic
+    AuthName "Restricted Access"
+    AuthUserFile /etc/apache2/.htpasswd
+    Require valid-user
+    ```
 
-        ```sh
-        sudo apt install apache2-utils -y
-        sudo htpasswd -c /etc/apache2/.htpasswd your_username
-        ```
+  - Tạo File .htpasswd và Thêm Người Dùng:
+
+    ```sh
+    sudo apt install apache2-utils -y
+    sudo htpasswd -c /etc/apache2/.htpasswd your_username
+    ```
 
 - Cấu Hình Quyền Truy Cập Apache:
 
-    - Đảm bảo rằng Apache cho phép sử dụng file .htaccess.
+  - Đảm bảo rằng Apache cho phép sử dụng file .htaccess.
 
-        - Mở File Virtual Host mặc định:
+    - Mở File Virtual Host mặc định:
 
-            ```sh
-            sudo nano /etc/apache2/sites-available/000-default.conf
-            ```
+      ```sh
+      sudo nano /etc/apache2/sites-available/000-default.conf
+      ```
 
-        - Thêm hoặc chỉnh
+    - Thêm hoặc chỉnh
 
-            ```apache.conf
-            <Directory /var/www/html/>
-                Options Indexes FollowSymLinks
-                AllowOverride All
-                Require all granted
-            </Directory>
-            ```
+      ```apache.conf
+      <Directory /var/www/html/>
+          Options Indexes FollowSymLinks
+          AllowOverride All
+          Require all granted
+      </Directory>
+      ```
 
 - Reset apache và chạy composer
 
-    ```sh
-    sudo systemctl restart apache2
-    cd /var/www/html/redisadmin
-    sudo composer install
-    ```
+  ```sh
+  sudo systemctl restart apache2
+  cd /var/www/html/redisadmin
+  sudo composer install
+  ```
+
 ## Cài giao diện reids với node js
 
 Cài Đặt Node.js và npm
@@ -336,30 +340,33 @@ chạy redis
 ```sh
 redis-commander
 ```
-- Cấu Hình Redis Commander Làm Dịch Vụ systemd. Để nó tự chạy  khi khởi động hệ thống
 
-    ```sh
-    sudo nano /etc/systemd/system/redis-commander.service
-    ```
+- Cấu Hình Redis Commander Làm Dịch Vụ systemd. Để nó tự chạy khi khởi động hệ thống
 
-    ```ini
-    [Unit]
-    Description=Redis Commander
-    After=network.target
+  ```sh
+  sudo nano /etc/systemd/system/redis-commander.service
+  ```
 
-    [Service]
-    ExecStart=/usr/bin/redis-commander --redis-host 192.168.129.130 --redis-port 6379 --redis-password your_redis_password
-    Restart=always
-    User=www-data
-    Environment=PATH=/usr/bin:/usr/local/bin
-    Environment=NODE_ENV=production
+  ```ini
+  [Unit]
+  Description=Redis Commander
+  After=network.target
 
-    [Install]
-    WantedBy=multi-user.target
-    ```
-    Lưu Ý:
-    - Thay 192.168.129.130, 6379, và your_redis_password bằng thông tin thực tế của Redis server.
-    - Đảm bảo rằng đường dẫn đến redis-commander là chính xác. Nếu cần, có thể tìm đường dẫn bằng cách chạy which redis-commander.
+  [Service]
+  ExecStart=/usr/bin/redis-commander --redis-host 192.168.129.130 --redis-port 6379 --redis-password your_redis_password
+  Restart=always
+  User=www-data
+  Environment=PATH=/usr/bin:/usr/local/bin
+  Environment=NODE_ENV=production
+
+  [Install]
+  WantedBy=multi-user.target
+  ```
+
+  Lưu Ý:
+
+  - Thay 192.168.129.130, 6379, và your_redis_password bằng thông tin thực tế của Redis server.
+  - Đảm bảo rằng đường dẫn đến redis-commander là chính xác. Nếu cần, có thể tìm đường dẫn bằng cách chạy which redis-commander.
 
 chạy tự động redis
 
