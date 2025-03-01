@@ -1,0 +1,45 @@
+services:
+  #    Quản lý metadata, leader election cho Kafka.
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    restart: always
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181" # Mở cổng 2181 để các container khác có thể kết nối.
+  #    Xử lý và lưu trữ tin nhắn.
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    restart: always
+    depends_on:
+      - zookeeper #  Kafka sẽ không khởi động nếu Zookeeper chưa chạy.
+    ports:
+      - "9092:9092" #  cổng 9092 cho giao tiếp nội bộ.
+      - "29092:29092" # cổng 29092 cho giao tiếp với máy host.
+    environment:
+      KAFKA_BROKER_ID: 1 # ID của broker (có thể thay đổi nếu có nhiều broker).
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181 #  Kafka sẽ kết nối với Zookeeper trên cổng 2181
+      # PLAINTEXT Cho container nội bộ kết nối. PLAINTEXT_HOST Để kết nối từ bên ngoài.
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      # Định nghĩa listener dùng giao thức nào
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      # xác định giao thức mà các broker sử dụng để trao đổi dữ liệu.
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      # Kafka thường có nhiều broker để backup dữ liệu, nhưng ở đây chỉ có 1 broker nên đặt là 1.
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  #    Giao diện web để quản lý Kafka
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    restart: always
+    depends_on:
+      - kafka
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
