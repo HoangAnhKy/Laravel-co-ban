@@ -27,6 +27,8 @@ Kafka có 4 thành phần chính:
 
 - nếu ko có [Download rdkafka](https://pecl.php.net/package/rdkafka/6.0.5/windows)
 
+- file chính vào ext và file phụ nếu có sẽ nằm cùng php.exe
+
 - thêm vào `php.ini`
 
   ```php
@@ -38,13 +40,11 @@ Kafka có 4 thành phần chính:
    php -m | grep rdkafka
   ```
 
-###  So sánh các thư viện PHP-Kafka cho Laravel
+### So sánh các thư viện PHP-Kafka cho Laravel
 
-| **Thư viện** | **Cần rdkafka không?** | **Hỗ trợ Laravel?** | **Hiệu suất** | **Dễ cài trên Windows?** | **Dùng khi nào?** |
-|-------------|------------------|-------------------|------------|------------------|-------------------|
-| **mateusjunges/laravel-kafka** | ✅ Cần rdkafka | ✅ Laravel Native | ⚡ Nhanh | ❌ Khó trên Windows | Khi bạn cần tích hợp chặt với Laravel |
-| **ensi-platform/laravel-php-rdkafka** | ✅ Cần rdkafka | ✅ Laravel Native | ⚡ Rất nhanh | ❌ Khó trên Windows | Khi bạn cần quản lý Kafka trong `config/kafka.php` |
-| **jobcloud/php-kafka-lib** | ✅ Cần rdkafka | 🔸 Dùng được với Laravel | ⚡ Tốt | ❌ Khó trên Windows | Khi muốn có nhiều cấu hình linh hoạt |
-| **longlang/phpkafka** | ❌ Không cần rdkafka | 🔸 Dùng được với Laravel | 🚀 Nhanh trên Windows/Linux | ✅ Dễ cài | Khi bạn cần đơn giản, không muốn cài `rdkafka` |
-
-
+| **Thư viện**                          | **Cần rdkafka không?** | **Hỗ trợ Laravel?**      | **Hiệu suất**               | **Dễ cài trên Windows?** | **Dùng khi nào?**                                  |
+| ------------------------------------- | ---------------------- | ------------------------ | --------------------------- | ------------------------ | -------------------------------------------------- |
+| **mateusjunges/laravel-kafka**        | ✅ Cần rdkafka         | ✅ Laravel Native        | ⚡ Nhanh                    | ❌ Khó trên Windows      | Khi bạn cần tích hợp chặt với Laravel              |
+| **ensi-platform/laravel-php-rdkafka** | ✅ Cần rdkafka         | ✅ Laravel Native        | ⚡ Rất nhanh                | ❌ Khó trên Windows      | Khi bạn cần quản lý Kafka trong `config/kafka.php` |
+| **jobcloud/php-kafka-lib**            | ✅ Cần rdkafka         | 🔸 Dùng được với Laravel | ⚡ Tốt                      | ❌ Khó trên Windows      | Khi muốn có nhiều cấu hình linh hoạt               |
+| **longlang/phpkafka**                 | ❌ Không cần rdkafka   | 🔸 Dùng được với Laravel | 🚀 Nhanh trên Windows/Linux | ✅ Dễ cài                | Khi bạn cần đơn giản, không muốn cài `rdkafka`     |
