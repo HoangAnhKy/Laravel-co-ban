@@ -205,7 +205,7 @@ class KafkaConsumer extends Command
         try {
             $consumer = KafkaConsumerBuilder::create()
                 ->withAdditionalConfig([
-                    'auto.offset.reset' => 'earliest',
+                    'auto.offset.reset' => 'earliest', // or latest
                     'enable.auto.commit' => 'false', // Kiểm soát offset thủ công
                 ])
                 ->withAdditionalBroker($brokers)
