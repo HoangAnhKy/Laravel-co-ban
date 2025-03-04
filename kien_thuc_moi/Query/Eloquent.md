@@ -8,6 +8,8 @@
                       ->first();
   ```
 
+- `increment` và `decrement` tăng giảm một cột bất kì.
+
 - `create(giá trị cần thêm)` dùng để thêm dữ liệu
 
   ```php
