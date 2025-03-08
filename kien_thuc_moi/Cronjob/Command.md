@@ -2,21 +2,28 @@
 
 - File sẽ nằm tại `app/Console/Commands/`
 
-    ```sh
-    php artisan make:command NameCommand
-    ```
--  Lưu ý: `signature` là lệnh chạy nó sẽ thực thi tất cả trong `handle`
+  ```sh
+  php artisan make:command NameCommand
+  ```
 
-    ```php
-        protected $signature = 'temp:clear';
+- Lưu ý: `signature` là lệnh chạy nó sẽ thực thi tất cả trong `handle`
 
-        /* sẽ thực thi bằng php artisan temp:clear
-        hoặc
+  ```php
+      protected $signature = 'temp:clear';
 
-        Artisan::call('temp:clear');
-        */
+      /* sẽ thực thi bằng php artisan temp:clear
+      hoặc
 
-    ```
+      Artisan::call('temp:clear');
+      */
+
+  ```
+
+- nếu muốn nhận thêm để xử lý gì đó
+
+  ```php
+     $format = $this->argument('format');
+  ```
 
 ## sử dụng chung với job
 
