@@ -4,6 +4,19 @@
 composer require phpoffice/phpspreadsheet
 ```
 
+# Chú ý
+
+- có thể giảm tải cho ram bằng cách này nhưng nó sẽ chậm hơn
+
+  ```php
+  //        $client = Redis::connection()->client();
+  //        $cache = new RedisAdapter($client);        // Tạo Redis Adapter
+          $cache = new FilesystemAdapter('', 0, sys_get_temp_dir()); // cache tại file
+
+          $simpleCache = new Psr16Cache($cache);        // Tạo Psr16Cache
+          Settings::setCache($simpleCache); // Đặt bộ nhớ đệm cho PhpSpreadsheet
+  ```
+
 # Ví dụ code
 
 ```php
