@@ -1,6 +1,6 @@
 # Khái niệm GraphQL
 
-- Chỉ có một `endpoind` duy nhất gửi tới server
+- Chỉ có một `endpoind` duy nhất gửi tới serve
 
 - Điểm khác nhau của `GrapQL` và `Resfull API`
 
