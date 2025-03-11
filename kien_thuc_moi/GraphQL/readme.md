@@ -16,19 +16,21 @@
 
 - Có 3 loại:
 
-  - [Query](cách%20dùng%20với%20query.md)
-  - Mutation
-  - Subcription
+  - [Query(Truy vấn dữ liệu)](cách%20dùng%20với%20query.md)
+  - [Mutation(Thay đổi dữ liệu)](./cách%20dùng%20với%20muntation.md)
+  - Subcription(Lắng nghe sự kiện real-time)
 
 # Gói cài đặt
 
 ```sh
 composer require rebing/graphql-laravel
-composer require lighthouse-php/lighthouse
+composer require nuwave/lighthouse
 ```
 
 - Nếu ưu tiên tính linh hoạt, hiệu suất cao và muốn tận dụng tích hợp chặt chẽ với Eloquent, Lighthouse là lựa chọn phù hợp. Tuy nhiên, cần sẵn sàng đầu tư thời gian để làm quen với SDL và cách tiếp cận của gói.​
 
 - Nếu muốn một giải pháp dễ tiếp cận hơn, sử dụng cú pháp PHP thuần và không cần các tính năng nâng cao, Rebing GraphQL có thể là lựa chọn tốt.
 
-### [ví dụ dùng rebing](./rebing.md)
+### [ví dụ dùng rebing](./rebing.md), chỉ có thể dùng query với mutation
+
+### [ví dụ dùng lighthouse](./lighthouse.md), dùng được cả 3

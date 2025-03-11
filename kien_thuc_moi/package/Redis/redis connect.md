@@ -43,13 +43,13 @@ docker exec -it redis-container redis-cli
   ```yaml
   version: "3"
   services:
-  redis:
-    image: redis/redis-stack:latest
-    container_name: redis-container
-    ports:
-      - "6379:6379"
-    volumes:
-      - ./redis-data:/data
+    redis:
+      image: redis/redis-stack:latest
+      container_name: redis-container
+      ports:
+        - "6379:6379"
+      volumes:
+        - ./redis-data:/data
   ```
 
 - Sau khi có file yml chạy câu lệnh để bật redis
