@@ -47,7 +47,7 @@
   ```json
   // laravel-echo-server.json
   {
-    "authHost": "http://localhost",
+    "authHost": "http://localhost", // Bind server socket.io lên domain này
     "authEndpoint": "/broadcasting/auth",
     "clients": [],
     "database": "redis",
@@ -61,7 +61,7 @@
       }
     },
     "devMode": true,
-    "host": null,
+    "host": null, // Bind server socket.io lên domain này
     "port": "6001",
     "protocol": "http",
     "socketio": {
@@ -97,8 +97,10 @@
 
 ### Cài đặt Laravel Echo và Socket.IO trong Frontend
 
+Đảm bảo laravel-echo-serve với socket.io cùng version
+
 ```sh
-npm install socket.io-client laravel-echo
+npm install socket.io-client@2.4.0 laravel-echo
 ```
 
 ### resources/js/bootstrap.js
@@ -113,7 +115,7 @@ window.io = io;
 
 window.Echo = new Echo({
   broadcaster: "socket.io",
-  host: "http://localhost:6001",
+  host: "http://localhost:6001", // Chú ý: domain + cổng laravel-echo-server
   transports: ["websocket", "polling"],
 });
 ```
