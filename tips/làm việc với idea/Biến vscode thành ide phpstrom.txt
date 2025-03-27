@@ -13,3 +13,4 @@ cài đặt các extention
 - PHP Sniffer & Beautifier
 - PHP Debug
 - PHP IntelliSense
+- Laravel Extra Intellisense
