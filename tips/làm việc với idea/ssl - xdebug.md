@@ -1,3 +1,19 @@
+# đăng ký ssh với github
+
+```sh
+ssh-keygen -t rsa -b 4096 -C "hoanganhkyltt@gmail.com"
+```
+sau đó add vô git
+
+- Tạo thêm file config như sau
+
+```sh
+Host github.com
+    Hostname github.com
+    User git
+    PubkeyAcceptedKeyTypes +ssh-rsa
+```
+
 # Cài đặt chứng chỉ SSL vào Windows
 
 - Tìm file: `tên_ứng_dụng.test.crt`, nhấp đúp để mở lên.
