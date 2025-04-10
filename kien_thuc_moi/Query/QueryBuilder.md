@@ -265,3 +265,42 @@ Laravel Query Builder cung cấp nhiều hàm mạnh mẽ để xây dựng và 
                   ->groupBy('status')
                   ->get();
   ```
+- **`DB::select("query", [binding dữ liệu vô query])`**: lấy dữ liệu qua câu query
+
+  ```php
+  public function getOrdersByMallPaymentAndProduct($mallId = 2, $paymentMethod = 1, $startDate = '2024-01-01')
+    {
+        return DB::select("
+            SELECT
+                DATE_FORMAT(a.order_date, '%Y%m') AS order_month,
+                a.received_order_id
+            FROM
+                hrnb.mst_order AS a
+            JOIN
+                hrnb.mst_order_detail AS b
+            ON
+                a.receive_id = b.receive_id
+            WHERE
+                a.mall_id = :mallId
+                AND a.payment_method = :paymentMethod
+                AND DATE(a.order_date) > :startDate
+                AND (
+                    b.product_code LIKE 'M03-%' OR
+                    b.product_code LIKE 'h03-%' OR
+                    b.product_code LIKE 'd102-%' OR
+                    b.product_code LIKE 'n1525-%' OR
+                    b.product_code LIKE 'c178-%' OR
+                    b.product_code LIKE 'r53-%' OR
+                    b.product_code LIKE 'o89-%' OR
+                    b.product_code LIKE 'k382-%' OR
+                    b.product_code LIKE 'b211-%'
+                )
+            GROUP BY
+                a.receive_id
+        ", [
+            'mallId' => $mallId,
+            'paymentMethod' => $paymentMethod,
+            'startDate' => $startDate,
+        ]);
+    }
+  ```
