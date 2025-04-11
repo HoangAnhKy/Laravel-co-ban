@@ -54,13 +54,10 @@ Host github.com
 - Lệnh tạo khóa và CSR cùng lúc
 
   ```sh
-  openssl req -new -newkey rsa:2048 -nodes -keyout domain.key -out domain.csr -subj "/CN=yourdomain.com"
-  ```
+  openssl genrsa -out domain.key 2048
+  openssl req -new -key domain.key -out domain.csr -config san.cnf -extensions req_ext
+  openssl x509 -req -in domain.csr -signkey domain.key -out domain.crt -days 365 -extensions req_ext -extfile san.cnf
 
-- Tạo chứng chỉ tự ký
-
-  ```sh
-  openssl x509 -req -days 365 -in domain.csr -signkey domain.key -out domain.crt
   ```
 
 # Cài đặt debug cho phpStorm
