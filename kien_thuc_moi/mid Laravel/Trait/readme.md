@@ -3,6 +3,7 @@ Trait là một cơ chế trong PHP dùng để tái sử dụng phương thức
 # Cấu trúc 
 
 ```php
+// app/Trait
 trait TenTrait {
     public function tenPhuongThuc() {
         // logic ở đây
