@@ -93,8 +93,6 @@ class AppServiceProvider extends ServiceProvider
 <?php
 namespace App\Http\Controllers;
 
-use UserService; // Sử dụng alias đã cấu hình trong boot
-
 class UserController extends Controller
 {
     public function show($id)
