@@ -43,6 +43,8 @@ C2: Tạo thẳng router mới để và tiến hành phân quyền
 - với 'admin' được tạo bên trong kernel trong thư mục $request bằng cách copy middleware có sẵn như 'web' sau đó đổi tên và thêm những middleware của mình muốn quản lý vào
 - Thao tác với session để đạt hiệu quả hơn trong việc quản lý dữ liệu
 
+- terminate() method trong Middleware: là một phương thức trong middleware mà Laravel gọi sau khi response đã được trả về cho người dùng.
+
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 SESSION
