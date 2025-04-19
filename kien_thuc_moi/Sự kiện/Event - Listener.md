@@ -117,7 +117,7 @@ php artisan make:listener name --event=nameEvent
             writeLogListener::class,
         );
 
-        // Dùng khi muốn chuyển thêm dữ liệu, biến các kiểu bên event qua bên listener
+        // Dùng khi muốn chuyển thêm dữ liệu, biến các kiểu bên event qua bên listener, truyền nhiều listener cũng được
         Event::listen(LogProcess::class, function (LogProcess $event) {
             $listener = new ListernerLog($event->user);
             $listener->handle();
