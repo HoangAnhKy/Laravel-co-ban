@@ -146,3 +146,60 @@ Passport::tokensCan([
 ```php
 $request->user()->tokenCan('scope-name')
 ```
+
+
+# Ví dụ khởi tạo user
+
+
+```php
+oute::get('/register', function (){
+    $user = \App\Models\User::create([
+        "name" => "dev",
+        "email" => "dev@yopmail.com",
+        "password" => bcrypt("123"),
+    ]);
+
+    // Tạo oauth_clients
+    $client_oauth = \Laravel\Passport\Client::create([
+        "user_id" => $user->id,
+        "name" => "dev",
+        "secret" => \Illuminate\Support\Str::random(40),
+        "redirect" => "http://localhost:8000",
+        "personal_access_client" => 1,
+        "password_client" => 0,
+        "revoked" => 0,
+    ])->first();
+
+    // tạo oauth_personal_access_clients
+    $client = \Laravel\Passport\PersonalAccessClient::query()->create([
+        "client_id" => $client_oauth->id,
+    ]);
+
+    $res = [];
+
+    // tạo token oauth_access_tokens
+    $res['token'] = $user->createToken($user->name)->accessToken;
+    $res['client_id'] = $client->id;
+    $res['client_secret'] = $client_oauth->secret;
+    return response()->json($res);
+});
+```
+
+# Thu hồi token
+
+```php
+
+Route::get('/logout', function (Request $request) {
+    $accessToken = $request->user()->token();
+    $tokenRepository = app(\Laravel\Passport\TokenRepository::class);
+    $refreshTokenRepository = app(\Laravel\Passport\RefreshTokenRepository::class);
+    $tokenRepository->revokeAccessToken($accessToken->id);
+    $refreshTokenRepository->revokeRefreshTokensByAccessTokenId($accessToken->id);
+
+    // thu hồi tất cả token
+    // foreach ($user->tokens as $token) {
+    //      $tokenRepository->revokeAccessToken($token->id);
+    // }
+    return response()->json(['message' => 'Đăng xuất thành công']);
+})->middleware('auth:api');
+```
