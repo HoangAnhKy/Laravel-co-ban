@@ -77,7 +77,6 @@ Sau đó, sử dụng token này để xác thực các request API bằng cách
 php artisan passport:keys --force
 ```
 
-
 # Các mô tả model
 
 - `oauth_access_tokens:` 
@@ -148,7 +147,7 @@ $request->user()->tokenCan('scope-name')
 ```
 
 
-# Ví dụ khởi tạo user
+# Ví dụ khởi tạo user customer
 
 
 ```php
@@ -185,7 +184,7 @@ oute::get('/register', function (){
 });
 ```
 
-# Thu hồi token
+# Thu hồi token customer
 
 ```php
 
@@ -202,4 +201,324 @@ Route::get('/logout', function (Request $request) {
     // }
     return response()->json(['message' => 'Đăng xuất thành công']);
 })->middleware('auth:api');
+```
+
+# Ví dụ thực tế  với code 
+
+sau bước cài đặt và khai báo `api` trong code, dùng `keys` triền khai môi trường. và chạy `migrate` để  lấy db
+
+## khai báo người dùng đầu tiên cho app
+
+```sh
+php artisan passport:client --password
+```
+
+sau đó khai báo vào `env`
+
+```env
+PASSPORT_PASSWORD_CLIENT_ID=
+PASSPORT_PASSWORD_SECRET=
+```
+
+## Tại route api
+
+
+```php
+<?php
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AuthController;
+
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/refresh', [AuthController::class, 'refreshToken']);
+
+Route::group(['middleware' => ['auth:api']], function () {
+    Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+});
+```
+
+## Tạo controller
+
+```sh
+php artisan make:controller Api/AuthController
+```
+
+```php
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RefreshTokenRequest;
+use App\Http\Requests\RegisterRequest;
+use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+
+class AuthController extends Controller
+{
+    /**
+     * User registration
+     */
+    public function register(RegisterRequest $request): JsonResponse
+    {
+        $userData = $request->validated();
+
+        $userData['email_verified_at'] = now();
+        $user = User::create($userData);
+
+        $response = Http::post(env('APP_URL') . '/oauth/token', [
+            'grant_type' => 'password',
+            'client_id' => env('PASSPORT_PASSWORD_CLIENT_ID'),
+            'client_secret' => env('PASSPORT_PASSWORD_SECRET'),
+            'username' => $userData['email'],
+            'password' => $userData['password'],
+            'scope' => '',
+        ]);
+
+        $user['token'] = $response->json();
+
+        return response()->json([
+            'success' => true,
+            'statusCode' => 201,
+            'message' => 'User has been registered successfully.',
+            'data' => $user,
+        ], 201);
+    }
+
+    /**
+     * Login user
+     */
+    public function login(LoginRequest $request): JsonResponse
+    {
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            $user = Auth::user();
+
+            $response = Http::post(env('APP_URL') . '/oauth/token', [
+                'grant_type' => 'password',
+                'client_id' => env('PASSPORT_PASSWORD_CLIENT_ID'),
+                'client_secret' => env('PASSPORT_PASSWORD_SECRET'),
+                'username' => $request->email,
+                'password' => $request->password,
+                'scope' => '',
+            ]);
+
+            $user['token'] = $response->json();
+
+            return response()->json([
+                'success' => true,
+                'statusCode' => 200,
+                'message' => 'User has been logged successfully.',
+                'data' => $user,
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => true,
+                'statusCode' => 401,
+                'message' => 'Unauthorized.',
+                'errors' => 'Unauthorized',
+            ], 401);
+        }
+
+    }
+
+    /**
+     * Login user
+     *
+     * @param  LoginRequest  $request
+     */
+    public function me(): JsonResponse
+    {
+
+        $user = auth()->user();
+
+        return response()->json([
+            'success' => true,
+            'statusCode' => 200,
+            'message' => 'Authenticated use info.',
+            'data' => $user,
+        ], 200);
+    }
+
+    /**
+     * refresh token
+     *
+     * @return void
+     */
+    public function refreshToken(RefreshTokenRequest $request): JsonResponse
+    {
+        $response = Http::asForm()->post(env('APP_URL') . '/oauth/token', [
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $request->refresh_token,
+            'client_id' => env('PASSPORT_PASSWORD_CLIENT_ID'),
+            'client_secret' => env('PASSPORT_PASSWORD_SECRET'),
+            'scope' => '',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'statusCode' => 200,
+            'message' => 'Refreshed token.',
+            'data' => $response->json(),
+        ], 200);
+    }
+
+    /**
+     * Logout
+     */
+    public function logout(): JsonResponse
+    {
+        Auth::user()->tokens()->delete();
+
+        return response()->json([
+            'success' => true,
+            'statusCode' => 204,
+            'message' => 'Logged out successfully.',
+        ], 204);
+    }
+}
+```
+
+## Tạo request
+
+### RegisterRequest
+
+```sh
+ php artisan make:request RegisterRequest
+```
+
+```php
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class RegisterRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'name' => ['required', 'max:255'],
+            'email' => ['required', 'email', 'unique:users'],
+            'password' => ['required', 'min:8', 'confirmed'],
+        ];
+    }
+}
+```
+
+### LoginRequest
+
+```sh
+ php artisan make:request LoginRequest
+```
+
+```php
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class LoginRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'email' => 'email|required',
+            'password' => 'required',
+        ];
+    }
+}
+```
+
+### RefreshTokenRequest
+
+```sh
+ php artisan make:request RefreshTokenRequest
+```
+
+```php
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class RefreshTokenRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'refresh_token' => ['required', 'string'],
+        ];
+    }
+}
+```
+
+# Thêm vào AppServiceProvider
+
+
+```php
+    public function boot(): void
+    {
+        // ...
+        //  Thiết lập **thời hạn hết hạn** của access token là **15 ngày** kể từ lúc tạo
+        Passport::tokensExpireIn(now()->addDays(15));
+
+        // Thiết lập thời hạn hết hạn của refresh token là 30 ngày.
+        Passport::refreshTokensExpireIn(now()->addDays(30));
+        
+        // Thiết lập thời hạn hết hạn của **Personal Access Token** là **6 tháng**
+        Passport::personalAccessTokensExpireIn(now()->addMonths(6)); 
+        
+        // Cho phép người dùng login bằng email/username và password để lấy token (grant type: password)
+        Passport::enablePasswordGrant(); 
+    }
+
 ```
