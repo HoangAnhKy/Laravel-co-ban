@@ -19,6 +19,13 @@ SESSION_REDIS_DB=3
     ```sh
     INFO keyspace
     ```
+- xem toàn bộ key trong đó 
+
+    ```sh
+    select db_can_xem
+    keys *
+    ```
+
 - `SET key value`: Đặt giá trị cho một key. Ví dụ:
 
     ```sh
