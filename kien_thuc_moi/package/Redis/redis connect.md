@@ -100,3 +100,41 @@ redis-cli
 #   127.0.0.1:6379> ping
 #   PONG
 ```
+
+# Cài thêm giao diện
+
+- Download [Redis-Insight-linux-amd64.deb](https://redis.io/downloads/#:~:text=Redis-,Insight,-Download%20a%20powerful) 
+
+- Chạy lệnh sau khi download xong 
+
+  ```sh
+  sudo dpkg -i Redis-Insight-linux-amd64.deb
+  ```
+- khởi động
+
+  ```sh
+  redisinsight
+  ```
+
+# Tạo icon
+
+```sh
+nano ~/.local/share/applications/redisinsight.desktop
+```
+
+```ini
+[Desktop Entry]
+Version=1.0
+Name=RedisInsight
+Comment=Redis GUI for management and monitoring
+Exec=redisinsight
+Icon=/usr/share/icons/hicolor/48x48/apps/redisinsight.png
+Terminal=false
+Type=Application
+Categories=Utility;Development;
+StartupNotify=true
+```
+
+```sh
+chmod +x ~/.local/share/applications/redisinsight.desktop
+```
