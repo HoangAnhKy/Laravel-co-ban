@@ -24,12 +24,14 @@ Lệnh này sẽ:​
 # Cấu hình `cho modal User hoặc modal khác nếu đã chỉnh` thêm trait `HasApiTokens`:​
 
 ```php
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Laravel\Passport\HasApiTokens;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable
+
+class Users extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
-
+    use HasFactory, HasApiTokens;
     // ...
 }
 ```
@@ -522,3 +524,18 @@ class RefreshTokenRequest extends FormRequest
     }
 
 ```
+
+# Lưu ý
+
+- Đổi tên `env APP_URL` đúng với url hiện tại
+- Dùng mật khẩu đã được `Hash` như vậy mới lấy được token
+
+    ```php
+    // user model
+    public function casts()
+    {
+        return [
+            'password' => 'hashed',
+        ];
+    }
+    ```
