@@ -7,6 +7,26 @@
 
 
 # xGroup
+
+
+```less
+                ┌────────────┐
+                │  Producer  │
+                └─────┬──────┘
+                      ▼
+                ┌────────────┐
+                │  Stream    │ (vd: orders)
+                └─────┬──────┘
+                      ▼
+              ┌────────────────────┐
+              │  Consumer Group    │ (vd: order_group)
+              └───────┬────────────┘
+        ┌─────────────┴───────────────┐
+        ▼                             ▼
+  Consumer A                     Consumer B
+ (worker1)                          (worker2)
+```
+
 trong Redis được dùng để quản lý Consumer Groups cho Redis Streams. Đây là cơ chế giúp nhiều worker (hoặc consumer) chia nhau xử lý dữ liệu trong một stream mà không bị trùng lặp — rất giống với một hàng đợi nhưng hỗ trợ nhiều người tiêu dùng làm việc song song.
 
 ```php
@@ -142,4 +162,10 @@ class ConsumeOrders extends Command
         }
     }
 }
+```
+
+Lệnh tạo
+```sh
+php artisan stream:consume-orders consumer1
+php artisan stream:consume-orders consumer2
 ```
