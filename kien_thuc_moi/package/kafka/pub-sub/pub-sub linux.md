@@ -153,6 +153,7 @@ class KafkaProducerService
         }
         $kafkaMessage = KafkaProducerMessage::create($topic, -1)->withBody($message);
         $this->producer->produce($kafkaMessage);
+        $this->producer->flush(10000); // không gọi flush(), message có thể chưa bao giờ thực sự gửi đi, đặc biệt trong script ngắn hoặc controller.nó đợi đầy mới gửi
     }
 }
 ```
