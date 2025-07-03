@@ -219,4 +219,6 @@ _.has({ a: { b: 1 } }, 'a.b');
 
 _.defaults(obj, defaultObj)
 _.defaults({ a: 1 }, { a: 3, b: 2 }); // → { a: 1, b: 2 }
+_.keys(params);
+_.values(params);
 ```

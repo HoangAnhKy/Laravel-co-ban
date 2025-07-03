@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>lodash</title>
+</head>
+
+<body>
+
+</body>
+<script src="./lodash.min.js"></script>
+<script>
+    const params = {
+        name: '',
+        age: null,
+        gender: 'male',
+        page: 1,
+        active: false
+    };
+
+    const orders = [
+        { id: 1, date: '2024-01-01', price: 200 },
+        { id: 2, date: '2024-01-01', price: 150 },
+        { id: 3, date: '2024-01-02', price: 300 },
+    ];
+    const users = [
+        { name: 'Nam', age: 30 },
+        { name: 'An', age: 25 },
+        { name: 'Bình', age: 25 },
+    ];
+
+    const tags = ['vue', 'js', 'vue', 'html', 'js', 'vue'];
+
+
+    console.log("giải bài 1");
+    console.log(_.pickBy(params));
+
+    console.log("giải bài 2");
+    console.log(_.groupBy(orders, 'date'));
+
+    console.log("giải bài 3");
+    console.log(_.orderBy(users, 'age', 'asc'));
+
+    console.log("giải bài 4");
+    console.log(_.countBy(tags));
+
+</script>
+
+</html>
