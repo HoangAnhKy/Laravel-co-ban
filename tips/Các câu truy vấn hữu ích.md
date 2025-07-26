@@ -1,3 +1,11 @@
+
+- [Tạo bảng tạm](#tạo-bảng-tạm)
+- [insert chia nhỏ](#insert-chia-nhỏ)
+- [Câu lệnh update hoặc insert](#câu-lệnh-update-hoặc-insert)
+- [join update](#join-update)
+- [INSERT IGNORE](#insert-ignore)
+***
+
 # Tạo bảng tạm
 
 - Chỉ có hiệu lực từ khi tạm khi đóng MYSQL hoặc xog tiến trình
@@ -14,7 +22,7 @@
   dd(DB::table('temp_users')->get());
   ```
 
-# Chèn chia nhỏ
+# insert chia nhỏ
 
 ```php
 $batchSize = 10000; // Chèn mỗi lần 10.000 dòng
@@ -54,3 +62,26 @@ DB::statement("INSERT INTO table (col1, col2, ...) SELECT col1, col2, ... FROM t
               );
 
   ```
+
+# join update
+
+```php
+function joinUpdateCourseAndUser () {
+    $course_update = 6;
+    $query = DB::table("courses")
+        ->join('users', 'users.course_id', '=', 'courses.id')
+        ->update([
+            "users.course_id" => $course_update,
+            "courses.id" => $course_update,
+            "courses.name" => "Course $course_update",
+            "courses.description" => "Course $course_update",
+        ]);
+    return response()->json($query);
+}
+```
+
+# INSERT IGNORE 
+
+```js
+INSERT IGNORE INTO users (id, name) VALUES (1, 'John');
+```
