@@ -6,6 +6,20 @@
     - [line](#line):biểu đồ  đường
   
 - **Ngoài ra có thể  kết hợp bar + line**
+- thêm sự kiện click 
+
+    ```js
+    options: {
+        onClick: (evt, elements) => {
+            if (elements.length > 0) {
+                const index = elements[0].index;
+                const courseName = labels[index];
+                const value = dataValues[index];
+                alert(`Bạn vừa bấm vào: ${courseName} (${value}`);
+            }
+        },
+    }
+    ```
 ## bar
 
 - Khai báo trước `canvas` để  vẽ
