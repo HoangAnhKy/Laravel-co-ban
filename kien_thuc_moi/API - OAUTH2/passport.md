@@ -231,6 +231,10 @@ return response()->json(['key' => $key]);
 
 // kiểm tra hết hạn token tự chế
 $request->user()->token()->expires_at < now()
+// hàm có sẵn 
+if ($token->expires_at->isPast()) {
+    // ⛔️ Token đã hết hạn
+}
 ```
 
 # Ví dụ thực tế  với code 
