@@ -205,6 +205,34 @@ Route::get('/logout', function (Request $request) {
 })->middleware('auth:api');
 ```
 
+# customer lại ngày hết hạn của token
+
+```php
+// Model User
+use Laravel\Passport\PersonalAccessTokenResult;
+public function createTokenWithExpiry(string $name): PersonalAccessTokenResult
+{
+    $tokenResult = $this->createToken($name);
+    $token = $tokenResult->token;
+
+    $token->expires_at = now()->addMinutes(1); // ⏰ hết hạn sau đúng 1 phút
+    $token->save();
+
+    return $tokenResult;
+}
+// Sử dụng
+
+$user = \App\Models\User::query()->find(15);
+if (!$user) {
+    return response()->json(['error' => 'Unauthorized'], 401);
+}
+$key = $user->createTokenWithExpiry('Token Name');
+return response()->json(['key' => $key]);
+
+// kiểm tra hết hạn token tự chế
+$request->user()->token()->expires_at < now()
+```
+
 # Ví dụ thực tế  với code 
 
 sau bước cài đặt và khai báo `api` trong code, dùng `keys` triền khai môi trường. và chạy `migrate` để  lấy db
