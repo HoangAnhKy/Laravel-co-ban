@@ -57,5 +57,9 @@
 - khi nó quá tap thì nó tự trôi xuống dòng và nó dãn cột ra hết màn hình
 - thích hợp tích hợp table add/edit khi muốn có nhiều row trong đó  
 - nguyên lý chỉ cần đó là `flex` và nó có thể  xuống hàng(`flex-wrap`) và `flex-grow`
-- `flex-grow` trong CSS là thuộc tính của Flexbox cho biết mức độ một item `được phép giãn` ra chiếm phần không gian trống còn lại trong container. 1 là mặc định, 2 là gấp đôi,...
-
+- `flex-grow` trong CSS là thuộc tính của Flexbox cho biết mức độ một item `được phép giãn` ra chiếm phần không gian trống còn lại trong container. 1 là mặc định, 2 là gấp đôi
+- `flex-basis`: Kích thước cơ bản (trước khi giãn/thu)
+- `flex-shrink`: Xác định mức độ co lại của item khi container bị hẹp, nó có các giá trị:
+    - 0: không co
+    - 1: co 
+    - 2: co gấp đôi
