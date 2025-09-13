@@ -16,9 +16,9 @@ text = pytesseract.image_to_string(Image.open('sample.png'), lang='eng+vie')
 print(text) # nội dung ảnh
 ```
 
-## chú thích 
+# Các option cho các hàm trên 
 
-- syntax `image_to_string`
+- syntax full option: ví dụ với `image_to_string`
   
   ```py
     pytesseract.image_to_string(image, lang=None, config='', nice=0, output_type=Output.STRING, timeout=0)
@@ -35,15 +35,39 @@ print(text) # nội dung ảnh
     - `timeout` thời gian chạy tính bằng giây
 
 ## option của config
+- `oem #num#` (OCR Engine Mode): xác định engine mà Tesseract dùng để nhận diện:
+
+   | OEM | Engine Mode      | Mô tả                                                                               | Khi dùng                                                 |
+   | --- | ---------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------- |
+   | 0   | Legacy Engine    | Engine cũ, dựa trên rule-based (heuristic, pattern matching).                       | Hạn chế, ít dùng trừ khi OCR văn bản đặc thù.            |
+   | 1   | LSTM Neural Nets | Engine mới, dùng deep learning (LSTM) cho OCR. Chính xác hơn cho text thông thường. | Khuyên dùng cho đa số trường hợp. mạnh hơn Legacy Engine |
+   | 2   | Legacy + LSTM    | Chạy song song cả Legacy và LSTM, rồi chọn kết quả tốt hơn.                         | Dùng khi text phức tạp, muốn tận dụng cả 2.              |
+   | 3   | Default (Auto)   | Tesseract tự chọn engine tốt nhất theo dữ liệu và model.                            | Dùng khi không chắc chọn engine nào.                     |
+
+    Thực tế: đa số dùng --oem 1 hoặc --oem 3.
 
 - `--psm #num#` : Xác định cách Tesseract phân tích bố cục trang:
-    - 0 : Chỉ dùng OSD (Orientation & Script Detection).
-    - 1 : Auto page segmentation + OSD. (tự động tìm bố cục văn bản trong ảnh (chia thành dòng, đoạn, cột) mà không cần chỉ định.)
-    - 3 : Auto page segmentation, không OSD (phổ biến mặc định).
-    - 4 : Xem ảnh như 1 khối văn bản duy nhất (single column).
-    - 5 : Xem ảnh là 1 block text duy nhất, chỉ 1 cột
-    - 6 : Xem ảnh như 1 block đơn dòng (single uniform block).
-    - 7 : OCR 1 dòng duy nhất.
-    - 8 : OCR 1 word.
-    - 9 : OCR 1 word có số trong đó.
-    - 11 : OCR 1 dòng số.
+  
+| Giá trị | Ý nghĩa                                            | Trường hợp dùng                                                       |
+| ------- | -------------------------------------------------- | --------------------------------------------------------------------- |
+| 0       | Chỉ phát hiện orientation + script detection (OSD) | Muốn biết ảnh xoay mấy độ, ngôn ngữ gì; không cần OCR text            |
+| 1       | Auto + OSD                                         | Scan tài liệu chưa chắc xoay đúng chiều hoặc nhiều script             |
+| 2       | Auto (không OSD)                                   | OCR nhanh, ảnh chắc chắn đúng chiều, một trang đầy đủ                 |
+| 3       | Auto, coi cả ảnh là 1 trang (mặc định)             | OCR tài liệu chuẩn, nhiều đoạn text (default thường dùng)             |
+| 4       | Giả định có 1 block văn bản dọc                    | Trang báo, sách – một khối text chính, không nhiều cột                |
+| 5       | Giả định có 1 block văn bản dọc, cho căn thẳng     | Văn bản in thẳng hàng, không layout phức tạp                          |
+| 6       | Giả định có block văn bản đơn, không OSD           | OCR đoạn text rõ ràng, đã biết không xoay, chỉ 1 khối                 |
+| 7       | Treat image as a single text line                  | OCR một dòng text (vd: captcha, ảnh có 1 dòng số)                     |
+| 8       | Treat image as a single word                       | OCR một từ duy nhất (logo, nhãn mác)                                  |
+| 9       | Treat image as a single word in circle             | OCR chữ khắc vòng tròn (coin, logo dạng vòng)                         |
+| 10      | Treat image as a single character                  | OCR 1 ký tự duy nhất (captcha ký tự, nhận dạng số)                    |
+| 11      | Sparse text (nhiều dòng, không cần thứ tự)         | Ảnh chụp nhiều text rời rạc, không cần giữ thứ tự đọc                 |
+| 12      | Sparse text + OSD                                  | Giống 11 nhưng có xoay và nhận diện script                            |
+| 13      | Raw line (OCR không layout analysis)               | OCR dòng text thô, không phân tích bố cục; dùng cho training/test OCR |
+
+
+chú thích:
+- 0,1,12: liên quan đến OSD (xoay & script).
+- 2–6: OCR bố cục theo mức khối văn bản.
+- 7–10,13: OCR rất hẹp (line, word, char).
+- 11–12: OCR rời rạc, không quan tâm thứ tự.
