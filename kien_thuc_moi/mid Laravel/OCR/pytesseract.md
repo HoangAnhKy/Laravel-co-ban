@@ -16,6 +16,63 @@ text = pytesseract.image_to_string(Image.open('sample.png'), lang='eng+vie')
 print(text) # nội dung ảnh
 ```
 
+- Ứng dụng: OCR cơ bản 
+  - lấy toàn bộ văn bản trong ảnh.
+  - Scan tài liệu, hóa đơn, giấy tờ.
+  - Đọc text từ ảnh chụp màn hình.
+  - Trích xuất văn bản để dịch tự động hoặc phân tích.
+
+# ký tự + tọa độ `image_to_boxes`
+
+```py
+from PIL import Image
+import pytesseract
+
+boxes = pytesseract.image_to_boxes(Image.open("sample.png"), lang="eng")
+print(boxes)  # "A 50 100 70 120 0\nB 72 100 92 120 0..."
+```
+
+- Ứng dụng: 
+  - Trả về vị trí từng ký tự trong ảnh (tọa độ bounding box).
+  - Dùng để highlight từng ký tự.
+  - Nhận diện chữ cái riêng lẻ (ví dụ captcha, viết tay từng ký tự).
+
+# `image_to_data` → Trả về cấu trúc phân tích
+
+- dạng `Dict`
+    ```py
+    from PIL import Image
+    import pytesseract
+    from pytesseract import Output
+
+    data = pytesseract.image_to_data(Image.open("sample.png"), lang="eng", output_type=Output.DICT)
+    print(data.keys())  # dict có các field: level, page_num, block_num, line_num, word_num, left, top, width, height, conf, text
+    print(data["text"][:10])  # in thử 10 từ OCR được
+    ```
+
+- dạng `DataFrame`
+
+    ```py
+    from PIL import Image
+    import pytesseract
+    from pytesseract import Output
+
+    df = pytesseract.image_to_data(Image.open("sample.png"), lang="eng", output_type=Output.DATAFRAME)
+    print(df.head())  # in 5 dòng đầu
+    ```
+- so sánh
+
+    | Output      | Kiểu dữ liệu                     | Dùng khi nào                                    |
+    | ----------- | -------------------------------- | ----------------------------------------------- |
+    | `DICT`      | `dict` Python với list song song | Khi muốn đơn giản, không phụ thuộc pandas       |
+    | `DATAFRAME` | `pandas.DataFrame`               | Khi cần phân tích, lọc, thống kê, trực quan hóa |
+
+
+- Ứng dụng: Trả về chi tiết từng block / đoạn / dòng / từ (kèm tọa độ, độ tin cậy).
+  - Làm ứng dụng highlight văn bản.
+  - Xây hệ thống tìm kiếm văn bản trong ảnh.
+  - Phân tích bố cục (layout analysis).
+
 # Các option cho các hàm trên 
 
 - syntax full option: ví dụ với `image_to_string`
@@ -71,3 +128,23 @@ chú thích:
 - 2–6: OCR bố cục theo mức khối văn bản.
 - 7–10,13: OCR rất hẹp (line, word, char).
 - 11–12: OCR rời rạc, không quan tâm thứ tự.
+  
+
+## option Output(Output.DICT)
+
+```python
+dict_keys([
+    'level',     # cấp độ (block, paragraph, line, word)
+    'page_num',  # số trang (nếu ảnh nhiều trang PDF)
+    'block_num', # số thứ tự block
+    'par_num',   # số thứ tự paragraph trong block
+    'line_num',  # số thứ tự dòng trong paragraph
+    'word_num',  # số thứ tự từ trong dòng
+    'left',      # tọa độ x (bên trái)
+    'top',       # tọa độ y (trên cùng)
+    'width',     # chiều rộng của box
+    'height',    # chiều cao của box
+    'conf',      # độ tin cậy (confidence)
+    'text'       # chuỗi OCR nhận diện được
+])
+```
