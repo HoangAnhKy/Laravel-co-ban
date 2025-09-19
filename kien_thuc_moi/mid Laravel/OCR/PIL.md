@@ -206,3 +206,31 @@ from `PIL` có thể import các module chính sau:
 - `ImageOps` → thao tác tiện ích (grayscale, invert, mirror…)
 - `ImageSequence` → duyệt frame GIF/TIFF
 - `ImageStat` → thống kê ảnh
+
+# Demo 
+
+```py
+from PIL import Image, ImageDraw, ImageFont
+
+# Tạo ảnh trắng
+img = Image.new("RGB", (400, 200), color="white")
+draw = ImageDraw.Draw(img)
+
+# Chọn font (Arial hoặc DejaVuSans có sẵn trên Linux)
+font = ImageFont.truetype("DejaVuSans.ttf", 40)  # 40 = size chữ
+
+text = "Hello, OCR!"
+# Lấy kích thước chữ
+bbox = draw.textbbox((0, 0), text, font=font)
+text_width = bbox[2] - bbox[0]
+text_height = bbox[3] - bbox[1]
+
+# Tính tọa độ để căn giữa
+x = (img.width - text_width) // 2
+y = (img.height - text_height) // 2
+
+# Vẽ chữ
+draw.text((x, y), text, fill="black", font=font)
+
+img.show()
+```
