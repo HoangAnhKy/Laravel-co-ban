@@ -4,14 +4,15 @@
 Module chính để mở, tạo, và xử lý ảnh.
 
 Các hàm chính:
-    - `Image.open(path)` → mở ảnh
-    - `Image.new(mode, size, color)` → tạo ảnh mới
-    - `Image.save(path)` → lưu ảnh
-    - `Image.show()` → mở ảnh
-    - `Image.convert(mode)` → đổi mode (RGB, L, CMYK, …)
-    - `Image.resize((w,h))`, Image.rotate(angle), Image.crop(box)
-    - `Image.filter(...)` → áp dụng bộ lọc
-    - `Image.transpose()` → lật ảnh
+
+- `Image.open(path)` → mở ảnh
+- `Image.new(mode, size, color)` → tạo ảnh mới
+- `Image.save(path)` → lưu ảnh
+- `Image.show()` → mở ảnh
+- `Image.convert(mode)` → đổi mode (RGB, L, CMYK, …)
+- `Image.resize((w,h))`, Image.rotate(angle), Image.crop(box)
+- `Image.filter(...)` → áp dụng bộ lọc
+- `Image.transpose()` → lật ảnh
 
 ## ImageDraw
 
@@ -31,7 +32,7 @@ img.show()
 - hàm hay dùng
 
     | Tên hàm          | Cách dùng                                                                | Mô tả                                               |
-    |------------------|--------------------------------------------------------------------------|-----------------------------------------------------|
+    | ---------------- | ------------------------------------------------------------------------ | --------------------------------------------------- |
     | `point`          | `draw.point((x, y), fill="red")`                                         | Vẽ một hoặc nhiều pixel tại tọa độ                  |
     | `line`           | `draw.line((x1, y1, x2, y2), fill="blue", width=3)`                      | Vẽ đường thẳng hoặc nhiều đoạn nối tiếp             |
     | `rectangle`      | `draw.rectangle((x1, y1, x2, y2), outline="black", fill="yellow")`       | Vẽ hình chữ nhật (có thể có viền + màu nền)         |
@@ -46,7 +47,7 @@ img.show()
 - option của các hàm trên
 
     | Thuộc tính     | Dùng ở                                                                          | Ví dụ                                      | Ý nghĩa                                                                       |
-    |----------------|---------------------------------------------------------------------------------|--------------------------------------------|-------------------------------------------------------------------------------|
+    | -------------- | ------------------------------------------------------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------------- |
     | `fill`         | Hầu hết các hàm (`point`, `line`, `rectangle`, `ellipse`, `polygon`, `text`, …) | `fill="red"`                               | Màu tô bên trong (hoặc màu pixel/đường)                                       |
     | `outline`      | `rectangle`, `ellipse`, `polygon`, `pieslice`                                   | `outline="black"`                          | Màu viền                                                                      |
     | `width`        | `line`, `arc`, `rectangle`                                                      | `width=3`                                  | Độ dày nét vẽ                                                                 |
