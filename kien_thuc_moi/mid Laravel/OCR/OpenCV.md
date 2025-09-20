@@ -7,7 +7,7 @@ pip install opencv-python
 # Các hàm chính
 
 ## Đọc / ghi ảnh – video
-- `cv2.imread("img.png")` → đọc ảnh.
+- `cv2.imread("img.png")` → đọc ảnh. trả về numpy array `[254, 255](bit)`
 - `cv2.imwrite("out.png", img)` → lưu ảnh.
 - `cv2.imshow("window", img)` → hiển thị ảnh.
 - `cv2.VideoCapture(0)` → mở webcam.
@@ -19,7 +19,13 @@ pip install opencv-python
 - `cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)`→ nhị phân hóa ảnh.
 - `cv2.GaussianBlur(img, (5,5), 0)`→ làm mờ Gaussian.
 - `cv2.Canny(img, 100, 200)`→ phát hiện biên cạnh.
-- 
+- `cv2.convertScaleAbs(img, alpha=1.0, beta=-50)` → cân bằng sáng
+  - alpha = độ tương phản, beta = độ sáng (số âm = tối hơn, số dương = sáng hơn)
+  - alpha > 1 → tăng tương phản (contrast).
+  - 0 < alpha < 1 → giảm tương phản.
+  - beta > 0 → làm sáng ảnh.
+  - beta < 0 → làm tối ảnh.
+  
 ## Hình học
 - `cv2.line(img, (x1,y1), (x2,y2), color, thickness)` → vẽ đường.
 - `cv2.rectangle(img, (x1,y1), (x2,y2), color, thickness)` → vẽ hình chữ nhật.
@@ -41,3 +47,18 @@ pip install opencv-python
 - `cap = cv2.VideoCapture(0)` → lấy frame từ webcam.
 - `ret, frame = cap.read()` → đọc frame.
 - `cv2.imshow("Video", frame)` → hiển thị frame.
+
+
+# Demo
+
+## đọc và show img
+
+```py
+import cv2
+
+path = "./image.png"
+img = cv2.imread(path)
+cv2.imshow("windown", img)
+cv2.waitKey(0)  # chờ nhấn phím bất kỳ
+cv2.destroyAllWindows() # Đóng các cửa sổ sau khi bấm các nút bất kì
+```
