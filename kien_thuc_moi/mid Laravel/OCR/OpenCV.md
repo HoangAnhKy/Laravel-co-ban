@@ -62,3 +62,70 @@ cv2.imshow("windown", img)
 cv2.waitKey(0)  # chờ nhấn phím bất kỳ
 cv2.destroyAllWindows() # Đóng các cửa sổ sau khi bấm các nút bất kì
 ```
+
+## lưu text vào ảnh
+
+```py
+
+import cv2
+import numpy as np
+
+# --- 1. Tạo ảnh trắng mới ---
+width, height = 800, 600  # chiều rộng x chiều cao
+img_new = 255 * np.ones((height, width, 3), dtype=np.uint8)  # ảnh trắng, bỏ 255 đi thì là ảnh đen
+
+# img = cv2.imread("demo2.png")  # ảnh gốc
+# img_copy = img.copy()        # bản sao để vẽ
+
+# --- 2. Text muốn vẽ ---
+text = "Hello World trên ảnh trắng"
+
+# --- 3. Vẽ text lên ảnh ---
+font = cv2.FONT_HERSHEY_SIMPLEX
+font_scale = 1
+color = (0, 0, 255)  # đỏ
+thickness = 3   # Độ dày của text
+x, y = 50, 100  # vị trí text
+
+cv2.putText(img_new, text, (x, y), font, font_scale, color, thickness)
+
+# --- 4. Hiển thị và lưu ---
+cv2.imshow("White Image with Text", img_new)
+cv2.imwrite("white_image_with_text.png", img_new)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+```
+
+## Sử dụng font khác các font được hỗ  trợ trong opencv, sử  dụng thêm thư viện PIL
+
+```py
+from PIL import Image, ImageDraw, ImageFont
+import cv2
+import numpy as np
+
+# --- 1. Tạo ảnh trắng mới ---
+width, height = 800, 600
+img_pil = Image.new("RGB", (width, height), (255, 255, 255))  # ảnh trắng
+draw = ImageDraw.Draw(img_pil)
+
+# --- 2. Text muốn vẽ ---
+text = "Xin chào thế giới! Đây là text tiếng Việt."
+
+# --- 3. Load font Times New Roman ---
+font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+ # đường dẫn đến font
+font_size = 40
+font = ImageFont.truetype(font_path, font_size)
+
+# --- 4. Vẽ text lên ảnh ---
+x, y = 50, 100
+draw.text((x, y), text, font=font, fill=(0, 0, 255))  # chữ đỏ
+
+# --- 5. Chuyển sang OpenCV để hiển thị hoặc lưu ---
+img_cv = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+
+cv2.imshow("Vietnamese Text Image", img_cv)
+cv2.imwrite("white_image_with_vietnamese_text.png", img_cv)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+```
