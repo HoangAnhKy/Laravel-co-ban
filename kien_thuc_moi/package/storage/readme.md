@@ -1,3 +1,5 @@
+Muốn chỉnh sửa đường dẫn hay tạo thêm đường dẫn tới các nơi lưu trữ khác thì vào `filesystem.php`
+
 # Lệnh tạo symbolic link để truy cập file từ public
 Để sử dụng `Storage` để lấy file từ thư mục public, bạn cần chạy lệnh sau:
 
