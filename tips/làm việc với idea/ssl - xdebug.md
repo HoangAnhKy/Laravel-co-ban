@@ -105,11 +105,11 @@ Host github.com
 
 ## **Phím tắt debug hữu ích trong PhpStorm:**
 
-    | Shortcut | Mô tả |
-    | --- | --- |
-    | `Shift + F9` | Bật/tắt tạo "Listening for debug session" |
-    | `F9 (Resume)` | Resume chạy tiếp đến breakpoint kế tiếp |
-    | `F8 (Step Over)` | Chạy qua dòng code, không vào function call |
-    | `F7 (Step Into)` | Chạy từng bước chi tiết vào function |
-    | `Shift + F8 (Step Out)` | Trở lại hàm gọi trước đó |
-    | `Alt + F9` | Tạo mới Run/Debug config |
+| Shortcut                | Mô tả                                       |
+|-------------------------|---------------------------------------------|
+| `Shift + F9`            | Bật/tắt tạo "Listening for debug session"   |
+| `F9 (Resume)`           | Resume chạy tiếp đến breakpoint kế tiếp     |
+| `F8 (Step Over)`        | Chạy qua dòng code, không vào function call |
+| `F7 (Step Into)`        | Chạy từng bước chi tiết vào function        |
+| `Shift + F8 (Step Out)` | Trở lại hàm gọi trước đó                    |
+| `Alt + F9`              | Tạo mới Run/Debug config                    |
