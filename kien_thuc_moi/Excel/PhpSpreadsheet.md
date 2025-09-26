@@ -40,6 +40,9 @@ public function export(array $data, $output_type = "F"){
             $form->getActiveSheet()->setCellValue('A' . $i, $item->id ?? '');
             $form->getActiveSheet()->setCellValue('B' . $i, $item->full_name ?? '');
             $form->getActiveSheet()->setCellValue('C' . $i, $item->email ?? '');
+            // $Bulk = [ $item->id,  $item->full_name, $item->email]
+            // $sheet->fromArray($Bulk, null, "A$i"); 
+            // import nhiều 1 lúc giúp giảm tải
             if ($key < count($data))
                 $i++;
         }
@@ -54,8 +57,6 @@ public function export(array $data, $output_type = "F"){
     // màu nền: sheet->getStyle('A1')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFFF00');
     // màu chữ : $sheet->getStyle('A1')->getFont()->getColor()->setARGB('FFFF0000');
 
-
-
     // option save
     $filename = "export_" . now()->format('Y_m_d_H_i_s') . ".xlsx";
     $objWriter = new Xlsx($form);
@@ -68,6 +69,8 @@ public function export(array $data, $output_type = "F"){
         header('Cache-Control: max-age=0');
         $objWriter->save('php://output');
     }
+    
+    $form->disconnectWorksheets(); // ngắt kêt nối giải phóng bộ nhớ
 
 }
 ```
