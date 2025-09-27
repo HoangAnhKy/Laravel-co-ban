@@ -10,7 +10,6 @@ pip install pdfplumber
 ## Document
 - `pdf.pages` → danh sách các trang (Page objects).
 - `pdf.metadata` → metadata (title, author, subject...).
-- `pdf.open_metadata()` → metadata dạng dictionary chi tiết.
 - `pdf.open_outline()` → outline/bookmark (nếu có).
 
 ## Page
@@ -28,7 +27,27 @@ pip install pdfplumber
   - `page.rects`→ danh sách hình chữ nhật (PDF elements).
   - `page.lines`→ danh sách đường kẻ.
   - `page.curves` → danh sách đường cong.
+## image 
 
+- `to_image()` → chuyển pdf qua ảnh 
+
+    ```py
+    page.to_image(
+        resolution=150,     # DPI khi render trang PDF thành ảnh
+        zoom=1.0,           # Phóng to/thu nhỏ toàn bộ trang (scale)
+        antialias=False,    # Làm mượt cạnh chữ/hình (anti-aliasing)
+        grayscale=False     # Xuất ảnh dạng grayscale thay vì màu
+    )
+    ```
+- `crop(left, top, right, bottom)` → Cắt ảnh
+- `draw_rect` → vẽ lên ảnh
+    ``` py
+    im.draw_rect((x0, top, x1, bottom), fill=None, stroke="red", stroke_width=2)
+
+    im.draw_line((x0, top, x1, bottom), stroke="blue", stroke_width=2)
+
+    im.draw_circle((cx, cy, r), fill="yellow", stroke="black")
+    ```
 # Ví dụ
 
 ## lấy text
