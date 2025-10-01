@@ -86,6 +86,10 @@
   $process = new Process(['python3', base_path('scripts/demo.py')]);
   $process->setInput(json_encode(['a' => 1, 'b' => 2]));
   ```
+- `setEnv([$key=>$value])` → thiết lập biến môi trường.
+  ```php
+  $process->setEnv(['PYTHONPATH' => '/home/ubuntu/.local/lib/python3.10/site-packages']);
+  ```
 
 # Demo
 
