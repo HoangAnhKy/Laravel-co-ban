@@ -85,3 +85,140 @@ function joinUpdateCourseAndUser () {
 ```js
 INSERT IGNORE INTO users (id, name) VALUES (1, 'John');
 ```
+
+# Xoay bảng tự động theo cột
+
+ví dụ: 
+
+- Dữ liệu gốc (dt_delivery_data + mst_customer) có dạng:
+
+| real_date  | prefecture | company_name | customer_id | goods_price |
+| ---------- | ---------- | ------------ | ----------- | ----------- |
+| 2025-07-01 | Tokyo      | A Corp       | 1           | 1000        |
+| 2025-07-01 | Tokyo      | B Corp       | 2           | 2000        |
+
+
+- khi xoay 
+
+| ym      | prefecture | A Corp_customer_id | A Corp_goods_price | B Corp_customer_id | B Corp_goods_price |
+| ------- | ---------- | ------------------ | ------------------ | ------------------ | ------------------ |
+| 2025/07 | Tokyo      | 1                  | 1000               | 1                  | 2000               |
+
+
+## Nguyên lý
+
+### Tạo pivot columns động
+
+```sql
+SET @sql = NULL;
+
+SELECT GROUP_CONCAT(
+    DISTINCT CONCAT(
+        'Count(CASE WHEN t.company_name = ''', company_name, ''' THEN t.customer_id END) AS `', company_name, '`, ',
+        'SUM(CASE WHEN t.company_name = ''', company_name, ''' THEN t.goods_price ELSE 0 END) AS `', company_name, '`'
+    )
+) INTO @sql
+FROM (
+    SELECT DISTINCT c.company_name
+    FROM dt_delivery_data d
+    LEFT JOIN mst_customer c ON c.customer_id = d.customer_id
+) AS company_list;
+```
+Giải thích:
+
+- `SELECT DISTINCT c.company_name ...` Lấy tất cả tên công ty duy nhất từ dữ liệu.
+
+- `GROUP_CONCAT(CONCAT(...))` Tạo ra một chuỗi SQL gồm các cột pivot
+
+    ```sql
+    Count(CASE WHEN t.company_name = 'A Corp' THEN t.customer_id END) AS `A Corp`,
+    SUM(CASE WHEN t.company_name = 'A Corp' THEN t.goods_price ELSE 0 END) AS `A Corp`,
+    Count(CASE WHEN t.company_name = 'B Corp' THEN t.customer_id END) AS `B Corp`,
+    SUM(CASE WHEN t.company_name = 'B Corp' THEN t.goods_price ELSE 0 END) AS `B Corp`
+    ```
+- `CASE WHEN ... THEN ... END` là cách tính có điều kiện: Chỉ tính customer_id hoặc goods_price khi company_name trùng với công ty hiện tại.
+
+- `GROUP_CONCAT` nối tất cả các cột pivot thành một chuỗi dài để dùng trong query cuối cùng.
+- `@sql` sẽ giữ chuỗi SQL này, ví dụ:`@sql = "Count(CASE WHEN t.company_name = 'A Corp' THEN t.customer_id END) AS `A Corp`, SUM(CASE WHEN t.company_name = 'A Corp' THEN t.goods_price ELSE 0 END) AS `A Corp`, ..."`
+
+### Tạo query chính
+
+```sql
+SET @sql = CONCAT(
+'SELECT DATE_FORMAT(t.real_date, ''%Y/%m'') AS ym,
+        t.prefecture, ',
+@sql, '
+ FROM (
+    SELECT d.real_date,
+           c.prefecture,
+           c.company_name,
+           d.customer_id,
+           d.goods_price
+    FROM dt_delivery_data d
+    LEFT JOIN mst_customer c ON c.customer_id = d.customer_id
+) AS t
+GROUP BY ym, t.prefecture
+ORDER BY ym, t.prefecture;'
+);
+```
+
+- `CONCAT(...)` nối chuỗi SQL để tạo full query.
+- `@sql` Chèn các cột pivot đã tạo.
+
+### Thực thi
+
+```sql
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+```
+
+
+## Logic vận hành tổng thể
+- Xác định danh sách cột cần pivot (từ công ty).
+- Tạo chuỗi SQL cho các cột pivot bằng GROUP_CONCAT.
+- Chèn chuỗi pivot vào query chính, dùng CASE WHEN để tính COUNT và SUM.
+- Nhóm dữ liệu theo tháng và tỉnh.
+- Thực thi query động bằng PREPARE → EXECUTE.
+
+## SQL Demo
+
+```sql
+-- 1. Tạo các cột pivot cho customer_id và goods_price
+SET @sql = NULL;
+
+SELECT GROUP_CONCAT(
+    DISTINCT CONCAT(
+        'Count(CASE WHEN t.company_name = ''', company_name, ''' THEN t.customer_id END) AS `', company_name, '`, ',
+        'SUM(CASE WHEN t.company_name = ''', company_name, ''' THEN t.goods_price ELSE 0 END) AS `', company_name, '`'
+    )
+) INTO @sql
+FROM (
+    SELECT DISTINCT c.company_name
+    FROM dt_delivery_data d
+    LEFT JOIN mst_customer c ON c.customer_id = d.customer_id
+) AS company_list;
+
+-- 2. Chuẩn bị query chính
+SET @sql = CONCAT(
+'SELECT DATE_FORMAT(t.real_date, ''%Y/%m'') AS ym,
+        t.prefecture, ',
+@sql, '
+ FROM (
+    SELECT d.real_date,
+           c.prefecture,
+           c.company_name,
+           d.customer_id,
+           d.goods_price
+    FROM dt_delivery_data d
+    LEFT JOIN mst_customer c ON c.customer_id = d.customer_id
+) AS t
+GROUP BY ym, t.prefecture
+ORDER BY ym, t.prefecture;'
+);
+
+-- 3. Thực thi dynamic SQL
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+```
