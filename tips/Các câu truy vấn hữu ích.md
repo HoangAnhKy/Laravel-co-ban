@@ -4,6 +4,14 @@
 - [Câu lệnh update hoặc insert](#câu-lệnh-update-hoặc-insert)
 - [join update](#join-update)
 - [INSERT IGNORE](#insert-ignore)
+- [Xoay bảng tự động theo cột](#xoay-bảng-tự-động-theo-cột)
+  - [Nguyên lý](#nguyên-lý)
+    - [Tạo pivot columns động](#tạo-pivot-columns-động)
+    - [Tạo query chính](#tạo-query-chính)
+    - [Thực thi](#thực-thi)
+  - [Logic vận hành tổng thể](#logic-vận-hành-tổng-thể)
+  - [SQL Demo](#sql-demo)
+  - [Laravel Demo](#laravel-demo)
 ***
 
 # Tạo bảng tạm
@@ -221,4 +229,52 @@ ORDER BY ym, t.prefecture;'
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
+```
+
+## Laravel Demo
+
+```php
+Route::get('/pivot', function () {
+    // Cho phép GROUP_CONCAT dài hơn mặc định
+    DB::statement("SET SESSION group_concat_max_len = 1000000");
+
+    // Lấy phần SQL động — ép về string rõ ràng
+    $sqlDynamic = DB::table('course as c')
+        ->join('users as u', 'u.course_id', '=', 'c.id')
+        ->selectRaw("
+            GROUP_CONCAT(
+                DISTINCT CONCAT(
+                    'COUNT(CASE WHEN c.name = ''', c.name, ''' THEN u.id END) AS `', c.name, '_total`, ',
+                    'COUNT(CASE WHEN c.name = ''', c.name, ''' AND u.sex = ''female'' THEN u.id END) AS `', c.name, '_female`'
+                )
+                SEPARATOR ', '
+            ) as cols
+        ")
+        ->first();
+
+    // Nếu không có dữ liệu → báo lỗi
+    if (!$sqlDynamic || !$sqlDynamic->cols) {
+        return response()->json(['error' => 'Không có dữ liệu pivot.'], 400);
+    }
+
+    // Convert Expression thành string
+    $cols = (string) $sqlDynamic->cols;
+
+    // Ghép query động
+    $query2 = "
+        SELECT
+            DATE_FORMAT(c.created_at, '%Y-%m') AS month,
+            {$cols}
+        FROM users u
+        JOIN course c ON u.course_id = c.id
+        GROUP BY DATE_FORMAT(c.created_at, '%Y-%m')
+        ORDER BY month;
+    ";
+
+    // Thực thi SQL
+    $result = DB::select($query2);
+
+    // Trả kết quả
+    return response()->json($result);
+});
 ```
