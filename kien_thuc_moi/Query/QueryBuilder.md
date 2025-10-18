@@ -304,3 +304,26 @@ Laravel Query Builder cung cấp nhiều hàm mạnh mẽ để xây dựng và 
         ]);
     }
   ```
+
+## Xóa bỏ một điều kiện nào đó trong query sau khi query đã được build.
+
+```php
+  // Lấy toàn bộ query
+  $wheres = $q->wheres;
+  // tìm và bỏ các field đã where trước đó
+  $field = "year"
+  $years  = [2024, 2025];
+
+  $newWheres = collect($wheres)->reject(function ($where) use ($field) {
+      // nó chỉ xóa những where cơ bản và whereIn, và cột có column hoặc cột đầu tiền là field cần xóa thì loại bỏ
+      return ($where['type'] === 'Basic' || $where['type'] === 'In') && ($where['column'] ?? $where['first'] ?? null) === $field;
+  })->all();
+  // gán lại wheres
+  $q->wheres = $newWheres;
+  // phải giữ lại các giá trị binding vào câu query và loại bỏ các query ở field bị bỏ
+  $q->bindings['where'] = collect($q->bindings['where'] ?? [])->filter(function ($v, $k) use ($wheres, $newWheres) {
+      return $k < count($newWheres);
+  })->values()->all();
+  // gán lại query
+  $q->whereIn($field, $years);
+```
