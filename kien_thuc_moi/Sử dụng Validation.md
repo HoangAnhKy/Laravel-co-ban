@@ -303,3 +303,31 @@ public function Register(Request $req){
 }
 */
 ```
+
+## Validate với dữ liệu detail
+
+- dataRequest 
+    ```json
+    {
+    "carts": [
+        {
+        "product_id": 1,
+        "quantity": 2
+        },
+        {
+        "product_id": 1,
+        "quantity": 2
+        }
+    ]
+    }
+    ```
+- validate
+
+    ```php
+    $validated = Validator::make($request, [
+        "carts" => "required|array",
+        "carts.*.product_id" => "required|exists:products,id",
+        "carts.*.quantity" => "required|integer|min:1",
+    ]);
+    $data = $validated->validated();
+    ```
