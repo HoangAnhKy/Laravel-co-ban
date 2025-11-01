@@ -1,3 +1,13 @@
+- [docs](#docs)
+- [plugin](#plugin)
+    - [filepond-plugin-image-preview](#filepond-plugin-image-preview)
+- [code demo](#code-demo)
+  - [code back-end](#code-back-end)
+  - [code giao diện](#code-giao-diện)
+- [upload code theo dạng trunk file](#upload-code-theo-dạng-trunk-file)
+
+***
+
 # [docs](https://github.com/pqina/filepond)
 
 # plugin
@@ -27,7 +37,7 @@ Xem trước hình ảnh
 
 # code demo
 
-- code back-end
+## code back-end
 
   ```php
   <?php
@@ -85,7 +95,7 @@ Xem trước hình ảnh
   });
   ```
 
-- code giao diện
+## code giao diện
 
   - khởi tạo form
     ```php
@@ -187,7 +197,7 @@ Xem trước hình ảnh
     });
     ```
 
-- upload code theo dạng trunk file
+# upload code theo dạng trunk file
 
   ```js
   process: (fieldName, file, metadata, load, error, progress, abort) => {
