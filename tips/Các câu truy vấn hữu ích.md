@@ -12,6 +12,7 @@
   - [Logic vận hành tổng thể](#logic-vận-hành-tổng-thể)
   - [SQL Demo](#sql-demo)
   - [Laravel Demo](#laravel-demo)
+- [insertUsing](#insertusing)
 ***
 
 # Tạo bảng tạm
@@ -278,3 +279,38 @@ Route::get('/pivot', function () {
     return response()->json($result);
 });
 ```
+
+# insertUsing
+
+Dùng để chèn dữ liệu vào một bảng bằng kết quả của truy vấn SELECT `(tức là INSERT INTO ... SELECT ... trong SQL)`, phải đặt theo thứ tự
+
+- kiểu `query builder`
+  
+    ```php
+    DB::table('orders')->insertUsing(
+        ['user_id', 'status', 'total_price', 'created_by', 'created_at', 'updated_at'],
+        DB::table('carts')->select(
+                'user_id',
+                DB::raw(config('define.ORDERS_STATUS.PENDING') . ' as status'),
+                'total_price',
+                DB::raw(Auth::id() . ' as created_by'),
+                DB::raw('NOW() as created_at'),
+                DB::raw('NOW() as updated_at')
+            )
+            ->where('id', $cartID)
+    );
+    ```
+
+- Kiểu query thuần
+
+    ```php
+    $status = config('define.ORDERS_STATUS.PENDING');
+    $userId = Auth::id();
+    $sql = "
+        INSERT INTO orders (user_id, status, total_price, created_by, created_at, updated_at)
+        SELECT user_id, ?, total_price, ?, NOW(), NOW()
+        FROM carts
+        WHERE id = ?
+    ";
+    return DB::statement($sql, [$status, $userId, $cartID]);
+    ```
