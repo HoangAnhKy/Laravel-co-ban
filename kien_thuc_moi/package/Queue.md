@@ -203,3 +203,13 @@ php artisan queue:flush #Xóa Các Job Thất Bại
         });
     }
     ```
+
+    # trait hay dùng 
+
+    | **Trait**                        | **Dùng trong**                | **Chức năng chính**                                                                             | **Ví dụ sử dụng thực tế**                                |
+    | -------------------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+    | 🧱 `Dispatchable`                 | **Job / Event / Listener**    | Cho phép gọi `::dispatch()` để đẩy job hoặc event vào queue.                                    | `SendEmailJob::dispatch($user);`                         |
+    | 🔁 `InteractsWithQueue`           | **Job / Listener**            | Cung cấp các method tương tác trực tiếp với job trong hàng đợi (retry, fail, release, delete…). | `$this->release(30); // chạy lại sau 30s`                |
+    | 🚚 `Queueable`                    | **Job / Listener / Mailable** | Cấu hình thuộc tính queue: tên queue, delay, connection…                                        | `$this->onQueue('emails')->delay(now()->addMinutes(5));` |
+    | 📦 `SerializesModels`             | **Job / Listener / Mailable** | Tự động serialize (biến thành ID) và unserialize (load lại model) khi job qua queue.            | `$this->user = $user; // Model được serialize an toàn`   |
+    | 💌 `Queueable` *(trong Mailable)* | **Mailable**                  | Cho phép mail được xếp hàng khi gọi `Mail::to()->queue()`.                                      | `Mail::to($email)->queue(new WelcomeMail($user));`       |
