@@ -139,6 +139,17 @@ php artisan queue:flush #Xóa Các Job Thất Bại
     ```sh
     SendWelcomeEmail::dispatch($user);
     ```
+- `dispatch_sync()` Job chạy ngay trong request, request chờ job xong phù hợp job nhẹ
+    ```php
+    Route::get('/', function () {
+        try {
+            $result = dispatch_sync(new \App\Jobs\DemoJob());
+            return 'Job ran successfully!';
+        } catch (\Throwable $e) {
+            return 'Job failed: ' . $e->getMessage();
+        }
+    });
+    ```
 
 - `dispatchNow()` thực thi job ngay lập tức mà không đưa vào queue.
 
