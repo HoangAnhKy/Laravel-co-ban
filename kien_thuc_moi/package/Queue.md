@@ -224,3 +224,55 @@ php artisan queue:flush #Xóa Các Job Thất Bại
     | 🚚 `Queueable`                    | **Job / Listener / Mailable** | Cấu hình thuộc tính queue: tên queue, delay, connection…                                        | `$this->onQueue('emails')->delay(now()->addMinutes(5));` |
     | 📦 `SerializesModels`             | **Job / Listener / Mailable** | Tự động serialize (biến thành ID) và unserialize (load lại model) khi job qua queue.            | `$this->user = $user; // Model được serialize an toàn`   |
     | 💌 `Queueable` *(trong Mailable)* | **Mailable**                  | Cho phép mail được xếp hàng khi gọi `Mail::to()->queue()`.                                      | `Mail::to($email)->queue(new WelcomeMail($user));`       |
+
+
+# Xử lý jobs nặng
+
+- nên tạo thêm 1 bảng database để  lưu jobs đang chạy, sau đó cập nhật status và error nếu có
+- tạo thêm `listener` lắng nghe từ `event JobFailed`, nó sẽ tự động chạy vào nếu job chạy lỗi hoặc timeout
+```php
+<?php
+
+namespace App\Listeners;
+
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+class UpdateBatchJobOnFail
+{
+    public function handle(JobFailed $event): void
+    {
+        try {
+            $payload = $event->job->payload();
+
+            if (!isset($payload['data']['command'])) return;
+
+            $command = unserialize($payload['data']['command']);
+
+            if ($command instanceof \App\Jobs\DemoJob && isset($command->idSession)) {
+
+                // Lấy message lỗi từ event (nếu có)
+                $error = $event->exception->getMessage();
+                $statusMsg = 'Job failed';
+                if (strpos($error, 'timeout') !== false) {
+                    $statusMsg = 'Job timeout';
+                }
+
+                DB::table('batchJob')
+                    ->where('id_session', $command->idSession)
+                    ->update([
+                        'status' => 2, // failed
+                        'error' => $error ?: $statusMsg,
+                        'updated_at' => now(),
+                    ]);
+
+                Log::info("BatchJob updated to failed, idSession: " . $command->idSession . ", error: " . ($error ?: $statusMsg));
+            }
+
+        } catch (\Throwable $e) {
+            Log::error("Failed to update batchJob status: " . $e->getMessage());
+        }
+    }
+}
+```
