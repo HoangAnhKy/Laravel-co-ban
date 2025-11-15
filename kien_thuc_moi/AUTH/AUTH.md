@@ -218,6 +218,16 @@ Route::group(['prefix' => '/users', "middleware" => CheckRole::class], function(
     {
         return Response::deny('Bạn không có quyền tạo sản phẩm này.');
     }
+    /*
+    // có thể dùng như này trong controller
+    use Illuminate\Auth\Access\AuthorizationException;
+    try {
+        Gate::authorize('update', $product);
+    } catch (AuthorizationException $e) {
+        throw new AuthorizationException('Không được phép thực hiện hành động này!');
+    }
+
+    /*
     ```
 
 
