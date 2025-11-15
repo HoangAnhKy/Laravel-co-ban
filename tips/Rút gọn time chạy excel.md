@@ -1,3 +1,17 @@
+# set lại thời gian chạy
+
+```php
+ini_set('memory_limit', '2G');
+/*
+Mục đích: tăng giới hạn bộ nhớ (RAM) mà PHP script được sử dụng.
+
+Ví dụ:
+Mặc định PHP có thể chỉ cho script dùng 128M hoặc 256M
+Nếu xử lý file Excel lớn, import/export, hình ảnh, PDF, hoặc query nhiều record, script có thể out of memory
+2G = 2 Gigabyte → script có thể dùng tối đa 2GB RAM.
+*/
+set_time_limit(0); // script không bị timeout
+```
 # Nếu chỉ cần lấy giá trị
 
 ### dùng DB::table('users') thay vì eloquent
