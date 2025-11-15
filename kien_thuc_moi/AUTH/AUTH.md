@@ -212,6 +212,12 @@ Route::group(['prefix' => '/users', "middleware" => CheckRole::class], function(
         // Ví dụ: Chỉ admin hoặc người tạo course mới có quyền phê duyệt
         return $user->position === 'admin' || $user->id === $courses->created_by;
     }
+
+    // chỉnh messager 
+    public function create(Users $users)
+    {
+        return Response::deny('Bạn không có quyền tạo sản phẩm này.');
+    }
     ```
 
 
