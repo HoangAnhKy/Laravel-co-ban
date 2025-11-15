@@ -13,6 +13,7 @@
   - [SQL Demo](#sql-demo)
   - [Laravel Demo](#laravel-demo)
 - [insertUsing](#insertusing)
+- [so sánh và tìm hiểu `cursorPaginate` và `paginate`](#so-sánh-và-tìm-hiểu-cursorpaginate-và-paginate)
 ***
 
 # Tạo bảng tạm
@@ -313,4 +314,16 @@ Dùng để chèn dữ liệu vào một bảng bằng kết quả của truy v�
         WHERE id = ?
     ";
     return DB::statement($sql, [$status, $userId, $cartID]);
+    ```
+
+# so sánh và tìm hiểu `cursorPaginate` và `paginate`
+- `paginate`: khi page càng lớn, OFFSET càng lớn → query chậm, scan nhiều bản ghi.
+
+    ```php
+    $users = User::paginate(10); // SELECT * FROM users LIMIT 10 OFFSET 100;
+    ```
+-  `cursorPaginate`: Query sẽ dùng WHERE id > last_seen_id LIMIT 10 thay vì OFFSET → rất nhanh. **CursorPaginate chỉ an toàn khi cột dùng làm con trỏ là unique**
+
+    ```php
+    $users = User::orderBy('id')->cursorPaginate(10); // SELECT * FROM users WHERE id > 10 ORDER BY id ASC LIMIT 10;
     ```

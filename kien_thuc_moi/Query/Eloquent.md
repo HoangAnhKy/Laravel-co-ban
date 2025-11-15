@@ -74,6 +74,12 @@
   ```php
   $users = User::paginate(10); // Lấy 10 user trên mỗi trang
   ```
+- `cursorPaginate(n)` cũng dùng để phân trang, Laravel sẽ tạo link next/prev dựa trên id (hoặc cột orderBy). [chi tiết](../../tips/Các%20câu%20truy%20vấn%20hữu%20ích.md#so-sánh-và-tìm-hiểu-cursorpaginate-và-paginate)
+
+  ```php
+  $users = User::orderBy('id')->cursorPaginate(10);
+  // SELECT * FROM users WHERE id > 10 ORDER BY id ASC LIMIT 10;
+  ```
 
 - `{{ $users->withQueryString()->links() }}` dùng để nối câu truy vấn để hiện số trang tiếp theo của câu truy vấn
 
