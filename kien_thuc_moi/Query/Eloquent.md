@@ -7,6 +7,14 @@
                       ->lockForUpdate() // ⚠️ KHÓA DÒNG NÀY
                       ->first();
   ```
+- `get` và `cursor`
+  - `get()` sẽ lấy tất cả kết quả từ database và load vào bộ nhớ dưới dạng `Collection`.
+  - `cursor()` trả về Generator (một kiểu iterator), nghĩa là mỗi bản ghi được lấy ra khi cần, không load tất cả vào RAM cùng lúc.
+  
+  ```php
+  $data = DB::table('users')->orderBy('id')->offset(1900000)->limit(10)->get(); // RAM 32GB 0.40741
+  $data = DB::table('users')->orderBy('id')->offset(1900000)->limit(10)->cursor(); // RAM 32GB 0.00017
+  ```
 
 - `increment` và `decrement` tăng giảm một cột bất kì.
 
