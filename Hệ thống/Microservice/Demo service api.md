@@ -45,6 +45,8 @@ Route::get('/orders/{id}', function ($id) {
 
     // Gọi sang Service A để lấy thông tin user
     $user = Http::get("http://localhost:8001/api/users/{$order['user_id']}")->json();
+    // $response = Http::withToken("TOKEN")->get("https://service-b.local/api/user"); 
+    // SỬ  DỤNG THÊM TOKEN NẾU NÓ ĐƯỢC BẢO MẬT QUA SANCTUM HAY PASSPORT
 
     return [
         'order' => $order,
