@@ -14,6 +14,7 @@
   - [Laravel Demo](#laravel-demo)
 - [insertUsing](#insertusing)
 - [so sánh và tìm hiểu `cursorPaginate` và `paginate`](#so-sánh-và-tìm-hiểu-cursorpaginate-và-paginate)
+- [join bảng theo union và cross join](#join-bảng-theo-union-và-cross-join)
 ***
 
 # Tạo bảng tạm
@@ -327,3 +328,89 @@ Dùng để chèn dữ liệu vào một bảng bằng kết quả của truy v�
     ```php
     $users = User::orderBy('id')->cursorPaginate(10); // SELECT * FROM users WHERE id > 10 ORDER BY id ASC LIMIT 10;
     ```
+
+# join bảng theo union và cross join
+
+điều kiện: lấy toàn bộ tên với product trong năm, db chỉ có năm 2025 không có 2024 nhưng vẫn phải lấy
+
+```sql
+SELECT 
+    y.year,
+    p.product_code,
+    COALESCE(
+        SUM(CASE 
+            WHEN d.month BETWEEN 1 AND 3 THEN d.amount 
+            ELSE 0 
+        END), 0
+    ) AS q1
+FROM mst_product p
+CROSS JOIN (SELECT 2024 AS year UNION ALL SELECT 2025) y
+LEFT JOIN dt_statistics_cus d 
+    ON d.product_code = p.product_code 
+   AND d.year = y.year
+WHERE p.product_code = '01AJA40720MC21-A-T'
+GROUP BY y.year, p.product_code  
+ORDER BY y.year ASC;
+```
+
+cách 2:
+
+
+```sql
+SELECT 
+    2024 AS year,
+    p.product_code,
+    COALESCE(SUM(CASE WHEN d.month BETWEEN 1 AND 3 THEN d.amount ELSE 0 END), 0) AS q1
+FROM mst_product p
+LEFT JOIN dt_statistics_cus d 
+    ON d.product_code = p.product_code AND d.year = 2024
+WHERE p.product_code = '01AJA40720MC21-A-T'
+GROUP BY p.product_code
+
+UNION ALL
+
+SELECT 
+    2025 AS year,
+    p.product_code,
+    COALESCE(SUM(CASE WHEN d.month BETWEEN 1 AND 3 THEN d.amount ELSE 0 END), 0) AS q1
+FROM mst_product p
+LEFT JOIN dt_statistics_cus d 
+    ON d.product_code = p.product_code AND d.year = 2025
+WHERE p.product_code = '01AJA40720MC21-A-T'
+GROUP BY p.product_code
+ORDER BY year;
+```
+
+Code demo bằng laravel
+
+```php
+
+Route::get("/test", function () {
+    $year = 2025;
+    $years = [$year, $year - 1];
+
+    $query = \App\Models\MstProduct::query()
+        ->select([
+            DB::raw("y.year AS year"),
+            "mst_product.product_code",
+            "mst_product.product_name",
+            DB::raw("COALESCE(SUM(CASE WHEN dt_statistics_cus.month BETWEEN 1 AND 3 THEN dt_statistics_cus.count ELSE 0 END), 0) AS count_q1"),
+            DB::raw("COALESCE(SUM(CASE WHEN dt_statistics_cus.month BETWEEN 4 AND 6 THEN dt_statistics_cus.count ELSE 0 END), 0) AS count_q2"),
+            DB::raw("COALESCE(SUM(CASE WHEN dt_statistics_cus.month BETWEEN 7 AND 9 THEN dt_statistics_cus.count ELSE 0 END), 0) AS count_q3"),
+            DB::raw("COALESCE(SUM(CASE WHEN dt_statistics_cus.month BETWEEN 10 AND 12 THEN dt_statistics_cus.count ELSE 0 END), 0) AS count_q4"),
+            DB::raw("COALESCE(SUM(CASE WHEN dt_statistics_cus.month BETWEEN 1 AND 12 THEN dt_statistics_cus.count ELSE 0 END), 0) AS count_total"),
+        ])
+        ->crossJoin(DB::raw('(SELECT ' . implode(' AS year UNION ALL SELECT ', $years) . ' AS year) y'))
+        ->leftJoin('dt_statistics_cus', function ($join) {
+            $join->on('dt_statistics_cus.product_code', '=', 'mst_product.product_code')
+                ->on('dt_statistics_cus.year', '=', DB::raw('y.year'));
+        })
+        ->groupBy('y.year', 'mst_product.product_code', 'mst_product.product_name')
+        ->orderBy('mst_product.product_code')
+        ->orderBy('y.year', 'desc');
+
+    $data = $query->paginate(10)->getCollection()->toArray();
+
+    dd($data);
+});
+```
