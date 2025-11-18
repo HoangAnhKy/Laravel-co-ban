@@ -1,3 +1,19 @@
+# getContent
+
+Dùng để  gọi tới hàm khác xử  lý trong backend
+
+```php
+ $responseExportNote = json_decode(app()->make(DeliveryNoteDetailController::class)->exportNoteDetailPdfFile($requestExportNote)->getContent(), true);
+            if (!$responseExportNote['status']) {
+                throw new \Exception($responseExportNote['message']);
+            }
+
+/*
+app()->make: đại diện cho chỗ  provider, cho phép gọi tới controller khác
+getContent(): Phương thức này được gọi trên đối tượng Response được trả về 
+*/
+```
+
 # khái niệm
 
 trong Laravel, có 2 cách phổ biến để lấy thông tin request
