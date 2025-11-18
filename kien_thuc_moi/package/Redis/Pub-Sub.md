@@ -90,16 +90,6 @@ class RedisSubscriber extends Command
     {
         // Ngăn phpredis tự timeout => sống bất tử 
         ini_set('default_socket_timeout', -1);
-
-        /*
-        // hoặc 60s ping 1 lan
-        pcntl_async_signals(true);
-        pcntl_signal(SIGALRM, function () {
-            \Illuminate\Support\Facades\Redis::client()->ping();
-            $redis->ping();
-        });
-        pcntl_alarm(60);
-        */
         Redis::subscribe(['notifications'], function ($message) {
             $this->info("Received message: " . $message);
             // Bạn có thể xử lý thông báo ở đây, ví dụ: lưu vào cơ sở dữ liệu hoặc phát thông báo real-time
