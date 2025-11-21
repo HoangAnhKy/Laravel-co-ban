@@ -10,6 +10,7 @@ Mục đích:
 Ví dụ: 
 
 ```php
+// throttle:60,1 => 1 phút sài được 60 lần
 Route::middleware('throttle:60,1')->group(function () {
     Route::get('/user', function () {
         return "User info";
@@ -108,3 +109,44 @@ if (RateLimiter::tooManyAttempts($key, 5)) {
 
 // ghi nhận 1 lần gọi
 RateLimiter::hit($key, 60); // 60 giây decay
+```
+
+# Tạo mới middeware
+
+```php
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Cache\RateLimiter;
+use Symfony\Component\HttpFoundation\Response;
+
+class CustomRateLimit
+{
+    protected $limiter;
+
+    public function __construct(RateLimiter $limiter)
+    {
+        $this->limiter = $limiter;
+    }
+
+    public function handle(Request $request, Closure $next): Response
+    {
+        $key = optional($request->user())->id ?: $request->ip(); // key tính theo IP
+
+        // kiểm tra đã quá giới hạn chưa
+        if ($this->limiter->tooManyAttempts($key, 5)) {
+            return response()->json([
+                'message' => 'Bạn gọi API quá nhiều lần, thử lại sau 1 phút!',
+            ], 429);
+        }
+
+        // ghi nhận 1 lần gọi, thời gian decay = 60 giây
+        $this->limiter->hit($key, 60);
+
+        return $next($request);
+    }
+}
+```
