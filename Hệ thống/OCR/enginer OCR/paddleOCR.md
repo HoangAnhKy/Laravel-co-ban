@@ -3,6 +3,16 @@
 ```sh
 pip install paddlepaddle paddleocr
 ```
+# các cờ đã biết 
+
+```py
+use_angle_cls=True                              # xoay ảnh cho đúng
+lang='japan'                                    # Tiếng nhật
+
+use_doc_orientation_classify=False,             # kiểm tra xem có nghiên không, nếu có xoay lại cho đúng. Dùng flase nếu chắc chắn đúng
+use_doc_unwarping=False,                        # làm phẳng tài liệu bị cong
+use_textline_orientation=False,                 # phát hiện hướng của từng dòng chữ
+```
 
 # demo cơ bản
 
