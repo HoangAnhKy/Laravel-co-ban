@@ -80,71 +80,38 @@ result = ocr.ocr("image.png")
 
 ```py
 from paddleocr import PaddleOCR
+from pdf2image import convert_from_path
 import numpy as np
-import cv2
 
-def save_rows_to_img(image_path, merged_rows, out_path):
-    img = cv2.imread(image_path)
-    if img is None:
-        raise ValueError("Không load được ảnh gốc")
+def pdf_to_image_list(FILE):
+    return convert_from_path(FILE, dpi=300)
 
-    for row in merged_rows:
-        x1, y1, x2, y2 = row["bbox"]
-        pts = np.array([
-            [x1, y1],
-            [x2, y1],
-            [x2, y2],
-            [x1, y2]
-        ], dtype=np.int32).reshape((-1,1,2))
+def convert_to_image(pil_img):
+    return np.array(pil_img)
 
-        cv2.polylines(img, [pts], True, (0,255,0), 2)
-        # cv2.putText(img, row["text"], (x1, y1-10),cv2.FONT_HERSHEY_SIMPLEX, 0.7,(0,0,255), 2, cv2.LINE_AA)
+def read_ocr(page, items):
+    for text, poly in zip(page["rec_texts"], page["rec_polys"]):
+        poly = np.array(poly)
+        items.append({
+            "text": text,
+            "poly": poly,
+            "xc": poly[:,0].mean(),
+            "yc": poly[:,1].mean(),
+        })
 
-    cv2.imwrite(out_path, img)
-    print("Đã lưu ảnh:", out_path)
+def group_by_row(items, rows):
+    current = [items[0]]
+    for item in items[1:]:
+        if abs(item["yc"] - current[-1]["yc"]) < 12:
+            current.append(item)
+        else:
+            rows.append(current)
+            current = [item]
+    rows.append(current)
+    return rows
 
-def handleOCR(IMAGE_PATH = "./image copy.png"):
-
-    ocr = PaddleOCR(
-        use_doc_orientation_classify=False, 
-        use_doc_unwarping=False, 
-        use_textline_orientation=False
-    )
-
-    result = ocr.predict(IMAGE_PATH)
-
-    rows = []
+def group_by_poly(rows):
     merged_rows = []
-
-    for page in result:
-        items = []
-
-        # Thu OCR
-        for text, poly in zip(page["rec_texts"], page["rec_polys"]):
-            poly = np.array(poly)
-            items.append({
-                "text": text,
-                "poly": poly,
-                "xc": poly[:,0].mean(),
-                "yc": poly[:,1].mean()
-            })
-
-        if not items:
-            continue
-
-        # Sort theo Y và X
-        items.sort(key=lambda x: (x["yc"], x["xc"]))
-
-        current = [items[0]]
-        for item in items[1:]:
-            if abs(item["yc"] - current[-1]["yc"]) < 12:
-                current.append(item)
-            else:
-                rows.append(current)
-                current = [item]
-        rows.append(current)
-
-    # Xử lý row → gộp bbox
     for row in rows:
         row.sort(key=lambda x: x["xc"])
 
@@ -160,7 +127,32 @@ def handleOCR(IMAGE_PATH = "./image copy.png"):
             "text": " ".join(it["text"] for it in row),
             "bbox": [x1, y1, x2, y2]
         })
-    return merged_rows;
-    
-print(handleOCR("./システム用CSV ワールド御見積書(3)_estimate.pdf"))J
+    return merged_rows
+
+def handle_OCR(FILE = "./システム用CSV ワールド御見積書(3)_estimate.pdf"):
+    ocr = PaddleOCR(
+        lang='japan',
+        use_doc_orientation_classify=False,
+        use_doc_unwarping=False,             
+        use_textline_orientation=False,
+    )
+
+    # chuyển pdf sang ảnh trước
+    listImage = pdf_to_image_list(FILE)
+    rows = []
+    # đọc từng tấm rồi convert qua img sao cho ocr đọc được
+    for img in listImage:
+        result = ocr.predict(convert_to_image(img))
+        for line in result:
+            items = []
+            read_ocr(line, items)
+            if not items:continue
+            # sắp xếp theo tọa độ y rồi x
+            items.sort(key=lambda x: (x["yc"], x["xc"]))
+            # sắp xếp theo hàng
+            group_by_row(items, rows)
+            # xử lý theo tọa độ
+            print(group_by_poly(rows))
+        
+handle_OCR()
 ```
