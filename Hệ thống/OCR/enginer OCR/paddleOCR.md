@@ -74,3 +74,93 @@ result = ocr.ocr("image.png")
 | `rec_polys`                   | polygon list  | **Box chữ/dòng** sau khi nhận dạng (tinh chỉnh từ `dt_polys`)                            |
 | `textline_orientation_angles` | list of float | Góc xoay của mỗi dòng chữ                                                                |
 | `rec_boxes`                   | polygon list  | **Box cuối cùng** của chữ/dòng, có thể dùng trực tiếp để vẽ bounding box                 |
+
+
+# Demo
+
+```py
+from paddleocr import PaddleOCR
+import numpy as np
+import cv2
+
+def save_rows_to_img(image_path, merged_rows, out_path):
+    img = cv2.imread(image_path)
+    if img is None:
+        raise ValueError("Không load được ảnh gốc")
+
+    for row in merged_rows:
+        x1, y1, x2, y2 = row["bbox"]
+        pts = np.array([
+            [x1, y1],
+            [x2, y1],
+            [x2, y2],
+            [x1, y2]
+        ], dtype=np.int32).reshape((-1,1,2))
+
+        cv2.polylines(img, [pts], True, (0,255,0), 2)
+        # cv2.putText(img, row["text"], (x1, y1-10),cv2.FONT_HERSHEY_SIMPLEX, 0.7,(0,0,255), 2, cv2.LINE_AA)
+
+    cv2.imwrite(out_path, img)
+    print("Đã lưu ảnh:", out_path)
+
+def handleOCR(IMAGE_PATH = "./image copy.png"):
+
+    ocr = PaddleOCR(
+        use_doc_orientation_classify=False, 
+        use_doc_unwarping=False, 
+        use_textline_orientation=False
+    )
+
+    result = ocr.predict(IMAGE_PATH)
+
+    rows = []
+    merged_rows = []
+
+    for page in result:
+        items = []
+
+        # Thu OCR
+        for text, poly in zip(page["rec_texts"], page["rec_polys"]):
+            poly = np.array(poly)
+            items.append({
+                "text": text,
+                "poly": poly,
+                "xc": poly[:,0].mean(),
+                "yc": poly[:,1].mean()
+            })
+
+        if not items:
+            continue
+
+        # Sort theo Y và X
+        items.sort(key=lambda x: (x["yc"], x["xc"]))
+
+        current = [items[0]]
+        for item in items[1:]:
+            if abs(item["yc"] - current[-1]["yc"]) < 12:
+                current.append(item)
+            else:
+                rows.append(current)
+                current = [item]
+        rows.append(current)
+
+    # Xử lý row → gộp bbox
+    for row in rows:
+        row.sort(key=lambda x: x["xc"])
+
+        xs, ys = [], []
+        for it in row:
+            xs.extend(it["poly"][:,0])
+            ys.extend(it["poly"][:,1])
+
+        x1, y1 = int(min(xs)), int(min(ys))
+        x2, y2 = int(max(xs)), int(max(ys))
+
+        merged_rows.append({
+            "text": " ".join(it["text"] for it in row),
+            "bbox": [x1, y1, x2, y2]
+        })
+    return merged_rows;
+    
+print(handleOCR("./システム用CSV ワールド御見積書(3)_estimate.pdf"))J
+```
