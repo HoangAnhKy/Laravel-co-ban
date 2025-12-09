@@ -105,7 +105,8 @@ result = pipeline.predict(
 )
 
 
-for block in enumerate(result):
-    print(block)
-    
+for i, block in enumerate(result):
+    # block.save_to_json(save_path="output")
+    all_keys = block.keys()
+    print(f"Block {i} keys: {all_keys}")
 ```
