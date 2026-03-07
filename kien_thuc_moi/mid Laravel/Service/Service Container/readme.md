@@ -50,6 +50,10 @@ interface LoggerInterface
 
 Tại: `app\Services`
 
+Dùng lệnh hoặc tạo tay:
+```sh
+php artisan make:class Services/FileLogger
+```
 Code:
 
 ```php
