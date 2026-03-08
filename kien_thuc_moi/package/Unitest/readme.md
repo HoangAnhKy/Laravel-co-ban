@@ -167,3 +167,66 @@ public function test_user_can_register()
     $home->assertSee('Xin chào, Nguyễn Văn A');
 }
 ```
+
+# Ví dụ test Feature
+
+```php
+<?php
+
+namespace Tests\Feature;
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use App\Models\Orders;
+
+class OrderApiTest extends TestCase
+{
+    use RefreshDatabase;
+
+    /**
+     * Test chức năng lấy chi tiết đơn hàng
+     */
+    public function test_it_can_get_order_detail()
+    {
+        // 1. ARRANGE: Tạo 1 đơn hàng thật trong DB Test
+        $order = Orders::create([
+            'name'  => 'Order Test 01',
+            'email' => 'test@yopmail.com',
+            'qty'   => 10,
+        ]);
+
+        // 2. ACT: Gọi đúng đường dẫn GET /get-order/{id} 
+        $response = $this->getJson('/get-order/' . $order->id);
+
+        // 3. ASSERT: Thanh tra
+        $response->assertStatus(200);
+
+        // Kiểm tra xem data trả về có đúng tên 'Order Test 01' không
+        $response->assertJsonFragment([
+            'name' => 'Order Test 01'
+        ]);
+    }
+
+    /**
+     * Test chức năng tạo đơn hàng (Với code Controller hiện tại )
+     */
+    public function test_it_can_create_order_or_handle_limit()
+    {
+        $response = $this->getJson('/create');
+
+        // Nếu may mắn random <= 50
+        if ($response->status() === 200) {
+            $response->assertJsonFragment(['message' => 'Order created successfully']);
+        }
+        // Nếu đen đủi random > 50
+        else {
+            $response->assertStatus(500);
+            // Kiểm tra xem có đúng message lỗi admin không
+            $this->assertEquals(
+                "Mua sỉ số lượng lớn vui lòng liên hệ admin, tối đa 50 SP/đơn.",
+                $response->json('message') // Tùy vào cách bạn throw exception
+            );
+        }
+    }
+}
+```
