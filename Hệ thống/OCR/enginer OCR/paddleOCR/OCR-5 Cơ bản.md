@@ -2,6 +2,9 @@
 
 ```sh
 pip install paddlepaddle paddleocr
+// nếu bị lỗi xung đột cài thêm
+// python -m pip install paddlepaddle-gpu==3.3.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
+// docs: https://github.com/PaddlePaddle/PaddleOCR?tab=readme-ov-file
 ```
 # các cờ đã biết 
 
