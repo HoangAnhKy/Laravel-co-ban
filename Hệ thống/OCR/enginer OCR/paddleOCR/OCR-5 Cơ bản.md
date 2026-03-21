@@ -159,3 +159,30 @@ def handle_OCR(FILE = "./システム用CSV ワールド御見積書(3)_estimate
         
 handle_OCR()
 ```
+
+# chú ý
+
+## fonts
+- file font ở `~/.paddlex/fonts`
+- có khi phải vào đây để điều chỉnh font cho nó đọc đúng định dạng.
+
+
+## dùng mode 
+
+```py
+from paddleocr import PaddleOCR 
+ocr = PaddleOCR(
+    text_detection_model_name="PP-OCRv5_server_det", # mode tìm vùng có chữ
+    text_recognition_model_name="PP-OCRv5_server_rec", # mode đọc nội dung trong từng box
+    use_doc_orientation_classify=False,
+    use_doc_unwarping=False,
+    use_textline_orientation=False,
+    device="gpu", # đọc bằng gpu cho nhanh
+)
+result = ocr.predict("./image.png")  
+for res in result:  
+    res.print()  
+    res.save_to_img("output")  
+    res.save_to_json("output")
+
+```
