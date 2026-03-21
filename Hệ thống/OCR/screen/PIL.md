@@ -234,3 +234,23 @@ draw.text((x, y), text, fill="black", font=font)
 
 img.show()
 ```
+
+
+# demo tăng DPI
+
+```py
+from PIL import Image
+
+img_path = "./japan.png"
+high_dpi_path = "./japan_600dpi.png"
+
+# --- 1. TIỀN XỬ LÝ (TRẢ LẠI LANCZOS) ---
+img = Image.open(img_path)
+# tăng kích thước ảnh lên là 2
+new_size = (int(img.width * 2.0), int(img.height * 2.0))
+
+# Phải có LANCZOS thì phóng to x3 chữ mới giữ được độ sắc cạnh
+img_resized = img.resize(new_size, Image.Resampling.LANCZOS)
+img_resized.save(high_dpi_path, dpi=(600, 600))
+print(f"✅ Đã nâng cấp ảnh lên 600 DPI (Lanczos) và lưu tại: {high_dpi_path}")
+```
