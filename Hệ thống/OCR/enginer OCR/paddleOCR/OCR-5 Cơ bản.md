@@ -178,6 +178,7 @@ ocr = PaddleOCR(
     use_doc_unwarping=False,
     use_textline_orientation=False,
     device="gpu", # đọc bằng gpu cho nhanh
+    # text_recognition_model_dir="./modal/inference", # dùng với modal tự build nó sẽ tốt hơn
 )
 result = ocr.predict("./image.png")  
 for res in result:  
