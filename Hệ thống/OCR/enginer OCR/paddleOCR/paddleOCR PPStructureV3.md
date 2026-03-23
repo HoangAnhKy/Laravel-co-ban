@@ -110,3 +110,12 @@ for i, block in enumerate(result):
     all_keys = block.keys()
     print(f"Block {i} keys: {all_keys}")
 ```
+
+# Cài
+
+```sh
+# đưa lên bản mới nhất
+pip install --upgrade paddleocr
+# cài gói chuyên dụng
+pip install "paddlex[ocr]"
+```
