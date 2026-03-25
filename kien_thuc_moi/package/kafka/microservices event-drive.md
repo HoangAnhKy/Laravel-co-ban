@@ -68,13 +68,32 @@ class SendOrderToKafka implements ShouldQueue
      */
     public function handle(OrderCreated $event)
     {
-        // Gửi thông điệp đến Kafka
+        // Gửi thông điệp đến Kafka, nó sẽ là kiểu phân tán balance ra cá partition nếu có từ 2 cái trở đi
         Kafka::publish()
             ->onTopic('orders')
             ->withBodyKey('order_id', $event->orderId)
             ->withBodyKey('product', $event->product)
             ->withBodyKey('quantity', $event->quantity)
             ->send();
+        /*
+        // set cố định gửi vào 1 partition nào đó
+
+        // 1. Tạo nội dung tin nhắn
+        $message = new Junges\Kafka\Message\Message(
+            body: [
+                'order_id' => $event->orderId,
+                'product' => $event->product,
+                'quantity' => $event->quantity,
+            ],
+            partition: 1 // set chỉ gửi cố định cho partition 1
+        );
+        // 2.  Gửi đi
+        Kafka::publish()
+            ->onTopic('orders')
+            ->withMessage($message)
+            ->send();
+
+        */
     }
 }
 ```
