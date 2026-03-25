@@ -11,7 +11,8 @@ services:
       - "2181:2181" # Mở cổng 2181 để các container khác có thể kết nối.
   #    Xử lý và lưu trữ tin nhắn.
   kafka:
-    image: confluentinc/cp-kafka:latest
+    # image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:7.5.0
     container_name: kafka
     restart: always
     depends_on:
