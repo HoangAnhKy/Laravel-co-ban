@@ -115,16 +115,16 @@ class ConsumeKafkaOrders extends Command
 
     public function handle()
     {
-        $consumer = Kafka::createConsumer()
-            ->subscribe('orders')
-            ->withHandler(function ($message) {
+        // thay đổi mới do docs được cập nhật
+        $consumer = Kafka::consumer(['orders'])
+            ->withConsumerGroupId('inventory-service-group')
+            ->withAutoCommit()
+            ->withHandler(function (ConsumerMessage $message) {
                 $order = $message->getBody();
 
-                // Xử lý đơn hàng
-                $this->info('Đã nhận đơn hàng: ' . json_encode($order));
+                $this->info('Đã nhận đơn hàng2: ' . json_encode($order));
 
-                // Ví dụ: Cập nhật kho hàng
-                // Inventory::updateStock($order['product'], $order['quantity']);
+                // Logic xử lý của bạn...
             })
             ->build();
 
