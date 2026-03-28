@@ -1,5 +1,6 @@
 [docs](https://laravelkafka.com/docs/v2.0/introduction)
 
+[tip tham khảo](./tips.md)
 ### cài thư viện
 
 ```sh
