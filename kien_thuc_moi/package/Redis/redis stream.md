@@ -56,7 +56,7 @@ $messages = Redis::xReadGroup(
 **subcommand**
 
 | Tham số       | Chức năng                                        |
-|---------------|--------------------------------------------------|
+| ------------- | ------------------------------------------------ |
 | `CREATE`      | Tạo một group mới trên stream.                   |
 | `SETID`       | Đặt lại "vị trí đọc" của group (đổi start ID).   |
 | `DESTROY`     | Xóa toàn bộ group khỏi stream. Không xóa stream. |
@@ -65,7 +65,7 @@ $messages = Redis::xReadGroup(
 **Dùng kết hợp với XPENDING, XACK, XCLAIM để quản lý message tồn đọng.**
 
 | Lệnh       | Công dụng chính                                       |
-|------------|-------------------------------------------------------|
+| ---------- | ----------------------------------------------------- |
 | `XPENDING` | Kiểm tra message nào bị treo, ai đang giữ             |
 | `XACK`     | Báo cho Redis biết message đã xử lý xong              |
 | `XCLAIM`   | Chuyển quyền xử lý từ consumer này sang consumer khác |
@@ -168,4 +168,22 @@ Lệnh tạo
 ```sh
 php artisan stream:consume-orders consumer1
 php artisan stream:consume-orders consumer2
+```
+
+# Lấy danh sách
+
+```php
+Route::get('/send-order', function () {
+    $messages = Redis::XREVRANGE('orders', '+', '-', 10); // lấy 10 thằng cuối
+    $messages = Redis::xRange('orders', '-', '+', 10); // lấy 10 thằng đầu
+
+    return response()->json($messages);
+
+    foreach ($messages as $id => $fields) {
+        echo "ID tin nhắn: " . $id;
+        echo PHP_EOL;
+        echo "Khách hàng: " . $fields['user_id'];
+        echo "<br />";
+    }
+});
 ```
