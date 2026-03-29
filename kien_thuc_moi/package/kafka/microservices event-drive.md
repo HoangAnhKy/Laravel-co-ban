@@ -148,9 +148,9 @@ class ConsumeKafkaOrders extends Command
                 $this->info('Đã nhận đơn hàng2: ' . json_encode($order));
 
                 // Logic xử lý...
-                
+
                 // commit bằng tay 
-                // $consumer->commit();
+                // $consumer->commit($message);
             })
             ->build();
 
