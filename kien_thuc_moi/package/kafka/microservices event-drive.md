@@ -128,6 +128,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Junges\Kafka\Facades\Kafka;
+use Junges\Kafka\Contracts\MessageConsumer;
+use Junges\Kafka\Contracts\ConsumerMessage;
 
 class ConsumeKafkaOrders extends Command
 {
@@ -138,14 +140,17 @@ class ConsumeKafkaOrders extends Command
     {
         // thay đổi mới do docs được cập nhật
         $consumer = Kafka::consumer(['orders'])
-            ->withConsumerGroupId('inventory-service-group')
-            ->withAutoCommit()
-            ->withHandler(function (ConsumerMessage $message) {
+            ->withConsumerGroupId('inventory-service-group') // dùng đẻ nhớ đang đọc tới đâu
+            ->withAutoCommit() // tự động commit xác nhận đã đọc xong
+            ->withHandler(function (ConsumerMessage $message, MessageConsumer $consumer) {
                 $order = $message->getBody();
 
                 $this->info('Đã nhận đơn hàng2: ' . json_encode($order));
 
-                // Logic xử lý của bạn...
+                // Logic xử lý...
+                
+                // commit bằng tay 
+                // $consumer->commit();
             })
             ->build();
 
