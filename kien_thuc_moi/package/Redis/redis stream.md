@@ -92,6 +92,11 @@ class CreateStreamGroup extends Command
         $group = 'order_group';
 
         try {
+            // Tham số cuối là 'true' tương đương với MKSTREAM (tự tạo stream nếu chưa có)
+            
+            // Tham số kế cuối
+            // Dùng 0 (hoặc 0-0): quét lại từ đầu chí cuối cuốn sổ. Có bao nhiêu đơn hàng cũ chưa xử lý, nó sẽ "hốt" sạch về làm lại từ đầu.
+            // Dùng $: bỏ qua tất cả các tin nhắn đã có trong quá khứ. Nó chỉ bắt đầu "ngóng" và xử lý những tin nhắn nào được bắn vào sau khi lệnh này chạy xong.
             Redis::xGroup('CREATE', $stream, $group, '0-0', true);
             $this->info("Group '{$group}' created on stream '{$stream}'.");
         } catch (\Exception $e) {
