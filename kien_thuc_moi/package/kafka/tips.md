@@ -175,3 +175,73 @@ class RedriveFailedOrders extends Command
     }
 }
 ```
+
+# Xử lý khi web có nhiều khách hàng hoặc ngày đặc biệt quá tải
+
+- cho nó chay thêm 2-n `kafka:consume` tùy vào số  lượng `patition` đã set để  nó chia nhỏ ra đỡ bị treo hoặc đợi
+
+- có thể  chia nhỏ qua serve khác nếu cần thiết
+
+
+## cài đặt **supervisor** để  quản lý
+
+```sh
+sudo apt install supervisor
+```
+
+## tạo file cấu hình
+
+```sh
+sudo nano /etc/supervisor/conf.d/kafka-worker.conf
+```
+
+
+```ini
+[program:kafka-consumer]
+# Đường dẫn đến lệnh artisan
+command=php /var/www/your-project/artisan kafka:consume-orders
+
+# ĐÂY LÀ CHỖ QUAN TRỌNG NHẤT: Set chạy 3 lần (nó tạo 3 cái kafka-consumer:kafka-consumer_(num đếm từ 00 trở đi))
+process_name=%(program_name)s_%(process_num)02d
+numprocs=3
+
+# Tự động chạy khi máy chủ khởi động
+autostart=true
+# Tự động bật lại nếu bị sập
+autorestart=true
+
+# Chạy với tư cách user nào (thường là www-data hoặc user)
+user=user
+
+# Nơi lưu Log
+stdout_logfile=/var/www/your-project/storage/logs/kafka.log
+stderr_logfile=/var/www/your-project/storage/logs/kafka-error.log
+```
+
+nạp cấu hình vừa tạo
+
+```sh
+sudo supervisorctl update
+```
+
+## lệnh chạy
+
+```sh
+sudo supervisorctl start kafka-consumer:*
+# chạy 1 cái 
+# sudo supervisorctl start kafka-consumer:kafka-consumer_00
+```
+
+## lệnh dừng
+
+```sh
+sudo supervisorctl stop kafka-consumer:*
+# dừng 1 cái 
+# sudo supervisorctl stop kafka-consumer:kafka-consumer_00
+```
+
+## kiểm tra status
+
+```sh
+sudo supervisorctl status
+```
