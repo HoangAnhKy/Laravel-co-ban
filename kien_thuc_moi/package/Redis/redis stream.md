@@ -64,12 +64,25 @@ $messages = Redis::xReadGroup(
 
 **Dùng kết hợp với XPENDING, XACK, XCLAIM để quản lý message tồn đọng.**
 
-| Lệnh       | Công dụng chính                                       |
-| ---------- | ----------------------------------------------------- |
-| `XPENDING` | Kiểm tra message nào bị treo, ai đang giữ             |
-| `XACK`     | Báo cho Redis biết message đã xử lý xong              |
-| `XCLAIM`   | Chuyển quyền xử lý từ consumer này sang consumer khác |
+| Lệnh         | Công dụng chính                                                                                          |
+| ------------ | -------------------------------------------------------------------------------------------------------- |
+| `XPENDING`   | Kiểm tra message nào bị treo, ai đang giữ                                                                |
+| `XACK`       | Báo cho Redis biết message đã xử lý xong                                                                 |
+| `XCLAIM`     | Chuyển quyền xử lý từ consumer này sang consumer khác                                                    |
+| `XAUTOCLAIM` | Tự động cứu hộ: Quét và giật lại tin nhắn bị kẹt chỉ với 1 dòng lệnh (Thay thế combo XPENDING + XCLAIM). |
 
+**Dùng để gửi dữ liệu lên group**
+
+## xAdd
+
+```php
+// Gửi full group
+Redis::xAdd('orders', '*', ['order_id' => $id,'status' => 'pending']);
+// Gửi riêng
+Redis::xAdd('orders:lazy_boy', '*', ['data' => 'Tin này chỉ dành cho ông Lười']);
+```
+
+***
 
 ## Ví dụ xGroup/xReadGroup
 
