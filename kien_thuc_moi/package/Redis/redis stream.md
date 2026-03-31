@@ -82,6 +82,22 @@ Redis::xAdd('orders', '*', ['order_id' => $id,'status' => 'pending']);
 Redis::xAdd('orders:lazy_boy', '*', ['data' => 'Tin này chỉ dành cho ông Lười']);
 ```
 
+## Hàm chạy trực tiếp
+
+Vì lý do là Redis không có kiểu hàm cho nó hoặc một số hàm cũ không còn nên phải dùng tới 
+`executeRaw`
+
+```php
+Redis::executeRaw([
+    'XAUTOCLAIM', // Tên lệnh
+    'orders',      // Stream
+    'order_group', // Group
+    'hero_worker', // Consumer
+    '30000',       // Thời gian kẹt (ms)
+    '0-0'          // Điểm bắt đầu quét
+]);
+```
+
 ***
 
 ## Ví dụ xGroup/xReadGroup
@@ -204,4 +220,131 @@ Route::get('/send-order', function () {
         echo "<br />";
     }
 });
+```
+
+# Demo trường hợp bị treo
+
+Khi dùng Consumer Group, Redis có một cái "túi riêng" cho mỗi Worker gọi là PEL (Pending Entries List).
+- Lazy Worker thò tay vào Stream lấy đơn hàng #1001.
+- Redis ghi chú: "Đơn #1001 đang nằm trong túi của Lazy Worker".
+- Lazy Worker bị sập (mất điện, lỗi code) mà chưa kịp gọi XACK.
+- Hậu quả: Đơn #1001 bị kẹt trong cái túi đó mãi mãi. Những Worker khác không thấy đơn này vì nó không còn là "tin nhắn mới" (>) nữa.
+
+
+Giải pháp là tạo ra một Worker đặc biệt (hoặc chính là các Worker bình thường nhưng có thêm "mắt thần") dùng lệnh `XAUTOCLAIM`
+
+Lệnh này hoạt động giống như một Máy quét Radar:
+- Nó không quét những tin nhắn mới.
+- Nó quét tất cả cái túi (PEL) của cái Group đó.
+- Nó tìm những tin nhắn nào đã nằm im (idle) quá lâu mà không có ai động vào.
+
+
+## khởi tạo group và tạo comsumer lazy (lắng nghe 1 lần và không xAck)
+
+```php
+<?php
+
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Redis;
+
+class RedisSetUp extends Command
+{
+    protected $signature = 'redis:setup';
+    protected $description = 'Command description';
+    public function handle()
+    {
+        try {
+            Redis::xGroup('CREATE', 'orders', 'order_group', '0', true);
+            $this->info("✅ Đã tạo Stream 'orders' và Group 'order_group'!");
+        } catch (\Exception $e) {
+            $this->warn("ℹ️ Group đã tồn tại hoặc có lỗi: " . $e->getMessage());
+        }
+    }
+}
+```
+
+```php
+<?php
+
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Redis;
+
+class RedisLazyWorker extends Command
+{
+    protected $signature = 'redis:lazy';
+    public function handle()
+    {
+        $this->warn("🚧 Worker Lười Biếng đang rình mò...");
+
+        while (true) {
+            // Đọc tin mới ('>')
+            $data = Redis::xReadGroup('order_group', 'lazy_boy', ['orders' => '>'], 1, 2000);
+            if ($data) {
+                foreach ($data['orders'] as $id => $fields) {
+                    $this->error("📥 Nhận đơn #{$fields['order_id']} nhưng tôi... ĐI NGỦ ĐÂY! (Không ACK)");
+                    return; // Thoát luôn, tin nhắn rơi vào PEL
+                }
+            }
+        }
+    }
+}
+```
+
+## Khởi tạo Route gửi product vào steam
+
+```php
+Route::get("/product/{id}", function ($id) {
+    Redis::xAdd('orders', '*', [
+        'order_id' => $id,
+        'customer' => 'Kyha',
+        'status' => 'pending'
+    ]);
+    $this->info("🚀 Đã bắn đơn hàng #$id vào Stream!");
+});
+```
+
+## Tạo cái command cứu hộ
+
+```php
+<?php
+
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Redis;
+
+class RedisRescueWorker extends Command
+{
+    protected $signature = 'redis:rescue';
+
+    public function handle()
+    {
+        $this->info("🦸 Worker Anh Hùng đang đi tuần tra...");
+        while (true) {
+            // XAUTOCLAIM <stream> <group> <consumer> <min-idle-time> <start-id> [COUNT count]
+            // min-idle-time: 10000ms (10 giây). Nếu tin kẹt > 10s thì cứu.
+            $res = Redis::executeRaw([
+                'XAUTOCLAIM', 'orders', 'order_group', 'hero_worker', '10000', '0-0', 'COUNT', 1
+            ]);
+            // Cấu trúc trả về: [ID tiếp theo, [mảng các tin cứu được]]
+            if (!empty($res[1])) {
+                foreach ($res[1] as $entry) {
+                    $id = $entry[0];
+                    $fields = $entry[1];
+
+                    $this->warn("⚡ CỨU HỘ: Đã giựt lại đơn #{$fields[1]} (ID: $id)");
+
+                    // Xử lý lại và ACK
+                    Redis::xAck('orders', 'order_group', [$id]);
+                    $this->info("✅ Đã xử lý lại và ACK thành công!");
+                }
+            }
+            usleep(500000); // Nghỉ 0.5s rồi tuần tra tiếp
+        }
+    }
+}
 ```
