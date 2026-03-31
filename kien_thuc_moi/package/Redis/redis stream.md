@@ -238,6 +238,12 @@ Lệnh này hoạt động giống như một Máy quét Radar:
 - Nó quét tất cả cái túi (PEL) của cái Group đó.
 - Nó tìm những tin nhắn nào đã nằm im (idle) quá lâu mà không có ai động vào.
 
+<span style="color:red">Lưu ý:</span> 
+Khi một message đã được một consumer đọc, nó sẽ nằm trong PEL và thuộc về consumer đó.
+
+Các consumer khác:
+- ❌ Không thể đọc message này bằng `xReadGroup`
+- ✅ Nhưng vẫn có thể "giành lại" để xử lý bằng `XCLAIM` hoặc `XAUTOCLAIM`
 
 ## khởi tạo group và tạo comsumer lazy (lắng nghe 1 lần và không xAck)
 
