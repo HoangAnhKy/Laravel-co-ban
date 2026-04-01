@@ -19,6 +19,10 @@ Route::middleware('throttle:60,1')->group(function () {
 ```
 # Các hàm hỗ trợ 
 
+- `RateLimiter::availableIn($key)` lấy số  giây đếm ngược để có thể thao tác
+- `RateLimiter::remaining($key, $countMax);` số lần có còn lại có thể gửi
+- `RateLimiter::clear($key)` bỏ giới hạn
+
 ## Giới hạn theo số request / thời gian
 - `Limit::perMinute(3)` → 3 request mỗi phút.
 - `Limit::perSecond(10)` → 10 request mỗi giây (Laravel 11 mới thêm).
