@@ -77,3 +77,24 @@ public function getHotPostsPureRedis()
     return response()->json(['error' => 'Server busy'], 503);
 }
 ```
+
+# cache tự động
+
+```php
+// trong env set cache là redis
+
+Route::get("/demo-lock", function () {
+    $lockKey = 'hot_posts_lock';
+
+    try {
+        // lock key trong vòng 30, nếu mà đối tượng vào sau trong 5s mà có thể  lấy được key thì trả về. Không thì sẽ bị timeout
+        // nó tự động xóa lock khi hoàn thành 
+        return Cache::lock($lockKey, 30)->block(5, function () {
+            sleep(20);
+            return 'success';
+        });
+    } catch (\Illuminate\Contracts\Cache\LockTimeoutException $e) {
+        return 'timeout!';
+    }
+});
+```
