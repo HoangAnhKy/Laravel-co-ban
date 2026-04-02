@@ -16,7 +16,7 @@ composer require elasticsearch/elasticsearch
 php artisan make:provider ElasticsearchServiceProvider
 ```
 
-## Thêm thông tin khởi tạo Elastich search
+## Thêm thông tin khởi tạo Elastic search
 
 ```php
 <?php
