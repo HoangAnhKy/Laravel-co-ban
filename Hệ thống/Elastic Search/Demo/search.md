@@ -204,7 +204,12 @@ public function search(Request $request)
                 ]
             ],
             'sort' => [
-                ['price' => ['order' => 'asc']], // Giá tăng dần
+                ['price' => 
+                    [
+                        'order' => 'asc',
+                        'missing' => '_last' // Không có giá thì cho xuống cuối danh sách
+                    ]
+                ], // Giá tăng dần
                 ['_score' => ['order' => 'desc']] // Sau đó mới đến độ liên quan
             ]
         ]
