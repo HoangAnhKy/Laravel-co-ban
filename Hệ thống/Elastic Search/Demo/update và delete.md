@@ -41,3 +41,22 @@ public function destroy(Request $request, $id)
     }
 }
 ```
+
+# get all
+
+```php
+public function getAll(Request $request)
+{
+    $params = [
+        'index' => 'my_products',
+        'body'  => [
+            'query' => [
+                'match_all' => (object)[] // Phải để (object)[] để ra dấu {} trong JSON
+            ]
+        ]
+    ];
+
+    $results = $this->client->search($params);
+    return response()->json($results->asArray()['hits']['hits']);
+}
+```
