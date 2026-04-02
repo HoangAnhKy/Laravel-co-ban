@@ -195,3 +195,147 @@ class StorageElasticSearch
     }
 }
 ```
+
+# típs tạo Suggestions | tự động gợi ý khi search
+
+## khởi tạo kho có dùng analysis và analyzer
+
+```php
+public function createStore()
+{
+    $params = [
+        'index' => $this->indexName, // Tên kho
+        'body' => [
+            'settings' => [
+                'analysis' => [
+                    'filter' => [
+                        'autocomplete_filter' => [
+                            'type' => 'edge_ngram',
+                            'min_gram' => 1, // Gõ 1 chữ đã gợi ý
+                            'max_gram' => 20  // Độ dài tối đa của từ băm
+                        ]
+                    ],
+                    'analyzer' => [
+                        'autocomplete_analyzer' => [
+                            'type' => 'custom',
+                            'tokenizer' => 'standard',
+                            'filter' => [
+                                'lowercase',
+                                'autocomplete_filter' // Dùng bộ lọc băm nhỏ ở trên
+                            ]
+                        ]
+                    ]
+                ],
+                'number_of_shards' => 3,   // Chia kho thành 3 ngăn vật lý (Hỗ trợ Routing)
+                'number_of_replicas' => 1  // Bản sao dự phòng
+            ],
+            'mappings' => [
+                'properties' => [
+                    'title' => [
+                        'type' => 'text',    // Cho phép search từng từ (Gaming, Chuột)
+                        'fields' => [
+                            'keyword' => [   // Tạo thêm bản sao để Group/Sort chính xác
+                                'type' => 'keyword',
+                                'ignore_above' => 256
+                            ]
+                        ],
+                        // lưu ý dùng search_analyzer
+                        'analyzer' => 'autocomplete_analyzer', // Lúc lưu thì băm nhỏ
+                        'search_analyzer' => 'standard'
+                    ],
+                    'content' => ['type' => 'text'],
+                ]
+            ],
+            'aliases' => [
+                $this->aliasName => (object)[] // Tạo luôn cái tên đại diện
+            ]
+        ]
+    ];
+
+    try {
+        $response = $this->client->indices()->create($params);
+        return response()->json($response->asArray());
+    } catch (\Exception $e) {
+        return "Lỗi rồi: " . $e->getMessage();
+    }
+}
+```
+
+## getSuggestions
+```php
+public function getSuggestions($query)
+{
+$params = [
+    'index' => $this->aliasName,
+    'body'  => [
+        'size' => 5, // Chỉ lấy 5 gợi ý đầu tiên cho nhẹ
+        '_source' => ['title'], // Chỉ lấy tiêu đề cho nhanh
+        'query' => [
+            'match' => [
+                'title' => [
+                    'query' => $query,
+                    'operator' => 'and'
+                ]
+            ]
+        ]
+    ]
+];
+
+$results = $this->client->search($params);
+
+// Trả về mảng đơn giản cho Frontend dễ dùng
+return collect($results->asArray()['hits']['hits'])->map(function($hit) {
+    return $hit['_source']['title'];
+});
+```
+
+## thêm sản phẩm test thử
+
+
+```php
+public function bulkStore()
+{
+    $params = [
+        'body' => []
+    ];
+
+    $dataFromDB = [
+        "product_3" => ['title' => 'iPhone 17 Pro', 'content' => '', 'price' => 3000],
+        "product_4" => ['title' => 'Samsung S26 Ultra', 'content' => '', 'price' => 2800],
+    ];
+
+    $indexName = 'my_products';
+
+    foreach ($dataFromDB as $key => $value) {
+        // Lưu ý: Trong Bulk, các field metadata phải có dấu gạch dưới (_)
+        $params['body'][] = [
+            'index' => [
+                '_index' => $indexName,
+                'routing' => "Phone",
+                '_id' => $key
+            ]
+        ];
+        $params['body'][] = $value;
+    }
+
+    $response = $this->client->bulk($params);
+    return response()->json($response->asArray());
+}
+```
+
+## Kết quả
+
+khi search ipho nó sẽ ra iphone 17 pro
+
+
+```php
+Route::get("/Sug", function (){
+    $storage = app(\App\Services\StorageElasticSearch::class);
+    return $storage->getSuggestions("iPho");
+});
+/*
+[
+    "iPhone 17 Pro"
+]
+*/
+```
