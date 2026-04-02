@@ -1,3 +1,13 @@
+- [Lưu ý](#lưu-ý)
+  - [routing](#routing)
+  - [Pipeline](#pipeline)
+    - [khởi tạo pipeline](#khởi-tạo-pipeline)
+    - [push dữ liệu lên store và dùng thêm cờ pipeline, nó sẽ chỉnh sửa đúng format bên trên](#push-dữ-liệu-lên-store-và-dùng-thêm-cờ-pipeline-nó-sẽ-chỉnh-sửa-đúng-format-bên-trên)
+- [khởi tạo một dữ liệu lên store](#khởi-tạo-một-dữ-liệu-lên-store)
+- [khởi tạo nhiều dữ liệu lên store](#khởi-tạo-nhiều-dữ-liệu-lên-store)
+
+***
+
 # Lưu ý
 
 ## routing

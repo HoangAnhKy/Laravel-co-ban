@@ -1,6 +1,34 @@
+- [Lý thuyết](#lý-thuyết)
+- [lưu ý](#lưu-ý)
+- [search match theo 1 field cụ thể](#search-match-theo-1-field-cụ-thể)
+- [search match theo nhiều fields](#search-match-theo-nhiều-fields)
+- [search theo routing](#search-theo-routing)
+- [search tự động sửa lỗi từ gần đúng `fuzziness`](#search-tự-động-sửa-lỗi-từ-gần-đúng-fuzziness)
+- [phân trang với from và size](#phân-trang-với-from-và-size)
+- [sort dữ liệu tìm kiếm](#sort-dữ-liệu-tìm-kiếm)
+- [highlight keysearch](#highlight-keysearch)
+- [Lọc chính xác](#lọc-chính-xác)
+- [chỉ  lấy cột `_source`](#chỉ--lấy-cột-_source)
+- [Đếm số lượng](#đếm-số-lượng)
+- [Boosting ^ | Đánh giá quan trọng](#boosting---đánh-giá-quan-trọng)
+- [lenient | fix lỗi tìm khác kiểu dữ liệu](#lenient--fix-lỗi-tìm-khác-kiểu-dữ-liệu)
+
+***
 # Lý thuyết 
 
 khi search nó sẽ dựa vào `match` để  tìm kiếm dữ liệu phù hợp
+
+# lưu ý
+
+```php
+$responseData = $results->asArray();
+
+// 1. Lấy danh sách sản phẩm
+$products = $responseData['hits']['hits'];
+
+// 2. Lấy bộ đếm khoảng giá
+$priceStats = $responseData['aggregations'];
+```
 
 
 # search match theo 1 field cụ thể
@@ -246,7 +274,7 @@ public function search(Request $request)
 
 - phân biệt trong tìm kiếm
   - `term`: là đi tìm sự "Chính xác tuyệt đối"
-  - `march`: là đi tìm sự "Phù hợp" (kiểu áng chừng, đại khái)
+  - `match`: là đi tìm sự "Phù hợp" (kiểu áng chừng, đại khái)
 
 ```php
 public function search(Request $request)
@@ -319,7 +347,7 @@ public function search(Request $request)
 }
 ```
 
-# Đểm số lượng 
+# Đếm số lượng 
 
 ```php
 public function search(Request $request)
@@ -371,5 +399,60 @@ public function search(Request $request)
 
     $results = $this->client->search($params);
     return response()->json($results->asArray());
+}
+```
+
+# Boosting ^ | Đánh giá quan trọng
+
+dùng để  tăng điểm chính xác khi tìm kiếm `multi_match`. ở ví dụ dưới khi title phù hợp điểm sẽ cao hơn 5 lần 
+
+```php
+public function search(Request $request)
+{
+    $params = [
+        'index' => 'my_products',
+        'body' => [
+            'query' => [
+                'multi_match' => [
+                    'query'  => $request->q ?? '',
+                    'fields' => [
+                        'title^5',   // <--- TIÊU ĐỀ QUAN TRỌNG GẤP 5 LẦN
+                        'content^1'  // Nội dung giữ nguyên trọng số cơ bản là 1
+                    ]
+                ]
+            ]
+        ]
+    ];
+
+    $results = $this->client->search($params);
+    return response()->json($results->asArray()['hits']['hits']);
+}
+```
+
+# lenient | fix lỗi tìm khác kiểu dữ liệu
+dùng khi tìm kiếm các trường khác nhau về kiểu dữ liệu int, string, .... Nó sẽ tránh được lỗi 400 
+
+```php
+public function search(Request $request)
+{
+    $params = [
+        'index' => 'my_products',
+        'body' => [
+            'query' => [
+                'multi_match' => [
+                    'query'  => $request->q ?? '',
+                    'fields' => [
+                        'title^5',
+                        'content^1',
+                        'price'
+                    ],
+                    'lenient' => true // tránh lỗi 400 khi search string trong trường int
+                ]
+            ]
+        ]
+    ];
+
+    $results = $this->client->search($params);
+    return response()->json($results->asArray()['hits']['hits']);
 }
 ```
