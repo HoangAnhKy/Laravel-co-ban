@@ -12,6 +12,7 @@
 - [Đếm số lượng](#đếm-số-lượng)
 - [Boosting ^ | Đánh giá quan trọng](#boosting---đánh-giá-quan-trọng)
 - [lenient | fix lỗi tìm khác kiểu dữ liệu](#lenient--fix-lỗi-tìm-khác-kiểu-dữ-liệu)
+- [track\_total\_hits | "Đếm không sót một ai"](#track_total_hits--đếm-không-sót-một-ai)
 
 ***
 # Lý thuyết 
@@ -455,4 +456,13 @@ public function search(Request $request)
     $results = $this->client->search($params);
     return response()->json($results->asArray()['hits']['hits']);
 }
+```
+
+# track_total_hits | "Đếm không sót một ai"
+
+```php
+'body' => [
+    'track_total_hits' => true, // <--- Đếm chính xác tổng số dù có bao nhiêu triệu bản ghi
+    'query' => [...]
+]
 ```
