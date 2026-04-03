@@ -387,3 +387,84 @@ public function proUpgrade()
     return "Nâng cấp hoàn tất, không mất một giây downtime nào!";
 }
 ```
+
+# tạo kho với dữ liệu mapping là 'type' => 'nested'
+
+dùng để tăng độ chính xác khi search, sử  dụng khi search kết hợp 
+
+## tạo kho có trường đặc biệt sử  dụng nested
+
+```php
+public function createStore()
+{
+    $params = [
+        'index' => 'products_nested_v1',
+        'body' => [
+            'mappings' => [
+                'properties' => [
+                    'title' => ['type' => 'text'],
+                    'variants' => [ // Đây là mảng chứa các phiên bản
+                        'type' => 'nested', // <--- QUAN TRỌNG NHẤT
+                        'properties' => [
+                            'color' => ['type' => 'keyword'],
+                            'storage' => ['type' => 'keyword'],
+                            'price' => ['type' => 'integer']
+                        ]
+                    ]
+                ]
+            ],
+        ]
+    ];
+    $response = $this->client->indices()->create($params);
+    return response()->json($response->asArray());
+}
+```
+
+## khởi  tạo search có thêm nested
+
+```php
+/*
+$products = [
+    [
+        'id' => 'samsung-s24',
+        'title' => 'Samsung Galaxy S24',
+        'variants' => [
+            ['color' => 'Đen', 'storage' => '256GB', 'price' => 22000000],
+            ['color' => 'Vàng', 'storage' => '512GB', 'price' => 26000000]
+        ]
+    ],
+    [
+        'id' => 'macbook-m3',
+        'title' => 'Macbook Pro M3',
+        'variants' => [
+            ['color' => 'Xám', 'storage' => '512GB', 'price' => 45000000]
+        ]
+    ]
+];
+*/
+
+public function search(Request $request)
+{
+    $params = [
+        'index' => 'products_nested_alias',
+        'body'  => [
+            'query' => [
+                'nested' => [
+                    'path' => 'variants', // Chỉ định tìm trong mảng variants
+                    'query' => [
+                        'bool' => [
+                            'must' => [
+                                ['term' => ['variants.color' => 'Xám']],
+                                ['term' => ['variants.storage' => '512GB']]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]
+    ];
+
+    $results = $this->client->search($params);
+    return response()->json($results->asArray()['hits']['hits']);
+}
+```
