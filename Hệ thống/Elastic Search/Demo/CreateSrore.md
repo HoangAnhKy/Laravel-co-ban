@@ -364,3 +364,26 @@ Route::get("/Sug", function (){
 ]
 */
 ```
+
+# trường hợp muốn thay đổi dữ liệu search hoặc copy toàn bộ dữ liệu khi thì dùng `Reindex`
+
+```php
+public function proUpgrade()
+{
+    // 1. Tạo v2 với analysis mới
+    $this->createStoreV2(); 
+
+    // 2. Reindex (Đổ hàng từ cũ sang mới)
+    $this->client->reindex([
+        'body' => [
+            'source' => ['index' => 'my_products_v1'], // Kho cũ
+            'dest' => ['index' => 'my_products_v2'] // Kho mới
+        ]
+    ]);
+
+    // 3. Đổi Alias (Khách vẫn search bình thường qua Alias)
+    $this->switchAlias('my_products_v1', 'my_products_v2', 'products_alias');
+
+    return "Nâng cấp hoàn tất, không mất một giây downtime nào!";
+}
+```
