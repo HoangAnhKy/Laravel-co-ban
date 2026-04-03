@@ -290,28 +290,29 @@ public function createStore()
 ```php
 public function getSuggestions($query)
 {
-$params = [
-    'index' => $this->aliasName,
-    'body'  => [
-        'size' => 5, // Chỉ lấy 5 gợi ý đầu tiên cho nhẹ
-        '_source' => ['title'], // Chỉ lấy tiêu đề cho nhanh
-        'query' => [
-            'match' => [
-                'title' => [
-                    'query' => $query,
-                    'operator' => 'and'
+    $params = [
+        'index' => $this->aliasName,
+        'body'  => [
+            'size' => 5, // Chỉ lấy 5 gợi ý đầu tiên cho nhẹ
+            '_source' => ['title'], // Chỉ lấy tiêu đề cho nhanh
+            'query' => [
+                'match' => [
+                    'title' => [
+                        'query' => $query,
+                        'operator' => 'and'
+                    ]
                 ]
             ]
         ]
-    ]
-];
+    ];
 
-$results = $this->client->search($params);
+    $results = $this->client->search($params);
 
-// Trả về mảng đơn giản cho Frontend dễ dùng
-return collect($results->asArray()['hits']['hits'])->map(function($hit) {
-    return $hit['_source']['title'];
-});
+    // Trả về mảng đơn giản cho Frontend dễ dùng
+    return collect($results->asArray()['hits']['hits'])->map(function($hit) {
+        return $hit['_source']['title'];
+    });
+}
 ```
 
 ## thêm sản phẩm test thử
