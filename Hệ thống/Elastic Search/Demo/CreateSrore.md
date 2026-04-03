@@ -205,17 +205,25 @@ class StorageElasticSearch
 - `Tokenizer` (Máy cắt từ)
 - `Token Filter` (Bộ lọc hậu kỳ)
 
-về  **filter**: 
-- type => edge_ngram: Đây là linh hồn của bộ lọc. Nó sẽ lấy một từ và "thái lát" nó từ phía bên trái (rìa - edge) sang phải.
+về  **analysis->filter**: 
+- type:
+  - edge_ngram: Đây là linh hồn của bộ lọc. Nó sẽ lấy một từ và "thái lát" nó từ phía bên trái (rìa - edge) sang phải.
+  - ngram: Nó sẽ lấy một từ và "thái lát" nó từ mọi vị trí (giống slice trong js băm cho đến hết)
 - min_gram => 1: Lát cắt nhỏ nhất là 1 ký tự. Tức là khách vừa gõ 1 chữ cái đầu tiên, máy đã tìm thấy hàng.
 - max_gram => 20: Lát cắt dài nhất là 20 ký tự. Nếu tên sản phẩm dài hơn 20, nó sẽ dừng băm ở ký tự thứ 20.
 
-về  **autocomplete_analyzer**
+về  **analyzer->autocomplete_analyzer->filter**
 
 - `tokenizer => standard (Chia từ)`: Nó sẽ chia câu của Kyha dựa trên khoảng trắng và dấu câu.
 - filter theo
-  - lowercase: Nó chuyển tất cả về chữ thường để khách gõ chữ hoa hay chữ thường đều trúng.
-  - autocomplete_filter: bộ filter ban nãy tạo
+  - `lowercase`: Nó chuyển tất cả về chữ thường để khách gõ chữ hoa hay chữ thường đều trúng.
+  - `asciifolding`: chuyển tất cả tiếng việt có dấu về không giấu
+  - `trim`: xóa bỏ khoảng trắng thừa ở 2 đầu
+  - `unique`: xóa những từ trùng
+  - `autocomplete_filter`: bộ filter ban nãy tạo
+  - các hàm có thể dùng ở trong hàm `analysis->filter` custom để  xử lý khi cắt từ trước
+    - `stopwords`: loại bỏ những từ bên trong('stopwords' => ['của', 'là', 'và']).
+    - `synonyms`: Lọc từ đồng nghĩa (synonyms' => [ 'dt' => 'điện thoại', 'iphone, táo, apple => apple_product'])
 
 ```php
 public function createStore()
