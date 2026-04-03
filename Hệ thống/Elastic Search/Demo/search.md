@@ -19,6 +19,8 @@
 
 khi search nó sẽ dựa vào `match` để  tìm kiếm dữ liệu phù hợp
 
+Kiểu `text` nó sẽ bị cắt nhỏ từng từ, còn `keyword` nó sẽ là nguyên cụm
+
 # lưu ý
 
 ```php

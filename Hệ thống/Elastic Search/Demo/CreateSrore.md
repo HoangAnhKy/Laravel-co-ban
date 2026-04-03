@@ -458,7 +458,8 @@ public function search(Request $request)
                                 ['term' => ['variants.storage' => '512GB']]
                             ]
                         ]
-                    ]
+                    ],
+                    'inner_hits' => (object)[] // chỉ lấy những thằng match khi search trong variants
                 ]
             ]
         ]
