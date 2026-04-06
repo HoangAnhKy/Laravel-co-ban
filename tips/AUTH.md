@@ -66,3 +66,53 @@ Cookie::get(...)            → lấy lại giá trị token đã Laravel tạo
 Cookie::queue(...)          → Laravel sẽ ghi đè cookie đó trong response
 */
 ```
+
+# redirect khi middleware bắt
+
+## tạo middleware check xem có login chưa
+
+ghi nhớ trang hiện tại cần tới
+
+```php
+<?php
+
+namespace App\Http\Middleware;
+
+use App\Trait\ResponseTrait;
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class CheckAdmin
+{
+    use ResponseTrait;
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        if (!auth()->check()) {
+            session(['url.intended' => url()->current()]);
+            return redirect()->route('user.login');
+        }
+
+        if (config("define.ROLE_LIST")[$request->user()->role] !== "ADMIN") {
+            auth()->logout();
+            return redirect()->route('user.login    ')->with("error", "Bạn không có quyền truy cập");
+        }
+        return $next($request);
+    }
+}
+```
+
+## redirect tới session lưu ban nãy
+
+```php
+public function responseValidateFrom($url, $status = true , $msg = '')
+{
+    $url = session()->pull('url.intended', route($url)); // lấy xong xóa
+    return redirect($url)->with($status ? $this->STATUS_SUCCESS : $this->STATUS_ERROR, $msg);
+}
+```
