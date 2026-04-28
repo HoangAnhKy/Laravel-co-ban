@@ -1,5 +1,17 @@
 # Một số câu truy vấn Eloquent
 
+- `isDirty()`: Model có bị thay đổi dữ liệu so với dữ liệu gốc trong DB hay không
+
+  ```php
+  $product = StockLogic::find(1);
+
+  // check
+  // $product->isDirty(['name', 'price']); check theo key cụ thể  chỉ cần khác 1 là true, không sẽ trả về false
+  if ($product->isDirty()) {
+      // có thay đổi
+  }
+  ```
+
 - `lockForUpdate`: là một phương thức trong Laravel Query Builder (hoặc Eloquent) dùng để khóa hàng dữ liệu (row locking) trong giao dịch database (transaction), giúp ngăn chặn tình trạng race condition (tranh chấp dữ liệu).
 
   ```php
