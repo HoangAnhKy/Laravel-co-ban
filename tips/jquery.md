@@ -57,3 +57,58 @@ trường hợp là: khi dùng ajax để  call dữ liệu các option cho sele
     });
     ```
 tóm lại flow sẽ là: `set city -> district loaded -> set district -> tương tự cho các hiệu ứng phía sau`
+
+# Load select2 bằng ajax và thêm các data-attr cho nó
+- Tạo dataInit cho select2
+
+    ```js
+    function initSelect2(target) {
+        target.select2({
+            placeholder: "Tìm sản phẩm...",
+            minimumInputLength: 0,
+            ajax: {
+                url: '{{ route("admin.product.search_product") }}',
+                dataType: 'json',
+                delay: 250, // 250s nó mới call ajax
+                data: function (params) { // data search
+                    return {
+                        search: params.term || '',
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data) { // hiện thị data
+                    return {
+                        results: data.data.data.map(item => ({
+                            // mặc định chỉ có id và text, khi thêm data nó sẽ tự động thêm data-attr
+                            id: item.id,
+                            text: item.name,
+                            price: item.price,
+                            stock_qty: item.stock?.qty || 0,
+                        })),
+                        pagination: {
+                            more: data.data.current_page < data.data.last_page
+                        }
+                    };
+                }
+            }
+        });
+    }
+    ```
+
+- Muốn lấy data trong đó thì
+    ```js
+    $(document).on("change", ".product-select-2", function () {
+        const currentRow = $(this).closest("tr");
+        const lastRow = $("#order-detail-list tr").last();
+
+        const data = $(this).select2('data')[0];
+
+        currentRow.find(".qty-input").attr("max", data.stock_qty).val(1);
+        currentRow.find(".price-input").val(data.price);
+        currentRow.find(".discount-input").val(data.price);
+
+        if (currentRow.is(lastRow)) {
+            loadInputData();
+        }
+    });
+    ```
