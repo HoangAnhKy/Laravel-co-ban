@@ -31,8 +31,8 @@ description: >
 
 ```
 app/
-├── Http/Controllers/Api/        ← API
-├── Http/Controllers/Web/        ← Blade/Inertia
+├── Http/Controllers/Api/
+├── Http/Controllers/Web/
 ├── Http/Requests/
 ├── Http/Resources/
 ├── Services/
@@ -58,57 +58,80 @@ interface ProductRepositoryInterface {
 ```php
 public function getAll(array $filters = []): LengthAwarePaginator {
     return Product::query()
-        ->with('category')                          // eager load — tránh N+1
+        ->with('category')
         ->when($filters['search'] ?? null, fn($q, $v) => $q->where('name', 'like', "%{$v}%"))
         ->when($filters['status'] ?? null, fn($q, $v) => $q->where('status', $v))
         ->latest()->paginate(20);
 }
 ```
 
-## Service — pattern cốt lõi
+## Service — Transaction & Exception pattern
+
+Transaction dùng `beginTransaction` / `commit` / `rollBack` thủ công — **không** dùng `DB::transaction(closure)`:
 
 ```php
-class ProductService {
-    public function __construct(private readonly ProductRepositoryInterface $repo) {}
+class OrderService {
+    public function __construct(
+        private readonly OrderRepositoryInterface $orderRepo,
+        private readonly OrderItemRepositoryInterface $itemRepo,
+    ) {}
 
-    public function create(array $data): Product {
-        $product = $this->repo->create($data);
-        SyncProductToPosJob::dispatch($product);   // tác vụ nặng → Queue
-        return $product;
+    public function create(array $data): Order {
+        DB::beginTransaction();
+        try {
+            $order = $this->orderRepo->create($data);
+            $this->itemRepo->createMany($order, $data['items']);
+            // dispatch job SAU khi commit — tránh job chạy trước khi data được ghi
+            DB::commit();
+            SyncOrderJob::dispatch($order);
+            return $order;
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            throw $e; // ném lên Controller xử lý
+        }
     }
 }
 ```
 
-## Form Request — pattern cốt lõi
+> Chỉ bọc transaction khi có **nhiều write liên quan nhau**. Create/update đơn lẻ không cần.
+
+## Controller — bắt exception từ Service
 
 ```php
-// Store: unique thường
-'name' => ['required', 'string', 'max:255', 'unique:products,name'],
-
-// Update: unique bỏ qua bản ghi hiện tại
-'name' => ['required', 'string', 'max:255', Rule::unique('products','name')->ignore($this->route('product'))],
-```
-
-## Controller API
-
-```php
+// API
 public function store(StoreProductRequest $request): JsonResponse {
-    return (new ProductResource($this->service->create($request->validated())))
-        ->response()->setStatusCode(201);
+    try {
+        $product = $this->service->create($request->validated());
+        return (new ProductResource($product))->response()->setStatusCode(201);
+    } catch (\Throwable $e) {
+        return response()->json(['message' => $e->getMessage()], 422);
+    }
 }
+
+// Web
+public function store(StoreProductRequest $request): RedirectResponse {
+    try {
+        $this->service->create($request->validated());
+        return redirect()->route('products.index')->with('success', 'Thêm thành công.');
+    } catch (\Throwable $e) {
+        return back()->withErrors(['error' => $e->getMessage()])->withInput();
+    }
+}
+
 public function destroy(Product $product): Response {
     $this->service->delete($product);
     return response()->noContent(); // 204
 }
 ```
 
-## Controller Web (Blade)
+## Form Request — pattern cốt lõi
 
 ```php
-public function store(StoreProductRequest $request): RedirectResponse {
-    $this->service->create($request->validated());
-    return redirect()->route('products.index')->with('success', 'Thêm thành công.');
-}
+// Store
+'name' => ['required', 'string', 'max:255', 'unique:products,name'],
+
+// Update — ignore bản ghi hiện tại
+'name' => ['required', 'string', 'max:255', Rule::unique('products','name')->ignore($this->route('product'))],
 ```
 
 ## API Resource
@@ -118,7 +141,7 @@ public function toArray(Request $request): array {
     return [
         'id'       => $this->id,
         'name'     => $this->name,
-        'category' => new CategoryResource($this->whenLoaded('category')), // whenLoaded — tránh N+1
+        'category' => new CategoryResource($this->whenLoaded('category')),
         'created_at' => $this->created_at->format('d/m/Y H:i'),
     ];
 }
@@ -149,8 +172,10 @@ public function register(): void {
 ## Quy tắc cứng
 
 - `readonly` cho constructor injection (PHP 8.1+)
-- Tách `StoreRequest` / `UpdateRequest` — không dùng chung để xử lý unique ignore
+- Tách `StoreRequest` / `UpdateRequest` — không dùng chung
 - `whenLoaded()` trong Resource — không load thẳng relation
 - API delete → `204 No Content`, không trả JSON
 - Filter trong query dùng `when()` — không if/else ngoài query
+- Transaction: `beginTransaction` → `commit` → `rollBack` trong catch, dispatch Job **sau** `commit`
+- Service ném exception lên, Controller bắt và trả response phù hợp
 - Tác vụ nặng trong Service → dispatch Job, không blocking
