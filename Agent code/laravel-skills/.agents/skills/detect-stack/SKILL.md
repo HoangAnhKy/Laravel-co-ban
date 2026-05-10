@@ -1,93 +1,44 @@
 ---
 name: detect-stack
 description: >
-    Phát hiện stack frontend của dự án Laravel và xác nhận với user trước khi tạo
-    bất kỳ file frontend nào. Bắt buộc chạy skill này TRƯỚC KHI tạo view, component,
-    hay bất kỳ file UI nào. Trigger khi user yêu cầu tạo page, view, component,
-    form, hay bất kỳ thứ gì liên quan đến giao diện trong dự án Laravel — kể cả
-    khi user chỉ nói "tạo trang danh sách", "làm form thêm sản phẩm", v.v.
+    Xác định frontend stack trước khi tạo bất kỳ file UI nào.
+    Trigger khi user yêu cầu tạo view, page, form, component, hay bất kỳ UI nào.
 ---
 
-# detect-stack
+## Ưu tiên phát hiện (dừng ở điều kiện đầu tiên khớp)
 
-Xác định stack frontend TRƯỚC KHI sinh bất kỳ code UI nào.
+| Thứ tự | Điều kiện                                                       | Stack           |
+| ------ | --------------------------------------------------------------- | --------------- |
+| 1      | `resources/js/Pages/*.tsx`                                      | React + Inertia |
+| 2      | `resources/js/Pages/*.vue`                                      | Vue 3 + Inertia |
+| 3      | `package.json` có `"react"`                                     | React           |
+| 4      | `package.json` có `"vue"`                                       | Vue 3           |
+| 5      | `.blade.php` có `Vue.createApp(` / `v-model` / `v-for` / `v-if` | Blade + Vue CDN |
+| 6      | Chỉ có `resources/views/*.blade.php`                            | Blade thuần     |
 
----
+> ⚠️ Check Vue CDN (5) TRƯỚC Blade thuần (6) — dự án Vue CDN cũng có file `.blade.php`.
 
-## Bước 1 — Tự phát hiện từ file dự án
+## Sau khi phát hiện
 
-Kiểm tra theo thứ tự ưu tiên dưới đây. Dừng lại ở điều kiện đầu tiên khớp.
+Xác nhận với user trước khi làm:
 
-| Thứ tự | Điều kiện phát hiện                                  | Stack xác định  |
-| ------ | ---------------------------------------------------- | --------------- |
-| 1      | `resources/js/Pages/*.tsx`                           | React + Inertia |
-| 2      | `resources/js/Pages/*.vue`                           | Vue 3 + Inertia |
-| 3      | `package.json` có `"react"`                          | React           |
-| 4      | `package.json` có `"vue"` (không có Pages/)          | Vue 3           |
-| 5      | File `.blade.php` có dấu hiệu Vue CDN (xem bên dưới) | Blade + Vue CDN |
-| 6      | Chỉ có `resources/views/*.blade.php`                 | Blade thuần     |
+> "Dự án đang dùng **[STACK]**. Tôi sẽ tạo frontend theo stack này. Tiếp tục?"
 
-### Dấu hiệu nhận biết Vue CDN trong Blade
+Nếu không phát hiện được, hỏi:
 
-Tìm bất kỳ dấu hiệu nào sau trong file `.blade.php`:
+> "Dự án dùng frontend nào? 1) Blade 2) Blade + Vue CDN 3) Vue 3 + Inertia 4) React + Inertia"
 
-- `<script src="...vue...">` · `Vue.createApp(` · `v-model` · `v-if` · `v-for`
-- `@click` · `:class` · `mounted()` · `watch:` · `methods:`
+## Skill áp dụng theo stack
 
-Ví dụ điển hình:
-
-```php
-<div id="root">
-    <input v-model="name">
-</div>
-<script src="{{ asset('assets/js/vue-3-cdn.min.js') }}"></script>
-<script>
-Vue.createApp({
-    data() { return { name: '' } }
-}).mount('#root')
-</script>
-```
-
-> ⚠️ Luôn check Vue CDN TRƯỚC Blade thuần — vì dự án Vue CDN cũng có file
-> `.blade.php`, nếu check nhầm thứ tự sẽ nhận sai stack.
-
----
-
-## Bước 2 — Nếu phát hiện được
-
-Thông báo ngắn, chờ xác nhận trước khi làm:
-
-> "Tôi phát hiện dự án đang dùng **[STACK]**.
-> Tôi sẽ tạo frontend theo [STACK]. Bạn có muốn tiếp tục không?"
-
----
-
-## Bước 3 — Nếu KHÔNG phát hiện được
-
-Hỏi user, không được tự đoán:
-
-> "Dự án này dùng frontend nào?
->
-> 1. Blade + Bootstrap
-> 2. Blade + Vue 3 CDN
-> 3. Vue 3 + Inertia
-> 4. React + Inertia
->
-> (Gõ số hoặc tên để chọn)"
-
----
-
-## Bước 4 — Sau khi xác định stack
-
-| Stack                   | Skill áp dụng     | Convention áp dụng                                                    |
-| ----------------------- | ----------------- | --------------------------------------------------------------------- |
-| Blade thuần             | `blade-ui`        | `@extends/@section`, `{{ }}`, Bootstrap 5 class                       |
-| Blade + Vue CDN         | `vue-cdn-laravel` | Vue qua `<script>`, `@{{ }}` tránh conflict Blade, data qua `@json()` |
-| Vue 3 / Vue 3 + Inertia | `vue-ui`          | SFC `.vue`, Composition API, Inertia `<Link>`                         |
-| React / React + Inertia | `react-ui`        | `.tsx`, Inertia `<Link>`, TypeScript types                            |
+| Stack             | Skill             | Lưu ý                                       |
+| ----------------- | ----------------- | ------------------------------------------- |
+| Blade thuần       | `blade-ui`        | `@extends`, `{{ }}`, Bootstrap 5            |
+| Blade + Vue CDN   | `vue-cdn-laravel` | `@{{ }}` tránh conflict, data qua `@json()` |
+| Vue 3 / + Inertia | `vue-ui`          | SFC `.vue`, Composition API                 |
+| React / + Inertia | `react-ui`        | `.tsx`, TypeScript                          |
 
 ## Quy tắc cứng
 
-- Không giả định stack khi chưa chắc chắn
-- Không tạo file frontend khi chưa xác định stack
-- Dự án mix nhiều stack → hỏi rõ page cụ thể đang làm dùng gì
+- Không giả định stack khi chưa chắc
+- Không tạo file UI khi chưa xác định stack
+- Dự án mix stack → hỏi rõ page đang làm dùng gì
