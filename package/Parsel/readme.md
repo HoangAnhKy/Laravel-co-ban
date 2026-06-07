@@ -20,6 +20,7 @@ composer require shipfastlabs/parsel
 cài thêm binary đính kèm
 
 ```sh
+// npm install @llamaindex/liteparse cài ở project
 vendor/bin/parsel-install-lit
 ```
 
