@@ -21,6 +21,7 @@ cài thêm binary đính kèm
 
 ```sh
 // npm install @llamaindex/liteparse cài ở project
+// thêm PARSEL_LIT_BINARY=/home/kyha/Downloads/coursePHP/node_modules/.bin/lit trong .env
 vendor/bin/parsel-install-lit
 ```
 
