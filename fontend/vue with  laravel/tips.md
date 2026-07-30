@@ -46,8 +46,16 @@
 - sử  dụng
   
     ```js
+    // C1: khai báo từng cái
     app.component('Pagination', window.GlobalComponents.PaginationComponent);
-
+    // C2: khai báo all
+    /*
+    // lây hết ra map vào
+    Object.entries(window.GlobalComponents).forEach(([name, component]) => {
+        app.component(name, component);
+    });
+    console.log(app._context.components); // check lại
+    */
     // trên giao diện html hoặc blade
     <Pagination :pagination="paginate"></Pagination>
     ```
