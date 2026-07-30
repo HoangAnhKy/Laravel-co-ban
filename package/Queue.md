@@ -276,3 +276,107 @@ class UpdateBatchJobOnFail
     }
 }
 ```
+### CheckBatch
+Dùng với bảng batch riêng để theo dõi bath chạy rồi trả về giao diện
+
+```php
+<?php
+
+namespace App\Service;
+
+use App\Models\Batch;
+
+class BatchService
+{
+    public static function addBatch($name, $batch_Code)
+    {
+        $batch = Batch::query()->where('batch_code', $batch_Code)->lockForUpdate()->first();
+
+        // Chưa có batch => tạo mới và chạy
+        if (!$batch) {
+            Batch::query()->create([
+                'name' => $batch_Code,
+                'batch_code' => $batch_Code,
+                'status' => 1,
+            ]);
+            return true;
+        }
+        // Đang chạy
+        if ($batch->status == 1) { return false;}
+        // Đã tồn tại nhưng đang tắt => bật lại
+        $batch->update(['status' => 1]);
+        return true;
+    }
+
+    public function updateBatch($batch_Code, $status)
+    {
+        return Batch::query()
+            ->where("batch_code", $batch_Code)
+            ->update(['status' => $status]);
+    }
+
+    public function checkBatch($batch_Code)
+    {
+        $query = Batch::query()
+            ->where("batch_code", $batch_Code)
+            ->where("status", "<>", config("define.BATCH_STATUS_RUN"))
+            ->first();
+        if (empty($query)) return null;
+        return $query->status;
+    }
+}
+```
+Khởi tạo controller để giao diện call API check
+
+```php
+public function checkBatch(Request $request)
+{
+    try {
+        $validated = $request->validate([
+            'batch_code' => 'required|string|max:255|exists:batches,batch_code'
+        ]);
+        // 8.1 trở đi dùng match gọn hơn switch case
+        [$flag, $msg] = match ($this->service->checkBatch($validated['batch_code'])) {
+            null => [false, 'Batch is available'],
+            0    => [true, 'Batch is done'],
+            2    => [true, 'Batch is failed'],
+            default => [false, 'Unknown batch status'],
+        };
+        return $this->responseData(
+            ["done" => $flag],
+            "Check batch success, " . $msg
+        );
+    }
+    catch (ValidationException $e) {
+        return $this->responseValidated($e);
+    }catch (\Exception $e) {
+        return $this->responseError($e->getMessage());
+    }
+}
+```
+về  phía giao diện, khởi tạo 1 hàm để check dùng chung
+
+```js
+<script>
+    const checkBatch = (batch_code, callback) => {
+        // truyền tên batch cho code check
+        axios.post('{{ route("check-batch") }}', { batch_code })
+            .then(res => {
+                // dùng callback để nhận xử lý riêng cho từng nghiệp vụ khi batch hoàn thành
+                if (callback && res.data.data.done) {
+                    callback(res);
+                } else {
+                    // nếu nó chưa xog thì 5s sau chạy lai check
+                    setTimeout(() => {
+                        checkBatch(batch_code, callback);
+                    }, 5000);
+                }
+            })
+            .catch(err => {
+                if (callback) {
+                    callback(null, err);
+                }
+            });
+    }
+</script>
+```
