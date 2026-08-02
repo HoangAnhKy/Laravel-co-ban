@@ -103,24 +103,27 @@ public function test_create_user_with_token()
 ### Các hàm `assert` phổ biến
 
 - Hay dùng
-  | Hàm                                                                                   | Mô tả                            | Ví dụ                                        |
-  | ------------------------------------------------------------------------------------- | -------------------------------- | -------------------------------------------- |
-  | `assertTrue($cond)`                                                                   | Kiểm tra đúng                    | $this->assertTrue(1 == 1);                   |
-  | `assertFalse($cond)`                                                                  | Kiểm tra sai                     | $this->assertFalse(false);                   |
-  | `assertEquals($expected, $actual)`                                                    | So sánh giá trị (==)             | $this->assertEquals(5, 2 + 3);               |
-  | `assertSame($expected, $actual)`                                                      | So sánh cả giá trị & kiểu (===)  | $this->assertSame('5', '5');                 |
-  | `assertNotEquals($expected, $actual)`                                                 | Khác nhau                        | $this->assertNotEquals(1, 2);                |
-  | `assertNotSame($expected, $actual)`                                                   | Khác nhau kiểu/giá trị           | $this->assertNotSame(5, '5');                |
-  | `assertNull($value)`                                                                  | Giá trị null                     | $this->assertNull(null);                     |
-  | `assertNotNull($value)`                                                               | Không phải null                  | $this->assertNotNull('abc');                 |
-  | `assertEmpty($value)`                                                                 | Rỗng ('', [], null)              | $this->assertEmpty([]);                      |
-  | `assertNotEmpty($value)`                                                              | Không rỗng                       | $this->assertNotEmpty([1]);                  |
-  | `assertCount($n, $array)`                                                             | Đúng số lượng                    | $this->assertCount(3, [1,2,3]);              |
-  | `assertContains($needle, $haystack)`                                                  | Mảng chứa phần tử                | $this->assertContains('a', ['a', 'b']);      |
-  | `assertNotContains($needle, $haystack)`                                               | Mảng không chứa phần tử          | (chưa có ví dụ)                              |
-  | `assertSessionHasErrors(['field'])`                                                   | kiểm tra validate trả về lỗi     | $response->assertSessionHasErrors(['email']) |
-  | `assertRedirect('/dashboard')`  `assertSessionHas('success', 'Đăng nhập thành công')` | Test redirect và session message | $response->assertRedirect('/dashboard');     |
-  | $response->assertSessionHas('success', 'Đăng nhập thành công');                       |
+  | Hàm                                     | Mô tả                                   | Ví dụ                                                             |
+  |-----------------------------------------|-----------------------------------------|-------------------------------------------------------------------|
+  | `assertJson([...])`                     | Kiểm tra JSON chứa giá trị mong muốn    | `$response->assertJson(['message' => 'Login success']);`          |
+  | `assertJsonPath($path, $value)`         | Kiểm tra giá trị tại một đường dẫn JSON | `$response->assertJsonPath('data.user.email', 'test@gmail.com');` |
+  | `assertTrue($cond)`                     | Kiểm tra đúng                           | $this->assertTrue(1 == 1);                                        |
+  | `assertFalse($cond)`                    | Kiểm tra sai                            | $this->assertFalse(false);                                        |
+  | `assertEquals($expected, $actual)`      | So sánh giá trị (==)                    | $this->assertEquals(5, 2 + 3);                                    |
+  | `assertSame($expected, $actual)`        | So sánh cả giá trị & kiểu (===)         | $this->assertSame('5', '5');                                      |
+  | `assertNotEquals($expected, $actual)`   | Khác nhau                               | $this->assertNotEquals(1, 2);                                     |
+  | `assertNotSame($expected, $actual)`     | Khác nhau kiểu/giá trị                  | $this->assertNotSame(5, '5');                                     |
+  | `assertNull($value)`                    | Giá trị null                            | $this->assertNull(null);                                          |
+  | `assertNotNull($value)`                 | Không phải null                         | $this->assertNotNull('abc');                                      |
+  | `assertEmpty($value)`                   | Rỗng ('', [], null)                     | $this->assertEmpty([]);                                           |
+  | `assertNotEmpty($value)`                | Không rỗng                              | $this->assertNotEmpty([1]);                                       |
+  | `assertCount($n, $array)`               | Đúng số lượng                           | $this->assertCount(3, [1,2,3]);                                   |
+  | `assertContains($needle, $haystack)`    | Mảng chứa phần tử                       | $this->assertContains('a', ['a', 'b']);                           |
+  | `assertNotContains($needle, $haystack)` | Mảng không chứa phần tử                 | (chưa có ví dụ)                                                   |
+  | `assertSessionHasErrors(['field'])`     | kiểm tra validate trả về lỗi            | $response->assertSessionHasErrors(['email'])                      |
+  | `assertRedirect('/dashboard')`          | Test redirect                           | $response->assertRedirect('/dashboard');                          |
+  | `assertSessionHas($key)`                | Kiểm tra session có key                 | `$response->assertSessionHas('success');`                         |
+  | `assertSessionHas($key, $value)`        | Kiểm tra session có key và giá trị      | `$response->assertSessionHas('success', 'Đăng nhập thành công');` |
 
 - Kiểm tra trong dB
 
@@ -195,7 +198,7 @@ class OrderApiTest extends TestCase
             'qty'   => 10,
         ]);
 
-        // 2. ACT: Gọi đúng đường dẫn GET /get-order/{id} 
+        // 2. ACT: Gọi đúng đường dẫn GET /get-order/{id}
         $response = $this->getJson('/get-order/' . $order->id);
 
         // 3. ASSERT: Thanh tra
