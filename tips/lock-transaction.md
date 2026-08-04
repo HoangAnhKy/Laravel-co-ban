@@ -63,3 +63,42 @@ try {
     $connection->rollBack();
 }
 ```
+
+# dùng tips chỉ  tốn 2 câu query, có thể tách db và dùng cách này để tiếp kiệm tối đa tài nguyên
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Laravel\Reverb\Loggers\Log;
+
+class IndexCount extends Model
+{
+    public $guarded = [];
+    public $timestamps = false;
+
+    public static function getCount($name)
+    {
+        // 1. Ép tạo mới nếu chưa có (Tốn 1 query)
+        DB::table('index_counts')->insertOrIgnore([
+            'index_code' => $name,
+            'count' => 0
+        ]);
+        // 2. Cộng số và ghi nhớ số vừa cộng (Tốn 1 query)
+        DB::table('index_counts')->where('index_code', $name)->update([
+            'count' => DB::raw('LAST_INSERT_ID(count + 1)')
+        ]);
+        // 3. Trả về đúng con số đó cho giao diện (0 tốn query)
+        return DB::getPdo()->lastInsertId();
+    }
+    /* test
+    for i in {1..500}; do
+        curl -s http://demo.local/generate &
+    done
+    wait
+     */
+}
+```
