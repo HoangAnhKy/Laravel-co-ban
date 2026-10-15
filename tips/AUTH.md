@@ -116,3 +116,26 @@ public function responseValidateFrom($url, $status = true , $msg = '')
     return redirect($url)->with($status ? $this->STATUS_SUCCESS : $this->STATUS_ERROR, $msg);
 }
 ```
+
+```php
+public function login(Request $request){
+    if($request->isMethod('post')){
+        try {
+            $data = $this->service->validationLogin($request->all());
+            $is_remember = $request->has('remember') ? true : false;
+            auth()->attempt($data, $is_remember);
+            // kiểm tra xem có mong muốn tới đâu trước đó không
+            if ($request->session()->has('url.intended')) {
+                // nếu có tới đó luôn
+                return redirect($request->session()->get('url.intended'));
+            }
+            return $this->success(auth()->user(), 'Logged in successfully');
+        }catch (ValidationException $e){
+            return $this->errorValidation($e);
+        }catch (\Exception $e){
+            return $this->error($e->getMessage());
+        }
+    }
+    return view('user.login');
+}
+```
