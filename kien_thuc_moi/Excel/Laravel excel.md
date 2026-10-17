@@ -257,6 +257,84 @@ composer require maatwebsite/excel
 
     ```
 
+  - hoặc có thể dùng `registerEvents` là API của Laravel Excel (maatwebsite/excel), các class dùng để chỉnh sửa `style` và `border` bên trong là của `PhpSpreadsheet`.
+
+    ```php
+    <?php
+
+    namespace App\Exports;
+
+    use App\Service\UserService;
+    use Maatwebsite\Excel\Concerns\FromCollection;
+    use Maatwebsite\Excel\Concerns\WithHeadings;
+    use Maatwebsite\Excel\Concerns\WithEvents;
+    use Maatwebsite\Excel\Events\AfterSheet;
+    use PhpOffice\PhpSpreadsheet\Style\Border;
+    use PhpOffice\PhpSpreadsheet\Style\Fill;
+
+    class UsersExport implements FromCollection, WithHeadings, WithEvents
+    {
+        private array $params;
+
+        public function __construct(array $params)
+        {
+            $this->params = $params;
+        }
+
+        public function collection()
+        {
+            return app(UserService::class)->getList($this->params, true);
+        }
+
+        public function headings(): array
+        {
+            return ['ID','Name','Email','Status','Created At'];
+        }
+
+        public function registerEvents(): array
+        {
+            return [
+                AfterSheet::class => function (AfterSheet $event) {
+                    $worksheet = $event->sheet->getDelegate();
+
+                    $lastRow = $worksheet->getHighestRow();
+                    $lastColumn = $worksheet->getHighestColumn();
+
+                    // Format header
+                    $worksheet->getStyle("A1:{$lastColumn}1")->applyFromArray([
+                        'font' => [
+                            'bold' => true,
+                            'color' => ['rgb' => 'FFFFFF'],
+                        ],
+                        'fill' => [
+                            'fillType' => Fill::FILL_SOLID,
+                            'startColor' => ['rgb' => '355E4A'],
+                        ],
+                        'alignment' => [
+                            'horizontal' => 'center',
+                            'vertical' => 'center',
+                        ],
+                    ]);
+
+                    // Border toàn bộ bảng
+                    $worksheet->getStyle("A1:{$lastColumn}{$lastRow}")
+                        ->getBorders()
+                        ->getAllBorders()
+                        ->setBorderStyle(Border::BORDER_THIN);
+
+                    // Tự động điều chỉnh độ rộng cột
+                    foreach (range('A', $lastColumn) as $column) {
+                        $worksheet->getColumnDimension($column)
+                            ->setAutoSize(true);
+                    }
+
+                    $worksheet->getRowDimension(1)->setRowHeight(25);
+                },
+            ];
+        }
+    }
+    ```
+
   - Nếu muốn chỉnh sửa lại cho hợp lý thì ta nên sử dụng FromView. Với cách sửa dụng y như controller bình thường là truyền data rồi gọi tới view
 
     ```php
